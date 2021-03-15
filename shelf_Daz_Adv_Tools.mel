@@ -1,0 +1,43 @@
+global proc shelf_Daz_Adv_Tools () {
+    global string $gBuffStr;
+    global string $gBuffStr0;
+    global string $gBuffStr1;
+
+
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 40
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select Very First Original Mesh Nodes." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Select Very First Original Nodes" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "VFOM" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "navButtonConnected.png" 
+        -image1 "navButtonConnected.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Select Very First Original Mesh Nodes.\n{\n    // List Mesh Upstream Geometry Nodes.\n    proc string[] listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)\n    {\n        string $plugs[];\n        if(nodeType($startNode) == \"mesh\")\n        {\n            $plugs[0] = $startNode+\".inMesh\";\n        }\n        else\n        {\n            string $plugName[] = listAttr(\"-a\", \"-m\", \"-st\", \"*inputGeometry*\", $startNode);\n            int $s = size($plugName);\n            for($i=0; $i<$s; $i++)\n            {\n                $plugs[$i] = $startNode+\".\"+$plugName[$i];\n            }\n        }\n\n        $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections(\"-s\", 1, \"-d\", 0, \"-scn\", 1, \"-sh\", 1, $plugs)));\n        if( size($sour) > 0 )\n        {\n            $passedNodes = stringArrayCatenate($passedNodes, $sour);\n            if( $depth < $maxDepth )\n            {\n                for( $each in $sour )\n                {\n                    $passedNodes = listUpstream($each,$passedNodes,($depth+1),$maxDepth);\n                }\n            }\n        }\n        return $passedNodes;\n    }\n\n    string $selObjShape[] = listRelatives(\"-s\", \"-typ\", \"mesh\", ls(\"-sl\"));\n    string $upstreamNodes[] =  listUpstream($selObjShape[0], {$selObjShape[0]}, 0, 20);\n\n    int $s = size($upstreamNodes);\n    for($i=$s-1; $i>=0; $i--)\n    {\n        print( $upstreamNodes[$i]+\"\\n\" );\n        if(nodeType($upstreamNodes[$i]) == \"mesh\")\n        {\n            select -r $upstreamNodes[$i];\n            break;\n        }\n    }\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+
+} 

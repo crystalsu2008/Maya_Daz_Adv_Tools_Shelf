@@ -1,0 +1,35 @@
+// Copies an already set AdvancedSkeleton Face Pre setting from an already bound Character.
+{
+    string $cmds[]={"\n\n// AdvancedSkeleton Face Pre Cmds.\n"};
+    string $cmd;
+    string $selObjs[];
+    string $textFields[] = {"asFaceMaskTextField",
+                            "asFaceFaceTextField",
+                            "asFaceAllHeadTextField",
+                            "asFaceRightEyeTextField",
+                            "asFaceLeftEyeTextField",
+                            "asFaceUpperTeethTextField",
+                            "asFaceLowerTeethTextField",
+                            "asFaceTongueTextField",
+                            "asFaceEyebrowTextField",
+                            "asFaceEyelashTextField",
+                            "asFaceExtrasTextField"};
+
+    for($txField in $textFields)
+    {
+        eval("asSelectFromTextField "+$txField+";");
+        $selObjs =  ls("-sl");
+        if(size($selObjs)>0)
+        {
+            $cmd = "select -r";
+            for($each in $selObjs)
+                $cmd = $cmd+" "+$each;
+            $cmd = $cmd+";";
+            appendStringArray($cmds, {$cmd}, 1);
+            appendStringArray($cmds, {"asChooseInput "+$txField+";"}, 1);
+        }
+        select("-cl");
+    }
+
+    print $cmds;
+}

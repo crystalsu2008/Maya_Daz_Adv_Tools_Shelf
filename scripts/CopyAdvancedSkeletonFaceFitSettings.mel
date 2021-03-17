@@ -1,0 +1,128 @@
+// Copies an already set AdvancedSkeleton Face Fit setting from an already bound Character.
+{
+    string $cmds[] = {"\n\n// AdvancedSkeleton Face Pre Cmds.\n"};
+    string $cmd;
+
+    // EyeBall
+    appendStringArray($cmds, {"\nasCreateFaceFit EyeBall \"\" 0 0 1 \"\";"}, 1);
+    proc string copyAdvFaceFitEyeBallAttrs( string $obj )
+    {
+        float $t[] = getAttr($obj+".t");
+        float $r[] = getAttr($obj+".r");
+        float $s[] = getAttr($obj+".s");
+
+        string $cmd = "setAttr "+$obj+".t "+string($t[0])+" "+string($t[1])+" "+string($t[2])+";\n";
+        $cmd = $cmd + "setAttr "+$obj+".rx "+string($r[0])+";\n";
+        $cmd = $cmd + "setAttr "+$obj+".ry "+string($r[1])+";\n";
+        $cmd = $cmd + "setAttr "+$obj+".s "+string($s[0])+" "+string($s[1])+" "+string($s[2])+";\n";
+
+        return $cmd;
+    }
+    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "FitEyeBall" )}, 1);
+
+    string $selObjs[];
+    string $selectTxFields[] = {"EyeLid \"Outer\";",
+                                "EyeLid \"Main\";",
+                                "EyeLid \"Inner\";",
+                                "Lip \"Outer\";",
+                                "Lip \"Main\";",
+                                "Lip \"Inner\";",
+                                "EyeBrowInner \"\";",
+                                "EyeBrowOuter \"\";",
+                                "EyeBrowCenter \"\";",
+                                "EyeBrowMid1 \"\";",
+                                "EyeBrowMid2 \"\";",
+                                "EyeBrowMid3 \"\";",
+                                "ForeHead \"\";",
+                                "JawPivot \"\";",
+                                "JawCorner \"\";",
+                                "Jaw \"\";",
+                                "Throat \"\";",
+                                "Cheek \"\";",
+                                "CheekBone \"\";",
+                                "CheekRaiser \"\";",
+                                "SmileBulge \"\";",
+                                "FrownBulge \"\";",
+                                "Nose \"\";",
+                                "NoseUnder \"\";",
+                                "NoseCorner \"\";",
+                                "NoseSide \"\";",
+                                "NoseCenter \"\";",
+                                "Nostril \"\";",
+                                "Pupil \"\";",
+                                "Iris \"\";",
+                                "SmileLine \"\";"};
+
+    string $createTxFields[] = {"EyeLid \"Outer\" 1 1 0 \"\";",
+                                "EyeLid \"Main\" 1 1 0 \"\";",
+                                "EyeLid \"Inner\" 1 1 0 \"\";",
+                                "Lip \"Outer\" 1 1 0 \"\";",
+                                "Lip \"Main\" 1 1 0 \"\";",
+                                "Lip \"Inner\" 1 1 0 \"\";",
+                                "EyeBrowInner \"\" 0 0 1 \"asGreenSG\";",
+                                "EyeBrowOuter \"\" 0 0 1 \"asRedSG\";",
+                                "EyeBrowCenter \"\" 0 0 1 \"asBlueSG\";",
+                                "EyeBrowMid1 \"\" 0 0 1 \"asRedSG\";",
+                                "EyeBrowMid2 \"\" 0 0 1 \"asRedSG\";",
+                                "EyeBrowMid3 \"\" 0 0 1 \"asRedSG\";",
+                                "ForeHead \"\" 0 0 0 \"\";",
+                                "JawPivot \"\" 0 0 1 \"asBlue2SG\";",
+                                "JawCorner \"\" 0 0 1 \"asBlue2SG\";",
+                                "Jaw \"\" 0 0 1 \"asBlue2SG\";",
+                                "Throat \"\" 0 0 1 \"asBlue2SG\";",
+                                "Cheek \"\" 0 0 1 \"asGreenSG\";",
+                                "CheekBone \"\" 0 0 1 \"asBlue2SG\";",
+                                "CheekRaiser \"\" 0 0 1 \"asRedSG\";",
+                                "SmileBulge \"\" 0 0 1 \"asBlueSG\";",
+                                "FrownBulge \"\" 0 0 1 \"asBlueSG\";",
+                                "Nose \"\" 0 0 1 \"asGreenSG\";",
+                                "NoseUnder \"\" 0 0 1 \"asBlueSG\";",
+                                "NoseCorner \"\" 0 0 1 \"asRedSG\";",
+                                "NoseSide \"\" 0 0 1 \"asBlueSG\";",
+                                "NoseCenter \"\" 0 0 1 \"asBlueSG\";",
+                                "Nostril \"\" 0 0 1 \"asBlueSG\";",
+                                "Pupil \"\" 0 0 0 \"asRedSG\";",
+                                "Iris \"\" 0 0 0 \"asGreenSG\";",
+                                "SmileLine \"\" 0 0 0 \"asRedSG\";"};
+
+    int $s = size($selectTxFields);
+    for($i=0;$i<$s;$i++)
+    {
+        eval("asFaceFitReSelect "+$selectTxFields[$i]);
+        $selObjs = ls("-sl");
+        if(size($selObjs)>0)
+        {
+            $cmd = "select -r";
+            for($each in $selObjs)
+                $cmd = $cmd+" "+$each;
+            $cmd = $cmd+";";
+            appendStringArray($cmds, {$cmd}, 1);
+            appendStringArray($cmds, {"asCreateFaceFit "+$createTxFields[$i]}, 1);
+        }
+        select("-cl");
+    }
+
+    // Tongue
+    appendStringArray($cmds, {"\nasCreateFaceFit Tongue \"\" 0 0 0 \"asBlueSG\";"}, 1);
+    proc string copyAdvFaceFitTongueAttrs( string $obj )
+    {
+        float $t[] = getAttr($obj+".t");
+        float $r[] = getAttr($obj+".r");
+        float $s[] = getAttr($obj+".s");
+
+        string $cmd = "setAttr "+$obj+".t "+string($t[0])+" "+string($t[1])+" "+string($t[2])+";\n";
+        $cmd = $cmd + "setAttr "+$obj+".r "+string($r[0])+" "+string($r[1])+" "+string($r[2])+";\n";
+        $cmd = $cmd + "setAttr "+$obj+".s "+string($s[0])+" "+string($s[1])+" "+string($s[2])+";\n";
+
+        return $cmd;
+    }
+    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue0" )}, 1);
+    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue1" )}, 1);
+    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue2" )}, 1);
+    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue3" )}, 1);
+    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue4" )}, 1);
+
+    appendStringArray($cmds, {"\nasCreateFaceFit UpMidLo \"\" 0 0 0 \"asGreenSG\";"}, 1);
+
+    print $cmds;
+}

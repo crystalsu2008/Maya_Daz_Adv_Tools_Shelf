@@ -1,0 +1,41 @@
+{
+string $DATSpath = DATSGetInstallPath();
+
+string $mayaEnvFile = getenv("MAYA_APP_DIR")+"/"+about("-v")+"/Maya.env";
+string $lines[] = freadAllLines($mayaEnvFile);
+int $MAYA_SHELF_PATH_fixed;
+int $numLines = size($lines);
+for($i=0; $i<$numLines; $i++)
+{
+    string $lineTokens[];
+    tokenize($lines[$i], "= ", $lineTokens);
+    if( $lineTokens[0] == "MAYA_SHELF_PATH" )
+    {
+        $lines[$i] = $lines[$i]+";"+$DATSpath+"shelves;";
+        $MAYA_SHELF_PATH_fixed=1;
+        fwriteAllLines($mayaEnvFile, $lines);
+        break;
+    }
+}
+if(!$MAYA_SHELF_PATH_fixed)
+{
+    string $allText = toNativePath(freadAllText($mayaEnvFile)+"\nMAYA_SHELF_PATH="+$DATSpath+"shelves;\n");
+    fwriteAllText($mayaEnvFile, $allText);
+}
+
+print("\nPlease restart the Maya to update the shelves.\n");
+}
+
+global proc DATSInstallPathProbe (){}
+
+global proc string DATSGetInstallPath ()
+{
+  string $whatIs=`whatIs DATSInstallPathProbe`;
+  string $fullPath=`substring $whatIs 25 999`;
+  string $buffer[];
+  int $numTok=`tokenize $fullPath "/" $buffer`;
+  int $numLetters=size($fullPath);
+  int $numLettersLastFolder=size($buffer[$numTok-1]);
+  string $scriptLocation=`substring $fullPath 1 ($numLetters-$numLettersLastFolder)`;
+  return $scriptLocation;
+}

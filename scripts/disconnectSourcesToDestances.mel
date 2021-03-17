@@ -1,0 +1,31 @@
+// Disconnect the 'outMesh' plugs from Source Group's Mesh objects to the 'inMesh' plugs from Destance Group's Mesh objects.
+// Disconnected by hierarchical order.
+// Select Source Group and Destance Group run this script.
+{
+    string $grps[] = ls("-sl");
+    string $sour[] = listRelatives("-c", $grps[0]);
+    string $dest[] = listRelatives("-c", $grps[1]);
+    string $sourShapes[];
+    string $destShapes[];
+
+    int $s = size($sour);
+    for($i=0; $i<$s; $i++)
+    {
+        $sourShapes = listRelatives("-s", "-typ", "mesh", $sour[$i]);
+        $destShapes = listRelatives("-s", "-typ", "mesh", $dest[$i]);
+
+        for($eachSour in $sourShapes)
+        {
+            for($eachDest in $destShapes)
+            {
+                string $so = $eachSour + ".outMesh";
+                string $de = $eachDest + ".inMesh";
+                if( isConnected("-iuc", $so, $de) )
+                {
+                    disconnectAttr($so, $de);
+                    break;
+                }
+            }
+        }
+    }
+}

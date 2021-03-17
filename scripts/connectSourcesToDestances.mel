@@ -1,0 +1,69 @@
+// Connect the 'outMesh' plugs from Source Group's Mesh objects to the 'inMesh' plugs from Destance Group's Mesh objects.
+// Connected by hierarchical order.
+// Select Source Group and Destance Group run this script.
+{
+    // List Mesh Upstream Geometry Nodes.
+    proc string[] listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)
+    {
+        string $plugs[];
+        if(nodeType($startNode) == "mesh")
+        {
+            $plugs[0] = $startNode+".inMesh";
+        }
+        else
+        {
+            string $plugName[] = listAttr("-a", "-m", "-st", "*inputGeometry*", $startNode);
+            int $s = size($plugName);
+            for($i=0; $i<$s; $i++)
+            {
+                $plugs[$i] = $startNode+"."+$plugName[$i];
+            }
+        }
+
+        $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections("-s", 1, "-d", 0, "-scn", 1, "-sh", 1, $plugs)));
+        if( size($sour) > 0 )
+        {
+            $passedNodes = stringArrayCatenate($passedNodes, $sour);
+            if( $depth < $maxDepth )
+            {
+                for( $each in $sour )
+                {
+                    $passedNodes = listUpstream($each,$passedNodes,($depth+1),$maxDepth);
+                }
+            }
+        }
+        return $passedNodes;
+    }
+
+    // Find Very First Original Mesh Nodes.
+    proc string findOriginalMesh(string $mesh)
+    {
+        string $selObjShape[] = listRelatives("-s", "-typ", "mesh", $mesh);
+        string $upstreamNodes[] =  listUpstream($selObjShape[0], {$selObjShape[0]}, 0, 20);
+
+        string $origMesh = $selObjShape[0];
+        int $s = size($upstreamNodes);
+        for($i=$s-1; $i>=0; $i--)
+        {
+            if(nodeType($upstreamNodes[$i]) == "mesh")
+            {
+                $origMesh = $upstreamNodes[$i];
+                break;
+            }
+        }
+        return $origMesh;
+    }
+
+    string $grps[] = ls("-sl");
+    string $sour[] = listRelatives("-c", $grps[0]);
+    string $dest[] = listRelatives("-c", $grps[1]);
+
+    int $s = size($sour);
+    for($i=0; $i<$s; $i++)
+    {
+        string $sourShape[] = listRelatives("-s", "-typ", "mesh", $sour[$i]);
+        string $destShape = findOriginalMesh($dest[$i]);
+        if($sourShape[0] != $destShape)
+            connectAttr("-f", ($sourShape[0]+".outMesh"), ($destShape+".inMesh"));
+    }
+}

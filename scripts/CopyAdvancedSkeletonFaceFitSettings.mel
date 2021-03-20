@@ -1,23 +1,39 @@
 // Copies an already set AdvancedSkeleton Face Fit setting from an already bound Character.
 {
-    string $cmds[] = {"\n\n// AdvancedSkeleton Face Pre Cmds.\n"};
+proc string copyAdvFaceFitEyeBallAttrs( string $obj )
+{
+    float $t[] = getAttr($obj+".t");
+    float $r[] = getAttr($obj+".r");
+    float $s[] = getAttr($obj+".s");
+
+    string $cmd = "setAttr "+$obj+".t "+string($t[0])+" "+string($t[1])+" "+string($t[2])+";\n";
+    $cmd = $cmd + "setAttr "+$obj+".rx "+string($r[0])+";\n";
+    $cmd = $cmd + "setAttr "+$obj+".ry "+string($r[1])+";\n";
+    $cmd = $cmd + "setAttr "+$obj+".s "+string($s[0])+" "+string($s[1])+" "+string($s[2])+";\n";
+
+    return $cmd;
+}
+
+proc string copyAdvFaceFitTongueAttrs( string $obj )
+{
+    float $t[] = getAttr($obj+".t");
+    float $r[] = getAttr($obj+".r");
+    float $s[] = getAttr($obj+".s");
+
+    string $cmd = "setAttr "+$obj+".t "+string($t[0])+" "+string($t[1])+" "+string($t[2])+";\n";
+    $cmd = $cmd + "setAttr "+$obj+".r "+string($r[0])+" "+string($r[1])+" "+string($r[2])+";\n";
+    $cmd = $cmd + "setAttr "+$obj+".s "+string($s[0])+" "+string($s[1])+" "+string($s[2])+";\n";
+
+    return $cmd;
+}
+
+global proc string advasFaceFitSettingCmd()
+{
+    string $cmds[] = {"// AdvancedSkeleton Face Fit Cmds.\n"};
     string $cmd;
 
     // EyeBall
     appendStringArray($cmds, {"\nasCreateFaceFit EyeBall \"\" 0 0 1 \"\";"}, 1);
-    proc string copyAdvFaceFitEyeBallAttrs( string $obj )
-    {
-        float $t[] = getAttr($obj+".t");
-        float $r[] = getAttr($obj+".r");
-        float $s[] = getAttr($obj+".s");
-
-        string $cmd = "setAttr "+$obj+".t "+string($t[0])+" "+string($t[1])+" "+string($t[2])+";\n";
-        $cmd = $cmd + "setAttr "+$obj+".rx "+string($r[0])+";\n";
-        $cmd = $cmd + "setAttr "+$obj+".ry "+string($r[1])+";\n";
-        $cmd = $cmd + "setAttr "+$obj+".s "+string($s[0])+" "+string($s[1])+" "+string($s[2])+";\n";
-
-        return $cmd;
-    }
     appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "FitEyeBall" )}, 1);
 
     string $selObjs[];
@@ -104,18 +120,6 @@
 
     // Tongue
     appendStringArray($cmds, {"\nasCreateFaceFit Tongue \"\" 0 0 0 \"asBlueSG\";"}, 1);
-    proc string copyAdvFaceFitTongueAttrs( string $obj )
-    {
-        float $t[] = getAttr($obj+".t");
-        float $r[] = getAttr($obj+".r");
-        float $s[] = getAttr($obj+".s");
-
-        string $cmd = "setAttr "+$obj+".t "+string($t[0])+" "+string($t[1])+" "+string($t[2])+";\n";
-        $cmd = $cmd + "setAttr "+$obj+".r "+string($r[0])+" "+string($r[1])+" "+string($r[2])+";\n";
-        $cmd = $cmd + "setAttr "+$obj+".s "+string($s[0])+" "+string($s[1])+" "+string($s[2])+";\n";
-
-        return $cmd;
-    }
     appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue0" )}, 1);
     appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue1" )}, 1);
     appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( "Tongue2" )}, 1);
@@ -124,5 +128,46 @@
 
     appendStringArray($cmds, {"\nasCreateFaceFit UpMidLo \"\" 0 0 0 \"asGreenSG\";"}, 1);
 
-    print $cmds;
+    string $allCmds = stringArrayToString($cmds, "\n");
+    return $allCmds;
+}
+
+proc string asFaceFitSetting_refreshButton_Cmd(string $scroll)
+{
+    string $cmd = "cmdScrollFieldExecuter(\"-edit\", \"-t\", advasFaceFitSettingCmd(), \""+$scroll+"\")";
+    return $cmd;
+}
+
+string $advasFaceFitSettingCmd_Window = window("-t", "AdvancedSkeleton Face Fit Setting Script");
+    string $advasFaceFitSettingCmd_form = formLayout("-nd", 100);
+        string $advasFaceFitSettingCmd_refreshButton = button("-l", "Refresh");
+        string $advasFaceFitSettingCmd_executeButton = button("-l", "Execute");
+        string $advasFaceFitSettingCmd_Scroll = cmdScrollFieldExecuter("-t", advasFaceFitSettingCmd());
+
+    formLayout -edit
+        -attachForm     $advasFaceFitSettingCmd_Scroll         "top"    5
+        -attachForm     $advasFaceFitSettingCmd_Scroll         "left"   5
+        -attachForm     $advasFaceFitSettingCmd_Scroll         "right"  5
+        -attachControl  $advasFaceFitSettingCmd_Scroll         "bottom" 5 $advasFaceFitSettingCmd_refreshButton
+
+        -attachNone     $advasFaceFitSettingCmd_refreshButton     "top"
+        -attachForm     $advasFaceFitSettingCmd_refreshButton     "left"   5
+        -attachPosition $advasFaceFitSettingCmd_refreshButton     "right"  5 50
+        -attachForm     $advasFaceFitSettingCmd_refreshButton     "bottom" 5
+
+        -attachNone     $advasFaceFitSettingCmd_executeButton   "top"
+        -attachPosition $advasFaceFitSettingCmd_executeButton   "left"   5 50
+        -attachForm     $advasFaceFitSettingCmd_executeButton   "right"  5
+        -attachForm     $advasFaceFitSettingCmd_executeButton   "bottom" 5
+    $advasFaceFitSettingCmd_form;
+
+    button("-edit",
+        "-c", asFaceFitSetting_refreshButton_Cmd($advasFaceFitSettingCmd_Scroll),
+    $advasFaceFitSettingCmd_refreshButton);
+
+    button("-edit",
+        "-c", "cmdScrollFieldExecuter(\"-edit\", \"-exc\", \""+$advasFaceFitSettingCmd_Scroll+"\")",
+    $advasFaceFitSettingCmd_executeButton);
+
+showWindow;
 }

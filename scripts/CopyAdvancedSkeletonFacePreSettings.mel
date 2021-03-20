@@ -1,35 +1,78 @@
 // Copies an already set AdvancedSkeleton Face Pre setting from an already bound Character.
 {
-    string $cmds[]={"\n\n// AdvancedSkeleton Face Pre Cmds.\n"};
-    string $cmd;
-    string $selObjs[];
-    string $textFields[] = {"asFaceMaskTextField",
-                            "asFaceFaceTextField",
-                            "asFaceAllHeadTextField",
-                            "asFaceRightEyeTextField",
-                            "asFaceLeftEyeTextField",
-                            "asFaceUpperTeethTextField",
-                            "asFaceLowerTeethTextField",
-                            "asFaceTongueTextField",
-                            "asFaceEyebrowTextField",
-                            "asFaceEyelashTextField",
-                            "asFaceExtrasTextField"};
-
-    for($txField in $textFields)
+    global proc string advasFacePreSettingCmd()
     {
-        eval("asSelectFromTextField "+$txField+";");
-        $selObjs =  ls("-sl");
-        if(size($selObjs)>0)
+        string $cmds[]={"// AdvancedSkeleton Face Pre Cmds.\n"};
+        string $cmd;
+        string $selObjs[];
+        string $textFields[] = {"asFaceMaskTextField",
+                                "asFaceFaceTextField",
+                                "asFaceAllHeadTextField",
+                                "asFaceRightEyeTextField",
+                                "asFaceLeftEyeTextField",
+                                "asFaceUpperTeethTextField",
+                                "asFaceLowerTeethTextField",
+                                "asFaceTongueTextField",
+                                "asFaceEyebrowTextField",
+                                "asFaceEyelashTextField",
+                                "asFaceExtrasTextField"};
+
+        for($txField in $textFields)
         {
-            $cmd = "select -r";
-            for($each in $selObjs)
-                $cmd = $cmd+" "+$each;
-            $cmd = $cmd+";";
-            appendStringArray($cmds, {$cmd}, 1);
-            appendStringArray($cmds, {"asChooseInput "+$txField+";"}, 1);
+            eval("asSelectFromTextField "+$txField+";");
+            $selObjs =  ls("-sl");
+            if(size($selObjs)>0)
+            {
+                $cmd = "select -r";
+                for($each in $selObjs)
+                    $cmd = $cmd+" "+$each;
+                $cmd = $cmd+";";
+                appendStringArray($cmds, {$cmd}, 1);
+                appendStringArray($cmds, {"asChooseInput "+$txField+";"}, 1);
+            }
+            select("-cl");
         }
-        select("-cl");
+
+        string $allCmds = stringArrayToString($cmds, "\n");
+        return $allCmds;
     }
 
-    print $cmds;
+    proc string asFacePreSetting_refreshButton_Cmd(string $scroll)
+    {
+        string $cmd = "cmdScrollFieldExecuter(\"-edit\", \"-t\", advasFacePreSettingCmd(), \""+$scroll+"\")";
+        return $cmd;
+    }
+
+    string $advasFacePreSettingCmd_Window = window("-t", "AdvancedSkeleton Face Pre Setting Script");
+        string $advasFacePreSettingCmd_form = formLayout("-nd", 100);
+            string $advasFacePreSettingCmd_refreshButton = button("-l", "Refresh");
+            string $advasFacePreSettingCmd_executeButton = button("-l", "Execute");
+            string $advasFacePreSettingCmd_Scroll = cmdScrollFieldExecuter("-t", advasFacePreSettingCmd());
+
+        formLayout -edit
+            -attachForm     $advasFacePreSettingCmd_Scroll         "top"    5
+            -attachForm     $advasFacePreSettingCmd_Scroll         "left"   5
+            -attachForm     $advasFacePreSettingCmd_Scroll         "right"  5
+            -attachControl  $advasFacePreSettingCmd_Scroll         "bottom" 5 $advasFacePreSettingCmd_refreshButton
+
+            -attachNone     $advasFacePreSettingCmd_refreshButton     "top"
+            -attachForm     $advasFacePreSettingCmd_refreshButton     "left"   5
+            -attachPosition $advasFacePreSettingCmd_refreshButton     "right"  5 50
+            -attachForm     $advasFacePreSettingCmd_refreshButton     "bottom" 5
+
+            -attachNone     $advasFacePreSettingCmd_executeButton   "top"
+            -attachPosition $advasFacePreSettingCmd_executeButton   "left"   5 50
+            -attachForm     $advasFacePreSettingCmd_executeButton   "right"  5
+            -attachForm     $advasFacePreSettingCmd_executeButton   "bottom" 5
+        $advasFacePreSettingCmd_form;
+
+        button("-edit",
+            "-c", asFacePreSetting_refreshButton_Cmd($advasFacePreSettingCmd_Scroll),
+        $advasFacePreSettingCmd_refreshButton);
+
+        button("-edit",
+            "-c", "cmdScrollFieldExecuter(\"-edit\", \"-exc\", \""+$advasFacePreSettingCmd_Scroll+"\")",
+        $advasFacePreSettingCmd_executeButton);
+
+    showWindow;
 }

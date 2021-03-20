@@ -9,7 +9,42 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 40
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Daz To AdvancedSkeleton Guide" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Daz To AdvancedSkeleton Guide" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Guide" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "render.png" 
+        -image1 "render.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "source \"C:/Users/Administrator/Documents/DEV/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
         -height 34
         -manage 1
         -visible 1
@@ -29,8 +64,8 @@ global proc shelf_Daz_Adv_Tools () {
         -imageOverlayLabel "OrigM" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "navButtonConnected.png" 
-        -image1 "navButtonConnected.png" 
+        -image "filtersOn.png" 
+        -image1 "filtersOn.png" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
@@ -64,8 +99,8 @@ global proc shelf_Daz_Adv_Tools () {
         -imageOverlayLabel "Connect" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "extend.png" 
-        -image1 "extend.png" 
+        -image "menuIconConnect.png" 
+        -image1 "menuIconConnect.png" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
@@ -77,9 +112,9 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 38
         -enable 1
-        -width 35
+        -width 41
         -height 34
         -manage 1
         -visible 1
@@ -99,12 +134,117 @@ global proc shelf_Daz_Adv_Tools () {
         -imageOverlayLabel "Disconnect" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "detachCurve.png" 
-        -image1 "detachCurve.png" 
+        -image "NEX_cut.png" 
+        -image1 "NEX_cut.png" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
         -command "// Disconnect the 'outMesh' plugs from Source Group's Mesh objects to the 'inMesh' plugs from Destance Group's Mesh objects.\n// Disconnected by hierarchical order.\n// Select Source Group and Destance Group run this script.\n\n{\n    string $grps[] = ls(\"-sl\");\n    string $sour[] = listRelatives(\"-c\", $grps[0]);\n    string $dest[] = listRelatives(\"-c\", $grps[1]);\n    string $sourShapes[];\n    string $destShapes[];\n    \n    int $s = size($sour);\n    for($i=0; $i<$s; $i++)\n    {\n        $sourShapes = listRelatives(\"-s\", \"-typ\", \"mesh\", $sour[$i]);\n        $destShapes = listRelatives(\"-s\", \"-typ\", \"mesh\", $dest[$i]);\n\n        for($eachSour in $sourShapes)\n        {\n            for($eachDest in $destShapes)\n            {\n                string $so = $eachSour + \".outMesh\";\n                string $de = $eachDest + \".inMesh\";\n                if( isConnected(\"-iuc\", $so, $de) )\n                {\n                    disconnectAttr($so, $de);\n\t\t\t\t\tbreak;\n                }\n            }\n        }\n    }\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Copies an already set AdvancedSkeleton Face Pre setting from an already bound Character." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Copy AdvancedSkeleton Face Pre Setting" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "FacePre" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "BasicHead.png" 
+        -image1 "BasicHead.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Copies an already set AdvancedSkeleton Face Pre setting from an already bound Character.\n{\n    global proc string advasFacePreSettingCmd()\n    {\n        string $cmds[]={\"// AdvancedSkeleton Face Pre Cmds.\\n\"};\n        string $cmd;\n        string $selObjs[];\n        string $textFields[] = {\"asFaceMaskTextField\",\n                                \"asFaceFaceTextField\",\n                                \"asFaceAllHeadTextField\",\n                                \"asFaceRightEyeTextField\",\n                                \"asFaceLeftEyeTextField\",\n                                \"asFaceUpperTeethTextField\",\n                                \"asFaceLowerTeethTextField\",\n                                \"asFaceTongueTextField\",\n                                \"asFaceEyebrowTextField\",\n                                \"asFaceEyelashTextField\",\n                                \"asFaceExtrasTextField\"};\n\n        for($txField in $textFields)\n        {\n            eval(\"asSelectFromTextField \"+$txField+\";\");\n            $selObjs =  ls(\"-sl\");\n            if(size($selObjs)>0)\n            {\n                $cmd = \"select -r\";\n                for($each in $selObjs)\n                    $cmd = $cmd+\" \"+$each;\n                $cmd = $cmd+\";\";\n                appendStringArray($cmds, {$cmd}, 1);\n                appendStringArray($cmds, {\"asChooseInput \"+$txField+\";\"}, 1);\n            }\n            select(\"-cl\");\n        }\n\n        string $allCmds = stringArrayToString($cmds, \"\\n\");\n        return $allCmds;\n    }\n\n    proc string asFacePreSetting_refreshButton_Cmd(string $scroll)\n    {\n        string $cmd = \"cmdScrollFieldExecuter(\\\"-edit\\\", \\\"-t\\\", advasFacePreSettingCmd(), \\\"\"+$scroll+\"\\\")\";\n        return $cmd;\n    }\n\n    string $advasFacePreSettingCmd_Window = window(\"-t\", \"AdvancedSkeleton Face Pre Setting Script\");\n        string $advasFacePreSettingCmd_form = formLayout(\"-nd\", 100);\n            string $advasFacePreSettingCmd_refreshButton = button(\"-l\", \"Refresh\");\n            string $advasFacePreSettingCmd_executeButton = button(\"-l\", \"Execute\");\n            string $advasFacePreSettingCmd_Scroll = cmdScrollFieldExecuter(\"-t\", advasFacePreSettingCmd());\n\n        formLayout -edit\n            -attachForm     $advasFacePreSettingCmd_Scroll         \"top\"    5\n            -attachForm     $advasFacePreSettingCmd_Scroll         \"left\"   5\n            -attachForm     $advasFacePreSettingCmd_Scroll         \"right\"  5\n            -attachControl  $advasFacePreSettingCmd_Scroll         \"bottom\" 5 $advasFacePreSettingCmd_refreshButton\n\n            -attachNone     $advasFacePreSettingCmd_refreshButton     \"top\"\n            -attachForm     $advasFacePreSettingCmd_refreshButton     \"left\"   5\n            -attachPosition $advasFacePreSettingCmd_refreshButton     \"right\"  5 50\n            -attachForm     $advasFacePreSettingCmd_refreshButton     \"bottom\" 5\n\n            -attachNone     $advasFacePreSettingCmd_executeButton   \"top\"\n            -attachPosition $advasFacePreSettingCmd_executeButton   \"left\"   5 50\n            -attachForm     $advasFacePreSettingCmd_executeButton   \"right\"  5\n            -attachForm     $advasFacePreSettingCmd_executeButton   \"bottom\" 5\n        $advasFacePreSettingCmd_form;\n\n        button(\"-edit\",\n            \"-c\", asFacePreSetting_refreshButton_Cmd($advasFacePreSettingCmd_Scroll),\n        $advasFacePreSettingCmd_refreshButton);\n\n        button(\"-edit\",\n            \"-c\", \"cmdScrollFieldExecuter(\\\"-edit\\\", \\\"-exc\\\", \\\"\"+$advasFacePreSettingCmd_Scroll+\"\\\")\",\n        $advasFacePreSettingCmd_executeButton);\n\n    showWindow;\n}\n" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Copies an already set AdvancedSkeleton Face Fit setting from an already bound Character." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Copy AdvancedSkeleton Face Fit Setting" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "FaceFit" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "BasicHead.png" 
+        -image1 "BasicHead.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Copies an already set AdvancedSkeleton Face Fit setting from an already bound Character.\n{\nproc string copyAdvFaceFitEyeBallAttrs( string $obj )\n{\n    float $t[] = getAttr($obj+\".t\");\n    float $r[] = getAttr($obj+\".r\");\n    float $s[] = getAttr($obj+\".s\");\n\n    string $cmd = \"setAttr \"+$obj+\".t \"+string($t[0])+\" \"+string($t[1])+\" \"+string($t[2])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".rx \"+string($r[0])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".ry \"+string($r[1])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".s \"+string($s[0])+\" \"+string($s[1])+\" \"+string($s[2])+\";\\n\";\n\n    return $cmd;\n}\n\nproc string copyAdvFaceFitTongueAttrs( string $obj )\n{\n    float $t[] = getAttr($obj+\".t\");\n    float $r[] = getAttr($obj+\".r\");\n    float $s[] = getAttr($obj+\".s\");\n\n    string $cmd = \"setAttr \"+$obj+\".t \"+string($t[0])+\" \"+string($t[1])+\" \"+string($t[2])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".r \"+string($r[0])+\" \"+string($r[1])+\" \"+string($r[2])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".s \"+string($s[0])+\" \"+string($s[1])+\" \"+string($s[2])+\";\\n\";\n\n    return $cmd;\n}\n\nglobal proc string advasFaceFitSettingCmd()\n{\n    string $cmds[] = {\"// AdvancedSkeleton Face Fit Cmds.\\n\"};\n    string $cmd;\n\n    // EyeBall\n    appendStringArray($cmds, {\"\\nasCreateFaceFit EyeBall \\\"\\\" 0 0 1 \\\"\\\";\"}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"FitEyeBall\" )}, 1);\n\n    string $selObjs[];\n    string $selectTxFields[] = {\"EyeLid \\\"Outer\\\";\",\n                                \"EyeLid \\\"Main\\\";\",\n                                \"EyeLid \\\"Inner\\\";\",\n                                \"Lip \\\"Outer\\\";\",\n                                \"Lip \\\"Main\\\";\",\n                                \"Lip \\\"Inner\\\";\",\n                                \"EyeBrowInner \\\"\\\";\",\n                                \"EyeBrowOuter \\\"\\\";\",\n                                \"EyeBrowCenter \\\"\\\";\",\n                                \"EyeBrowMid1 \\\"\\\";\",\n                                \"EyeBrowMid2 \\\"\\\";\",\n                                \"EyeBrowMid3 \\\"\\\";\",\n                                \"ForeHead \\\"\\\";\",\n                                \"JawPivot \\\"\\\";\",\n                                \"JawCorner \\\"\\\";\",\n                                \"Jaw \\\"\\\";\",\n                                \"Throat \\\"\\\";\",\n                                \"Cheek \\\"\\\";\",\n                                \"CheekBone \\\"\\\";\",\n                                \"CheekRaiser \\\"\\\";\",\n                                \"SmileBulge \\\"\\\";\",\n                                \"FrownBulge \\\"\\\";\",\n                                \"Nose \\\"\\\";\",\n                                \"NoseUnder \\\"\\\";\",\n                                \"NoseCorner \\\"\\\";\",\n                                \"NoseSide \\\"\\\";\",\n                                \"NoseCenter \\\"\\\";\",\n                                \"Nostril \\\"\\\";\",\n                                \"Pupil \\\"\\\";\",\n                                \"Iris \\\"\\\";\",\n                                \"SmileLine \\\"\\\";\"};\n\n    string $createTxFields[] = {\"EyeLid \\\"Outer\\\" 1 1 0 \\\"\\\";\",\n                                \"EyeLid \\\"Main\\\" 1 1 0 \\\"\\\";\",\n                                \"EyeLid \\\"Inner\\\" 1 1 0 \\\"\\\";\",\n                                \"Lip \\\"Outer\\\" 1 1 0 \\\"\\\";\",\n                                \"Lip \\\"Main\\\" 1 1 0 \\\"\\\";\",\n                                \"Lip \\\"Inner\\\" 1 1 0 \\\"\\\";\",\n                                \"EyeBrowInner \\\"\\\" 0 0 1 \\\"asGreenSG\\\";\",\n                                \"EyeBrowOuter \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"EyeBrowCenter \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"EyeBrowMid1 \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"EyeBrowMid2 \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"EyeBrowMid3 \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"ForeHead \\\"\\\" 0 0 0 \\\"\\\";\",\n                                \"JawPivot \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"JawCorner \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"Jaw \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"Throat \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"Cheek \\\"\\\" 0 0 1 \\\"asGreenSG\\\";\",\n                                \"CheekBone \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"CheekRaiser \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"SmileBulge \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"FrownBulge \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"Nose \\\"\\\" 0 0 1 \\\"asGreenSG\\\";\",\n                                \"NoseUnder \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"NoseCorner \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"NoseSide \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"NoseCenter \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"Nostril \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"Pupil \\\"\\\" 0 0 0 \\\"asRedSG\\\";\",\n                                \"Iris \\\"\\\" 0 0 0 \\\"asGreenSG\\\";\",\n                                \"SmileLine \\\"\\\" 0 0 0 \\\"asRedSG\\\";\"};\n\n    int $s = size($selectTxFields);\n    for($i=0;$i<$s;$i++)\n    {\n        eval(\"asFaceFitReSelect \"+$selectTxFields[$i]);\n        $selObjs = ls(\"-sl\");\n        if(size($selObjs)>0)\n        {\n            $cmd = \"select -r\";\n            for($each in $selObjs)\n                $cmd = $cmd+\" \"+$each;\n            $cmd = $cmd+\";\";\n            appendStringArray($cmds, {$cmd}, 1);\n            appendStringArray($cmds, {\"asCreateFaceFit \"+$createTxFields[$i]}, 1);\n        }\n        select(\"-cl\");\n    }\n\n    // Tongue\n    appendStringArray($cmds, {\"\\nasCreateFaceFit Tongue \\\"\\\" 0 0 0 \\\"asBlueSG\\\";\"}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue0\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue1\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue2\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue3\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue4\" )}, 1);\n\n    appendStringArray($cmds, {\"\\nasCreateFaceFit UpMidLo \\\"\\\" 0 0 0 \\\"asGreenSG\\\";\"}, 1);\n\n    string $allCmds = stringArrayToString($cmds, \"\\n\");\n    return $allCmds;\n}\n\nproc string asFaceFitSetting_refreshButton_Cmd(string $scroll)\n{\n    string $cmd = \"cmdScrollFieldExecuter(\\\"-edit\\\", \\\"-t\\\", advasFaceFitSettingCmd(), \\\"\"+$scroll+\"\\\")\";\n    return $cmd;\n}\n\nstring $advasFaceFitSettingCmd_Window = window(\"-t\", \"AdvancedSkeleton Face Fit Setting Script\");\n    string $advasFaceFitSettingCmd_form = formLayout(\"-nd\", 100);\n        string $advasFaceFitSettingCmd_refreshButton = button(\"-l\", \"Refresh\");\n        string $advasFaceFitSettingCmd_executeButton = button(\"-l\", \"Execute\");\n        string $advasFaceFitSettingCmd_Scroll = cmdScrollFieldExecuter(\"-t\", advasFaceFitSettingCmd());\n\n    formLayout -edit\n        -attachForm     $advasFaceFitSettingCmd_Scroll         \"top\"    5\n        -attachForm     $advasFaceFitSettingCmd_Scroll         \"left\"   5\n        -attachForm     $advasFaceFitSettingCmd_Scroll         \"right\"  5\n        -attachControl  $advasFaceFitSettingCmd_Scroll         \"bottom\" 5 $advasFaceFitSettingCmd_refreshButton\n\n        -attachNone     $advasFaceFitSettingCmd_refreshButton     \"top\"\n        -attachForm     $advasFaceFitSettingCmd_refreshButton     \"left\"   5\n        -attachPosition $advasFaceFitSettingCmd_refreshButton     \"right\"  5 50\n        -attachForm     $advasFaceFitSettingCmd_refreshButton     \"bottom\" 5\n\n        -attachNone     $advasFaceFitSettingCmd_executeButton   \"top\"\n        -attachPosition $advasFaceFitSettingCmd_executeButton   \"left\"   5 50\n        -attachForm     $advasFaceFitSettingCmd_executeButton   \"right\"  5\n        -attachForm     $advasFaceFitSettingCmd_executeButton   \"bottom\" 5\n    $advasFaceFitSettingCmd_form;\n\n    button(\"-edit\",\n        \"-c\", asFaceFitSetting_refreshButton_Cmd($advasFaceFitSettingCmd_Scroll),\n    $advasFaceFitSettingCmd_refreshButton);\n\n    button(\"-edit\",\n        \"-c\", \"cmdScrollFieldExecuter(\\\"-edit\\\", \\\"-exc\\\", \\\"\"+$advasFaceFitSettingCmd_Scroll+\"\\\")\",\n    $advasFaceFitSettingCmd_executeButton);\n\nshowWindow;\n}\n" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Set Genesis 8 Character From Bind Pose to T-Pose. Go to Bind Pose then run this script." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Set Genesis 8 Character From Bind Pose to T-Pose" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "T-Pose" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "goToBindPose.png" 
+        -image1 "goToBindPose.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "//Set Genesis 8 Character From Bind Pose to T-Pose.\n\nsetAttr \"lShldrBend.rotateZ\" 45;\nsetAttr \"rShldrBend.rotateZ\" -45;\n\nsetAttr \"lCollar.rotateZ\" 2.5;\nsetAttr \"rCollar.rotateZ\" -2.5;\n\nsetAttr \"lThighBend.rotateZ\" -15;\nsetAttr \"rThighBend.rotateZ\" 15;\n\nsetAttr \"lThighTwist.rotateY\" -10;\nsetAttr \"rThighTwist.rotateY\" 10;\n\nsetAttr \"lFoot.rotateY\" -8.5;\nsetAttr \"rFoot.rotateY\" 8.5;\n\nsetAttr \"lFoot.rotateZ\" 20;\nsetAttr \"rFoot.rotateZ\" -20;" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

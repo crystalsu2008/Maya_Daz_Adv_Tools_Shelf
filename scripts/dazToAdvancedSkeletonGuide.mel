@@ -1,0 +1,76 @@
+// Daz To AdvancedSkeleton Guide.
+{
+    global proc dazToAsGuidePathProbe(){}
+
+    proc string dazToAsGuidePath()
+    {
+      string $whatIs=`whatIs dazToAsGuidePathProbe`;
+      string $fullPath=`substring $whatIs 25 999`;
+      string $buffer[];
+      int $numTok=`tokenize $fullPath "/" $buffer`;
+      int $numLetters=size($fullPath);
+      int $numLettersLastFolder=size($buffer[$numTok-1]);
+      string $scriptLocation=`substring $fullPath 1 ($numLetters-$numLettersLastFolder)`;
+      return $scriptLocation;
+    }
+
+    proc string dazToAsGuides_cmd(string $script)
+    {
+        string $fileName = dazToAsGuidePath()+$script;
+        return "source \""+$fileName+"\"";
+    }
+
+    global proc dazToAsGuide_help(string $image)
+    {
+        string $folder = toNativePath("dazToAdvancedSkeletonGuide/");
+        string $fileName = dazToAsGuidePath()+$folder+"dazToAsGuide_help__"+$image+".jpg";
+        window;
+            paneLayout;
+                image -image $fileName;
+        showWindow;
+    }
+
+    string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
+        columnLayout("-adj", 1, "-cat", "both", 0);
+            frameLayout("-l", "Applay Advanced Skeleton", "-cll", 1, "-cl", 0);
+                columnLayout("-adj",1, "-cat","both",0);
+
+                    rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+                        text("-l", "Description");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_Description\")");
+                        setParent ..;
+
+                    rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+                        button("-l","Go To Bind Pose", "-w",160, "-c","gotoBindPose");
+                        text("-l", "");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_GoToBindPose\")");
+                        setParent ..;
+
+                    rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+                        button("-l","Go To T-Pose", "-w",160, "-c",dazToAsGuides_cmd("setGenesis8CharacterFromBindPoseToTPose.mel"));
+                        text("-l", "");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_GoToT-Pose\")");
+                        setParent ..;
+
+                    rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+                        text("-l", "Open NameMatcher");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_OpenNameMatcher\")");
+                        setParent ..;
+
+                    rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+                        text("-l", "Set Template");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_SetTemplate\")");
+                        setParent ..;
+
+                    rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+                        text("-l", "Place FitSkeleton");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_PlaceFitSkeleton\")");
+                        setParent ..;
+
+                    rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+                        button("-l","Delete Eye & Jaw", "-w",160, "-c","delete Eye Jaw1;");
+                        text("-l", "");
+                        button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_DeleteEyeAndJaw\")");
+                        setParent ..;
+    showWindow $dazToAsGuide_Window;
+}

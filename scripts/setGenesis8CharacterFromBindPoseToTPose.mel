@@ -1,0 +1,33 @@
+//Set Genesis 8 Character From Bind Pose to T-Pose.
+//Go to Bind Pose then run this script.
+
+setAttr "lShldrBend.rotateZ" 45;
+setAttr "rShldrBend.rotateZ" -45;
+
+setAttr "lCollar.rotateZ" 2.5;
+setAttr "rCollar.rotateZ" -2.5;
+
+setAttr "lThighBend.rotateZ" -12;
+setAttr "rThighBend.rotateZ" 12;
+
+setAttr "lThighTwist.rotateX" 1;
+setAttr "rThighTwist.rotateX" 1;
+setAttr "lThighTwist.rotateY" -10;
+setAttr "rThighTwist.rotateY" 10;
+setAttr "lThighTwist.rotateZ" -6;
+setAttr "rThighTwist.rotateZ" 6;
+
+setAttr "lShin.rotateX" 4;
+setAttr "rShin.rotateX" 4;
+setAttr "lShin.rotateZ" 3;
+setAttr "rShin.rotateZ" -3;
+
+setAttr "lFoot.rotateX" -3;
+setAttr "lFoot.rotateY" -8.5;
+setAttr "lFoot.rotateZ" 17;
+
+setAttr "rFoot.rotateX" -3;
+setAttr "rFoot.rotateY" 8.5;
+setAttr "rFoot.rotateZ" -17;
+
+setAttr "hip.translateY" 18.2;

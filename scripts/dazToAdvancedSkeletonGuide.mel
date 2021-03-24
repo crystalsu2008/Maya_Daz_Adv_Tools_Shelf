@@ -14,10 +14,11 @@
       return $scriptLocation;
     }
 
-    proc string dazToAsGuides_cmd(string $script)
+    proc string dazToAsGuides_cmd(string $script, string $suf, string $cmd)
     {
-        string $fileName = dazToAsGuidePath()+$script;
-        return "source \""+$fileName+"\"";
+        string $fileName = dazToAsGuidePath()+$script+"."+$suf;
+        if($cmd == "") $cmd = $script+"();";
+        return "source \""+$fileName+"\";"+$cmd;
     }
 
     global proc dazToAsGuide_help(string $image)
@@ -47,7 +48,7 @@
                         setParent ..;
 
                     rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
-                        button("-l","Go To T-Pose", "-w",160, "-c",dazToAsGuides_cmd("setGenesis8CharacterFromBindPoseToTPose.mel"));
+                        button("-l","Go To T-Pose", "-w",160, "-c",dazToAsGuides_cmd("dazas_setGen8CharacterToTPose","mel",""));
                         text("-l", "");
                         button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_GoToT-Pose\")");
                         setParent ..;

@@ -1,0 +1,70 @@
+// Remove Daz Genesis 8 Charcator's Expression Control Joints.
+// Select imported Daz Genesis 8 Charcator run this script.
+{
+    string $lockWeightsInfs[] = {"neckUpper", "hip", "abdomenLower", "abdomenUpper",
+        "chestLower", "chestUpper", "lCollar", "lShldrBend", "lShldrTwist", "lForearmBend",
+        "lForearmTwist", "lHand", "lCarpal1", "lIndex1", "lIndex2", "lIndex3", "lCarpal2",
+        "lMid1", "lMid2", "lMid3", "lCarpal3", "lRing1", "lRing2", "lRing3", "lCarpal4",
+        "lPinky1", "lPinky2", "lPinky3", "lThumb1", "lThumb2", "lThumb3","neckLower",
+        "rCollar", "rShldrBend", "rShldrTwist", "rForearmBend", "rForearmTwist", "rHand",
+        "rCarpal1", "rIndex1", "rIndex2", "rIndex3", "rCarpal2", "rMid1", "rMid2", "rMid3",
+        "rCarpal3", "rRing1", "rRing2", "rRing3", "rCarpal4", "rPinky1", "rPinky2", "rPinky3",
+        "rThumb1", "rThumb2", "rThumb3", "lPectoral", "rPectoral", "pelvis", "lThighBend",
+        "lThighTwist", "lShin", "lFoot", "lMetatarsals", "lToe", "lBigToe", "lBigToe_2",
+        "lSmallToe1", "lSmallToe1_2", "lSmallToe2", "lSmallToe2_2", "lSmallToe3", "lSmallToe3_2",
+        "lSmallToe4", "lSmallToe4_2", "rThighBend", "rThighTwist", "rShin", "rFoot", "rMetatarsals",
+        "rToe", "rBigToe", "rBigToe_2", "rSmallToe1", "rSmallToe1_2", "rSmallToe2", "rSmallToe2_2",
+        "rSmallToe3", "rSmallToe3_2", "rSmallToe4", "rSmallToe4_2", "lEar", "rEar"};
+
+    for( $each in $lockWeightsInfs )
+        setAttr(($each+".liw"), 1);
+
+    string $removeInfs[] = {
+        "upperTeeth",
+        "lowerJaw",
+            "lowerTeeth", "tongue01", "tongue02", "tongue03", "tongue04",
+            "lowerFaceRig", "lNasolabialLower", "rNasolabialLower", "lNasolabialMouthCorner",
+                "rNasolabialMouthCorner", "lLipCorner", "lLipLowerOuter", "lLipLowerInner",
+                "LipLowerMiddle", "rLipLowerInner", "rLipLowerOuter", "rLipCorner", "LipBelow",
+                "Chin", "lCheekLower", "rCheekLower", "BelowJaw", "lJawClench", "rJawClench",
+        "upperFaceRig",
+            "rBrowInner", "rBrowMid", "rBrowOuter", "lBrowInner", "lBrowMid",
+            "lBrowOuter", "CenterBrow", "MidNoseBridge", "lEyelidInner", "lEyelidUpperInner",
+            "lEyelidUpper", "lEyelidUpperOuter", "lEyelidOuter", "lEyelidLowerOuter",
+            "lEyelidLower", "lEyelidLowerInner", "rEyelidInner", "rEyelidUpperInner",
+            "rEyelidUpper", "rEyelidUpperOuter", "rEyelidOuter", "rEyelidLowerOuter",
+            "rEyelidLower", "rEyelidLowerInner", "lSquintInner", "lSquintOuter", "rSquintInner",
+            "rSquintOuter", "lCheekUpper", "rCheekUpper", "Nose", "lNostril", "rNostril", "lLipBelowNose",
+            "rLipBelowNose", "lLipNasolabialCrease", "rLipNasolabialCrease", "lNasolabialUpper",
+            "rNasolabialUpper", "lNasolabialMiddle", "rNasolabialMiddle", "LipUpperMiddle",
+            "lLipUpperOuter", "lLipUpperInner", "rLipUpperInner", "rLipUpperOuter",
+        "lEye",
+        "rEye"};
+
+    string $selObjs[] = ls("-sl");
+    string $skinCluster[] = listConnections("-t", "skinCluster", listRelatives("-s", "-typ", "mesh", $selObjs));
+    string $allInfs[]= skinCluster("-q", "-inf", $skinCluster);
+
+    ConvertSelectionToVertices();
+    string $allVtx[] = ls("-sl", "-fl");
+    select("-cl");
+    for( $inf in $removeInfs )
+    {
+        string $infVtxs[];
+        for( $vtx in $allVtx)
+        {
+            if( skinPercent( "-t", $inf, "-q", $skinCluster[0], $vtx) > 0 )
+                $infVtxs[size($infVtxs)] = $vtx;
+        }
+        if( size($infVtxs) > 0 )
+        {
+            print("Moving '"+$inf+"' Weights to 'head'...\n");
+            skinPercent( "-tmw", $inf, "-tmw", "head", $skinCluster[0], $infVtxs);
+        }
+    }
+    select($selObjs);
+    RemoveUnusedInfluences();
+    select($removeInfs);
+    select("-d", "lowerJaw", "lEye","rEye");
+    print("All Done! The Genesis 8 expression control joints has been removed. You can now delete the selected influences.");
+}

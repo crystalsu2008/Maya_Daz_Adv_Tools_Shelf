@@ -1,0 +1,25 @@
+// Mirror Daz joints transform from +x to -x.
+global proc dazas_mirrorDazJointsTrans(string $dir)
+{
+  string $so = "l";
+  string $de = "r";
+  if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right to left") {
+    $so = "r"; $de = "l";
+  }
+
+  float $tm[] = {-1.0, 1.0, 1.0};
+  float $rm[] = {1.0, -1.0, -1.0};
+
+  string $allJoints[] = {
+    "Collar", "ShldrBend", "ShldrTwist", "ForearmBend", "ForearmTwist", "Hand",
+    "Thumb1", "Thumb2", "Thumb3", "Thumb4", "Carpal1", "Index1", "Index2", "Index3",
+    "Index4", "Carpal2", "Mid1", "Mid2", "Mid3", "Mid4", "Carpal3", "Ring1", "Ring2",
+    "Ring3", "Ring4", "Carpal4", "Pinky1", "Pinky2", "Pinky3", "Pinky4"};
+
+  for($joint in $allJoints) {
+    $t = getAttr($so+$joint+".t");
+    setAttr($de+$joint+".t", $t[0]*$tm[0], $t[1]*$tm[1], $t[2]*$tm[2]);
+    $r = getAttr($so+$joint+".r");
+    setAttr($de+$joint+".r", $r[0]*$rm[0], $r[1]*$rm[1], $r[2]*$rm[2]);
+  }
+}

@@ -1,0 +1,24 @@
+// List all Mesh Vertexs in a string array;
+{
+    string $vtxs[] = ls("-sl", "-fl");
+    int $s = size($vtxs);
+    for($i=0; $i<$s; $i++) {
+        string $buf[];
+        $numTokens = tokenize($vtxs[$i], ".", $buf);
+        print("\"" + $buf[1] + "\", ");
+        if(($i+1)%15 == 0)
+            print("\n");
+    }
+}
+
+
+// List all selected objects in a string array;
+{
+    string $objs[] = ls("-sl");
+    int $s = size($objs);
+    for($i=0; $i<$s; $i++) {
+        print("\"" + $objs[$i] + "\", ");
+        if(($i+1)%6 == 0)
+            print("\n");
+    }
+}

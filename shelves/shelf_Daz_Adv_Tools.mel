@@ -34,7 +34,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "source \"C:/Users/Administrator/Documents/DEV/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";" 
+        -command "source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -42,7 +42,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -70,6 +70,76 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "// Select Very First Original Mesh Nodes.\n{\n    // List Mesh Upstream Geometry Nodes.\n    proc string[] listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)\n    {\n        string $plugs[];\n        if(nodeType($startNode) == \"mesh\")\n        {\n            $plugs[0] = $startNode+\".inMesh\";\n        }\n        else\n        {\n            string $plugName[] = listAttr(\"-a\", \"-m\", \"-st\", \"*inputGeometry*\", $startNode);\n            int $s = size($plugName);\n            for($i=0; $i<$s; $i++)\n            {\n                $plugs[$i] = $startNode+\".\"+$plugName[$i];\n            }\n        }\n\n        $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections(\"-s\", 1, \"-d\", 0, \"-scn\", 1, \"-sh\", 1, $plugs)));\n        if( size($sour) > 0 )\n        {\n            $passedNodes = stringArrayCatenate($passedNodes, $sour);\n            if( $depth < $maxDepth )\n            {\n                for( $each in $sour )\n                {\n                    $passedNodes = listUpstream($each,$passedNodes,($depth+1),$maxDepth);\n                }\n            }\n        }\n        return $passedNodes;\n    }\n\n    string $selObjShape[] = listRelatives(\"-s\", \"-typ\", \"mesh\", ls(\"-sl\"));\n    string $upstreamNodes[] =  listUpstream($selObjShape[0], {$selObjShape[0]}, 0, 20);\n\n    int $s = size($upstreamNodes);\n    for($i=$s-1; $i>=0; $i--)\n    {\n        if(nodeType($upstreamNodes[$i]) == \"mesh\")\n        {\n            select -r $upstreamNodes[$i];\n            break;\n        }\n    }\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select Vertexs those influences by selected influences.\n Select Influences & Skin Object run this script." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Select Vertexs those influences by selected influences" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "VtxInf" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "showInfluence.png" 
+        -image1 "showInfluence.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Select Vertexs those influences by selected influences.\n// Select Influences & Skin Object run this script.\n{\n  // List Mesh Upstream Geometry Nodes.\n  proc string[] listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)\n  {\n      string $plugs[];\n      if(nodeType($startNode) == \"mesh\")\n      {\n          $plugs[0] = $startNode+\".inMesh\";\n      }\n      else\n      {\n          string $plugName[] = listAttr(\"-a\", \"-m\", \"-st\", \"*inputGeometry*\", $startNode);\n          int $s = size($plugName);\n          for($i=0; $i<$s; $i++)\n          {\n              $plugs[$i] = $startNode+\".\"+$plugName[$i];\n          }\n      }\n\n      $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections(\"-s\", 1, \"-d\", 0, \"-scn\", 1, \"-sh\", 1, $plugs)));\n      if( size($sour) > 0 )\n      {\n          $passedNodes = stringArrayCatenate($passedNodes, $sour);\n          if( $depth < $maxDepth )\n          {\n              for( $each in $sour )\n              {\n                  $passedNodes = listUpstream($each,$passedNodes,($depth+1),$maxDepth);\n              }\n          }\n      }\n      return $passedNodes;\n  }\n\n  string $selObjs[] = ls(\"-sl\");\n  string $mesh[] = listRelatives(\"-s\", \"-typ\", \"mesh\", $selObjs);\n\n  string $immesh[];\n  for( $each in $mesh )\n    if( getAttr($each+\".intermediateObject\") )\n      $immesh[size($immesh)] = $each;\n  $mesh = stringArrayRemove($immesh, $mesh);\n\n  string $upstreamNodes[] = listUpstream($mesh[0], {$mesh[0]}, 0, 20);\n  string $skinCluster[] = ls(\"-typ\", \"skinCluster\", $upstreamNodes);\n\n  string $allInfs[]= skinCluster(\"-q\", \"-inf\", $skinCluster[0]);\n  string $infs[];\n\n  for( $each in $selObjs )\n    if( stringArrayContains($each, $allInfs) )\n      $infs[size($infs)] = $each;\n\n  ConvertSelectionToVertices();\n  string $allVtx[] = ls(\"-sl\", \"-fl\");\n  select(\"-cl\");\n  string $infVtxs[];\n  for( $inf in $infs )\n  {\n    for( $vtx in $allVtx)\n    {\n      if( skinPercent( \"-t\", $inf, \"-q\", $skinCluster[0], $vtx) > 0 )\n        $infVtxs[size($infVtxs)] = $vtx;\n    }\n    $allVtx = stringArrayRemove($infVtxs, $allVtx);\n  }\n  $infVtxs = stringArrayRemoveDuplicates($infVtxs);\n  select($infVtxs);\n}\n" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Remove Daz Genesis 8 Charcator's Expression Control Joints.  Select imported Daz Genesis 8 Charcator run this script." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Remove Gen8 Charcator's Expression Joints" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "ReExpJ" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "removeSkinInfluence.png" 
+        -image1 "removeSkinInfluence.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Remove Daz Genesis 8 Charcator's Expression Control Joints.\n// Select imported Daz Genesis 8 Charcator run this script.\n{\n    string $lockWeightsInfs[] = {\"neckUpper\", \"hip\", \"abdomenLower\", \"abdomenUpper\",\n        \"chestLower\", \"chestUpper\", \"lCollar\", \"lShldrBend\", \"lShldrTwist\", \"lForearmBend\",\n        \"lForearmTwist\", \"lHand\", \"lCarpal1\", \"lIndex1\", \"lIndex2\", \"lIndex3\", \"lCarpal2\",\n        \"lMid1\", \"lMid2\", \"lMid3\", \"lCarpal3\", \"lRing1\", \"lRing2\", \"lRing3\", \"lCarpal4\",\n        \"lPinky1\", \"lPinky2\", \"lPinky3\", \"lThumb1\", \"lThumb2\", \"lThumb3\",\"neckLower\",\n        \"rCollar\", \"rShldrBend\", \"rShldrTwist\", \"rForearmBend\", \"rForearmTwist\", \"rHand\",\n        \"rCarpal1\", \"rIndex1\", \"rIndex2\", \"rIndex3\", \"rCarpal2\", \"rMid1\", \"rMid2\", \"rMid3\",\n        \"rCarpal3\", \"rRing1\", \"rRing2\", \"rRing3\", \"rCarpal4\", \"rPinky1\", \"rPinky2\", \"rPinky3\",\n        \"rThumb1\", \"rThumb2\", \"rThumb3\", \"lPectoral\", \"rPectoral\", \"pelvis\", \"lThighBend\",\n        \"lThighTwist\", \"lShin\", \"lFoot\", \"lMetatarsals\", \"lToe\", \"lBigToe\", \"lBigToe_2\",\n        \"lSmallToe1\", \"lSmallToe1_2\", \"lSmallToe2\", \"lSmallToe2_2\", \"lSmallToe3\", \"lSmallToe3_2\",\n        \"lSmallToe4\", \"lSmallToe4_2\", \"rThighBend\", \"rThighTwist\", \"rShin\", \"rFoot\", \"rMetatarsals\",\n        \"rToe\", \"rBigToe\", \"rBigToe_2\", \"rSmallToe1\", \"rSmallToe1_2\", \"rSmallToe2\", \"rSmallToe2_2\",\n        \"rSmallToe3\", \"rSmallToe3_2\", \"rSmallToe4\", \"rSmallToe4_2\", \"lEar\", \"rEar\"};\n\n    for( $each in $lockWeightsInfs )\n        setAttr(($each+\".liw\"), 1);\n\n    string $removeInfs[] = {\n        \"upperTeeth\",\n        \"lowerJaw\",\n            \"lowerTeeth\", \"tongue01\", \"tongue02\", \"tongue03\", \"tongue04\",\n            \"lowerFaceRig\", \"lNasolabialLower\", \"rNasolabialLower\", \"lNasolabialMouthCorner\",\n                \"rNasolabialMouthCorner\", \"lLipCorner\", \"lLipLowerOuter\", \"lLipLowerInner\",\n                \"LipLowerMiddle\", \"rLipLowerInner\", \"rLipLowerOuter\", \"rLipCorner\", \"LipBelow\",\n                \"Chin\", \"lCheekLower\", \"rCheekLower\", \"BelowJaw\", \"lJawClench\", \"rJawClench\",\n        \"upperFaceRig\",\n            \"rBrowInner\", \"rBrowMid\", \"rBrowOuter\", \"lBrowInner\", \"lBrowMid\",\n            \"lBrowOuter\", \"CenterBrow\", \"MidNoseBridge\", \"lEyelidInner\", \"lEyelidUpperInner\",\n            \"lEyelidUpper\", \"lEyelidUpperOuter\", \"lEyelidOuter\", \"lEyelidLowerOuter\",\n            \"lEyelidLower\", \"lEyelidLowerInner\", \"rEyelidInner\", \"rEyelidUpperInner\",\n            \"rEyelidUpper\", \"rEyelidUpperOuter\", \"rEyelidOuter\", \"rEyelidLowerOuter\",\n            \"rEyelidLower\", \"rEyelidLowerInner\", \"lSquintInner\", \"lSquintOuter\", \"rSquintInner\",\n            \"rSquintOuter\", \"lCheekUpper\", \"rCheekUpper\", \"Nose\", \"lNostril\", \"rNostril\", \"lLipBelowNose\",\n            \"rLipBelowNose\", \"lLipNasolabialCrease\", \"rLipNasolabialCrease\", \"lNasolabialUpper\",\n            \"rNasolabialUpper\", \"lNasolabialMiddle\", \"rNasolabialMiddle\", \"LipUpperMiddle\",\n            \"lLipUpperOuter\", \"lLipUpperInner\", \"rLipUpperInner\", \"rLipUpperOuter\",\n        \"lEye\",\n        \"rEye\"};\n\n    string $selObjs[] = ls(\"-sl\");\n    string $skinCluster[] = listConnections(\"-t\", \"skinCluster\", listRelatives(\"-s\", \"-typ\", \"mesh\", $selObjs));\n    string $allInfs[]= skinCluster(\"-q\", \"-inf\", $skinCluster);\n\n    ConvertSelectionToVertices();\n    string $allVtx[] = ls(\"-sl\", \"-fl\");\n    select(\"-cl\");\n    for( $inf in $removeInfs )\n    {\n        string $infVtxs[];\n        for( $vtx in $allVtx)\n        {\n            if( skinPercent( \"-t\", $inf, \"-q\", $skinCluster[0], $vtx) > 0 )\n                $infVtxs[size($infVtxs)] = $vtx;\n        }\n        if( size($infVtxs) > 0 )\n        {\n            print(\"Moving '\"+$inf+\"' Weights to 'head'...\\n\");\n            skinPercent( \"-tmw\", $inf, \"-tmw\", \"head\", $skinCluster[0], $infVtxs);\n        }\n    }\n    select($selObjs);\n    RemoveUnusedInfluences();\n    select($removeInfs);\n    select(\"-d\", \"lowerJaw\", \"lEye\",\"rEye\");\n    print(\"All Done! The Genesis 8 expression control joints has been removed. You can now delete the selected influences.\");\n}\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -112,9 +182,9 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 38
+        -flexibleWidthValue 76
         -enable 1
-        -width 41
+        -width 35
         -height 34
         -manage 1
         -visible 1
@@ -217,7 +287,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -245,6 +315,40 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "//Set Genesis 8 Character From Bind Pose to T-Pose.\n\nsetAttr \"lShldrBend.rotateZ\" 45;\nsetAttr \"rShldrBend.rotateZ\" -45;\n\nsetAttr \"lCollar.rotateZ\" 2.5;\nsetAttr \"rCollar.rotateZ\" -2.5;\n\nsetAttr \"lThighBend.rotateZ\" -15;\nsetAttr \"rThighBend.rotateZ\" 15;\n\nsetAttr \"lThighTwist.rotateY\" -10;\nsetAttr \"rThighTwist.rotateY\" 10;\n\nsetAttr \"lFoot.rotateY\" -8.5;\nsetAttr \"rFoot.rotateY\" 8.5;\n\nsetAttr \"lFoot.rotateZ\" 20;\nsetAttr \"rFoot.rotateZ\" -20;" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/bak/checkHeadWeights.mel\";" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "commandButton.png" 
+        -image1 "commandButton.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/bak/checkAndHammerGen8HeadWeights.mel\";" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

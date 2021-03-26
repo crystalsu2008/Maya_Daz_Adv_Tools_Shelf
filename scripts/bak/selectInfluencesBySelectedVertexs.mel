@@ -1,0 +1,27 @@
+// Select influences those influences selected Vertexs.
+// Select Skin Vertexs run this script.
+{
+  string $selVtxs[] = ls("-sl", "-fl");
+  string $buffer[];
+  tokenize($selVtxs[0], ".", $buffer);
+  string $mesh[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
+
+  string $upstreamNodes[] = dazas_listUpstream($mesh[0], {$mesh[0]}, 0, 20);
+  string $skinCluster[] = ls("-typ", "skinCluster", $upstreamNodes);
+
+  string $allInfs[]= skinCluster("-q", "-inf", $skinCluster[0]);
+
+  select("-cl");
+  string $infs[];
+  for($vtx in $selVtxs)
+  {
+    for($inf in $allInfs)
+    {
+      if( skinPercent( "-t", $inf, "-q", $skinCluster[0], $vtx) > 0 )
+        $infs[size($infs)] = $inf;
+    }
+  }
+  $infs = stringArrayRemoveDuplicates($infs);
+  print $infs;
+  select($infs);
+}

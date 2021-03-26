@@ -1,0 +1,38 @@
+// Select Vertexs those are influenced by selected influences.
+// Select Influences & Skin Object run this script.
+{
+  string $selObjs[] = ls("-sl");
+  string $mesh[] = listRelatives("-s", "-typ", "mesh", $selObjs);
+
+  string $immesh[];
+  for( $each in $mesh )
+    if( getAttr($each+".intermediateObject") )
+      $immesh[size($immesh)] = $each;
+  $mesh = stringArrayRemove($immesh, $mesh);
+
+  string $upstreamNodes[] = dazas_listUpstream($mesh[0], {$mesh[0]}, 0, 20);
+  string $skinCluster[] = ls("-typ", "skinCluster", $upstreamNodes);
+
+  string $allInfs[]= skinCluster("-q", "-inf", $skinCluster[0]);
+  string $infs[];
+
+  for( $each in $selObjs )
+    if( stringArrayContains($each, $allInfs) )
+      $infs[size($infs)] = $each;
+
+  ConvertSelectionToVertices();
+  string $allVtx[] = ls("-sl", "-fl");
+  select("-cl");
+  string $infVtxs[];
+  for( $inf in $infs )
+  {
+    for( $vtx in $allVtx)
+    {
+      if( skinPercent( "-t", $inf, "-q", $skinCluster[0], $vtx) > 0 )
+        $infVtxs[size($infVtxs)] = $vtx;
+    }
+    $allVtx = stringArrayRemove($infVtxs, $allVtx);
+  }
+  $infVtxs = stringArrayRemoveDuplicates($infVtxs);
+  select($infVtxs);
+}

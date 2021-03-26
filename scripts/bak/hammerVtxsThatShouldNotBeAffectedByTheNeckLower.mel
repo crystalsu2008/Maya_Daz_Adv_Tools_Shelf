@@ -1,0 +1,60 @@
+// Select the vertices that should not be affected by the 'neckLower' skeleton and use the hammer.
+// Select Skin Object run this script.
+{
+  string $neckLowerVtxs[] = {
+      "vtx[26]", "vtx[27]", "vtx[40]", "vtx[50]", "vtx[56]", "vtx[57]", "vtx[58]", "vtx[73]", "vtx[74]", "vtx[93]", "vtx[108]", "vtx[119]", "vtx[125]", "vtx[126]", "vtx[127]",
+      "vtx[553]", "vtx[822]", "vtx[823]", "vtx[1602]", "vtx[1785]", "vtx[1786]", "vtx[1787]", "vtx[1790]", "vtx[1791]", "vtx[2019]", "vtx[2020]", "vtx[2021]", "vtx[2030]", "vtx[2031]", "vtx[2032]",
+      "vtx[2033]", "vtx[2034]", "vtx[2130]", "vtx[2131]", "vtx[2143]", "vtx[2144]", "vtx[2145]", "vtx[2146]", "vtx[2147]", "vtx[2148]", "vtx[2154]", "vtx[2155]", "vtx[2156]", "vtx[2157]", "vtx[2158]",
+      "vtx[2162]", "vtx[2163]", "vtx[2164]", "vtx[2165]", "vtx[2166]", "vtx[2167]", "vtx[2382]", "vtx[2383]", "vtx[2384]", "vtx[2385]", "vtx[2386]", "vtx[2387]", "vtx[2388]", "vtx[2389]", "vtx[2390]",
+      "vtx[2391]", "vtx[2392]", "vtx[2393]", "vtx[2394]", "vtx[2395]", "vtx[2396]", "vtx[2397]", "vtx[2456]", "vtx[2485]", "vtx[2486]", "vtx[2487]", "vtx[2488]", "vtx[2529]", "vtx[2530]", "vtx[2531]",
+      "vtx[2532]", "vtx[2533]", "vtx[2534]", "vtx[2535]", "vtx[2536]", "vtx[2537]", "vtx[2538]", "vtx[2539]", "vtx[2540]", "vtx[2541]", "vtx[2542]", "vtx[2543]", "vtx[2544]", "vtx[2545]", "vtx[2546]",
+      "vtx[2547]", "vtx[2548]", "vtx[2549]", "vtx[2553]", "vtx[2554]", "vtx[2555]", "vtx[2556]", "vtx[2557]", "vtx[2558]", "vtx[2601]", "vtx[2602]", "vtx[2605]", "vtx[2669]", "vtx[2714]", "vtx[2715]",
+      "vtx[2888]", "vtx[2890]", "vtx[2891]", "vtx[2892]", "vtx[2893]", "vtx[2894]", "vtx[2895]", "vtx[2902]", "vtx[2903]", "vtx[2904]", "vtx[2905]", "vtx[2906]", "vtx[2907]", "vtx[2908]", "vtx[2909]",
+      "vtx[2910]", "vtx[2911]", "vtx[2912]", "vtx[2913]", "vtx[2914]", "vtx[2915]", "vtx[2916]", "vtx[2917]", "vtx[2918]", "vtx[2919]", "vtx[2920]", "vtx[2921]", "vtx[2922]", "vtx[2923]", "vtx[2924]",
+      "vtx[2925]", "vtx[2926]", "vtx[2927]", "vtx[2928]", "vtx[2929]", "vtx[2930]", "vtx[2931]", "vtx[2932]", "vtx[2933]", "vtx[2934]", "vtx[2935]", "vtx[2936]", "vtx[2937]", "vtx[3509]", "vtx[3510]",
+      "vtx[3511]", "vtx[3512]", "vtx[3513]", "vtx[3514]", "vtx[3724]", "vtx[4005]", "vtx[4006]", "vtx[4007]", "vtx[4008]", "vtx[4009]", "vtx[4011]", "vtx[4246]", "vtx[4247]", "vtx[4248]", "vtx[4372]",
+      "vtx[4553]", "vtx[4554]", "vtx[6294]", "vtx[6305]", "vtx[6311]", "vtx[6312]", "vtx[6313]", "vtx[6739]", "vtx[7008]", "vtx[7009]", "vtx[7788]", "vtx[7971]", "vtx[7972]", "vtx[7973]", "vtx[7976]",
+      "vtx[7977]", "vtx[8205]", "vtx[8206]", "vtx[8207]", "vtx[8216]", "vtx[8217]", "vtx[8218]", "vtx[8219]", "vtx[8220]", "vtx[8316]", "vtx[8317]", "vtx[8329]", "vtx[8330]", "vtx[8331]", "vtx[8332]",
+      "vtx[8333]", "vtx[8334]", "vtx[8340]", "vtx[8341]", "vtx[8342]", "vtx[8343]", "vtx[8344]", "vtx[8348]", "vtx[8349]", "vtx[8350]", "vtx[8351]", "vtx[8352]", "vtx[8353]", "vtx[8568]", "vtx[8569]",
+      "vtx[8570]", "vtx[8571]", "vtx[8572]", "vtx[8573]", "vtx[8574]", "vtx[8575]", "vtx[8576]", "vtx[8577]", "vtx[8578]", "vtx[8579]", "vtx[8580]", "vtx[8581]", "vtx[8582]", "vtx[8583]", "vtx[8642]",
+      "vtx[8671]", "vtx[8672]", "vtx[8673]", "vtx[8674]", "vtx[8715]", "vtx[8716]", "vtx[8717]", "vtx[8718]", "vtx[8719]", "vtx[8720]", "vtx[8721]", "vtx[8722]", "vtx[8723]", "vtx[8724]", "vtx[8725]",
+      "vtx[8726]", "vtx[8727]", "vtx[8728]", "vtx[8729]", "vtx[8730]", "vtx[8731]", "vtx[8732]", "vtx[8733]", "vtx[8734]", "vtx[8735]", "vtx[8739]", "vtx[8740]", "vtx[8741]", "vtx[8742]", "vtx[8743]",
+      "vtx[8744]", "vtx[8787]", "vtx[8788]", "vtx[8791]", "vtx[8855]", "vtx[8900]", "vtx[8901]", "vtx[9074]", "vtx[9076]", "vtx[9077]", "vtx[9078]", "vtx[9079]", "vtx[9080]", "vtx[9081]", "vtx[9088]",
+      "vtx[9089]", "vtx[9090]", "vtx[9091]", "vtx[9092]", "vtx[9093]", "vtx[9094]", "vtx[9095]", "vtx[9096]", "vtx[9097]", "vtx[9098]", "vtx[9099]", "vtx[9100]", "vtx[9101]", "vtx[9102]", "vtx[9103]",
+      "vtx[9104]", "vtx[9105]", "vtx[9106]", "vtx[9107]", "vtx[9108]", "vtx[9109]", "vtx[9110]", "vtx[9111]", "vtx[9112]", "vtx[9113]", "vtx[9114]", "vtx[9115]", "vtx[9116]", "vtx[9117]", "vtx[9118]",
+      "vtx[9119]", "vtx[9120]", "vtx[9672]", "vtx[9673]", "vtx[9674]", "vtx[9675]", "vtx[9676]", "vtx[9677]", "vtx[9886]", "vtx[10164]", "vtx[10165]", "vtx[10166]", "vtx[10167]", "vtx[10168]", "vtx[10170]",
+      "vtx[10403]", "vtx[10404]", "vtx[10521]", "vtx[10700]", "vtx[10701]"};
+
+  string $mesh[] = listRelatives("-s", "-typ", "mesh", ls("-sl"));
+
+  string $immesh[];
+  for( $each in $mesh )
+    if( getAttr($each+".intermediateObject") )
+      $immesh[size($immesh)] = $each;
+  $mesh = stringArrayRemove($immesh, $mesh);
+
+  string $meshTrans[] = listRelatives("-p", $mesh[0]);
+  int $s = size($neckLowerVtxs);
+  for($i=0; $i<$s; $i++)
+    $neckLowerVtxs[$i] = ($meshTrans[0]+"."+$neckLowerVtxs[$i]);
+
+  string $upstreamNodes[] = dazas_listUpstream($mesh[0], {$mesh[0]}, 0, 20);
+  string $skinCluster[] = ls("-typ", "skinCluster", $upstreamNodes);
+
+  ConvertSelectionToVertices();
+  string $allVtx[] = ls("-sl", "-fl");
+  select("-cl");
+  string $infVtxs[];
+
+  string $inf = "neckLower";
+  for( $vtx in $allVtx)
+  {
+    if( skinPercent( "-t", $inf, "-q", $skinCluster[0], $vtx) > 0 )
+      $infVtxs[size($infVtxs)] = $vtx;
+  }
+
+  $infVtxs = stringArrayRemoveDuplicates($infVtxs);
+  $infVtxs = stringArrayRemove($neckLowerVtxs, $infVtxs);
+  select($infVtxs);
+  weightHammerVerts();
+}

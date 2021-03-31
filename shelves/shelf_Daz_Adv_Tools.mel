@@ -77,7 +77,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -89,7 +89,7 @@ global proc shelf_Daz_Adv_Tools () {
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Locks the weight of the joints outside the Gen 8 character's head joint" 
+        -label "Locks the weight of the joints outside the G8  head" 
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -99,12 +99,12 @@ global proc shelf_Daz_Adv_Tools () {
         -imageOverlayLabel "LWOH" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "lockGeneric_100.png" 
-        -image1 "lockGeneric_100.png" 
+        -image "polyNormalLock.png" 
+        -image1 "polyNormalLock.png" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "// Locks the weight of the joints outside the Genesis 8 character's head joint.\n{\n    string $lockWeightsInfs[] = {\"neckUpper\", \"hip\", \"abdomenLower\", \"abdomenUpper\",\n        \"chestLower\", \"chestUpper\", \"lCollar\", \"lShldrBend\", \"lShldrTwist\", \"lForearmBend\",\n        \"lForearmTwist\", \"lHand\", \"lCarpal1\", \"lIndex1\", \"lIndex2\", \"lIndex3\", \"lCarpal2\",\n        \"lMid1\", \"lMid2\", \"lMid3\", \"lCarpal3\", \"lRing1\", \"lRing2\", \"lRing3\", \"lCarpal4\",\n        \"lPinky1\", \"lPinky2\", \"lPinky3\", \"lThumb1\", \"lThumb2\", \"lThumb3\",\"neckLower\",\n        \"rCollar\", \"rShldrBend\", \"rShldrTwist\", \"rForearmBend\", \"rForearmTwist\", \"rHand\",\n        \"rCarpal1\", \"rIndex1\", \"rIndex2\", \"rIndex3\", \"rCarpal2\", \"rMid1\", \"rMid2\", \"rMid3\",\n        \"rCarpal3\", \"rRing1\", \"rRing2\", \"rRing3\", \"rCarpal4\", \"rPinky1\", \"rPinky2\", \"rPinky3\",\n        \"rThumb1\", \"rThumb2\", \"rThumb3\", \"lPectoral\", \"rPectoral\", \"pelvis\", \"lThighBend\",\n        \"lThighTwist\", \"lShin\", \"lFoot\", \"lMetatarsals\", \"lToe\", \"lBigToe\", \"lBigToe_2\",\n        \"lSmallToe1\", \"lSmallToe1_2\", \"lSmallToe2\", \"lSmallToe2_2\", \"lSmallToe3\", \"lSmallToe3_2\",\n        \"lSmallToe4\", \"lSmallToe4_2\", \"rThighBend\", \"rThighTwist\", \"rShin\", \"rFoot\", \"rMetatarsals\",\n        \"rToe\", \"rBigToe\", \"rBigToe_2\", \"rSmallToe1\", \"rSmallToe1_2\", \"rSmallToe2\", \"rSmallToe2_2\",\n        \"rSmallToe3\", \"rSmallToe3_2\", \"rSmallToe4\", \"rSmallToe4_2\", \"lEar\", \"rEar\"};\n\n    for( $each in $lockWeightsInfs )\n        setAttr(($each+\".liw\"), 1);\n}" 
+        -command "// Locks the weight of the Genesis 8 character joints outside the Genesis 8 character's head joint.\n{\n    string $lockWeightsInfs[] = {\"head\",\"neckUpper\", \"hip\", \"abdomenLower\", \"abdomenUpper\",\n        \"chestLower\", \"chestUpper\", \"lCollar\", \"lShldrBend\", \"lShldrTwist\", \"lForearmBend\",\n        \"lForearmTwist\", \"lHand\", \"lCarpal1\", \"lIndex1\", \"lIndex2\", \"lIndex3\", \"lCarpal2\",\n        \"lMid1\", \"lMid2\", \"lMid3\", \"lCarpal3\", \"lRing1\", \"lRing2\", \"lRing3\", \"lCarpal4\",\n        \"lPinky1\", \"lPinky2\", \"lPinky3\", \"lThumb1\", \"lThumb2\", \"lThumb3\",\"neckLower\",\n        \"rCollar\", \"rShldrBend\", \"rShldrTwist\", \"rForearmBend\", \"rForearmTwist\", \"rHand\",\n        \"rCarpal1\", \"rIndex1\", \"rIndex2\", \"rIndex3\", \"rCarpal2\", \"rMid1\", \"rMid2\", \"rMid3\",\n        \"rCarpal3\", \"rRing1\", \"rRing2\", \"rRing3\", \"rCarpal4\", \"rPinky1\", \"rPinky2\", \"rPinky3\",\n        \"rThumb1\", \"rThumb2\", \"rThumb3\", \"lPectoral\", \"rPectoral\", \"pelvis\", \"lThighBend\",\n        \"lThighTwist\", \"lShin\", \"lFoot\", \"lMetatarsals\", \"lToe\", \"lBigToe\", \"lBigToe_2\",\n        \"lSmallToe1\", \"lSmallToe1_2\", \"lSmallToe2\", \"lSmallToe2_2\", \"lSmallToe3\", \"lSmallToe3_2\",\n        \"lSmallToe4\", \"lSmallToe4_2\", \"rThighBend\", \"rThighTwist\", \"rShin\", \"rFoot\", \"rMetatarsals\",\n        \"rToe\", \"rBigToe\", \"rBigToe_2\", \"rSmallToe1\", \"rSmallToe1_2\", \"rSmallToe2\", \"rSmallToe2_2\",\n        \"rSmallToe3\", \"rSmallToe3_2\", \"rSmallToe4\", \"rSmallToe4_2\", \"lEar\", \"rEar\"};\n\n    for( $each in $lockWeightsInfs )\n        setAttr(($each+\".liw\"), 1);\n}" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -364,7 +364,7 @@ global proc shelf_Daz_Adv_Tools () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Check Genesis 8 character head vertexs weights to head related bones those are influenced by bones outside the head. Select Genesis 8 character skin mesh and run this script." 
+        -annotation "Check the weight of Genesis 8 character head vertices that are influenced by joints other than the head. Select Genesis 8 character skin mesh and run this script." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
@@ -399,7 +399,7 @@ global proc shelf_Daz_Adv_Tools () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Check & Hammer Genesis 8 character head vertexs weights to head related bones those are influenced by bones outside the head. Select Genesis 8 character skin mesh and run this script." 
+        -annotation "Check & Hammer the weight of Genesis 8 character head vertices that are influenced by joints other than the head. Select Genesis 8 character skin mesh and run this script." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
@@ -434,7 +434,7 @@ global proc shelf_Daz_Adv_Tools () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Check & Move Genesis 8 character head vertexs weights to head related bones those are influenced by bones outside the head. Select Genesis 8 character skin mesh and run this script." 
+        -annotation "Check & Move the weight of Genesis 8 character head vertices that are influenced by joints other than the head to the specified influence. Select Genesis 8 character skin mesh and run this script." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
@@ -454,7 +454,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "// Check & Move the weight of Genesis 8 character head vertices that are influenced by joints other than the head.\n// Select Genesis 8 character skin mesh and run this script.\ndazas_correctGen8HeadWeights(\"move\",{},{},\"\");" 
+        -command "// Check & Move the weight of Genesis 8 character head vertices that are influenced by joints other than the head to the specified influence.\n// Select Genesis 8 character skin mesh and run this script.\ndazas_correctGen8HeadWeights(\"move\",{},{},\"\");" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -525,6 +525,41 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "//Set Genesis 8 Character From Bind Pose to T-Pose.\n\nsetAttr \"lShldrBend.rotateZ\" 45;\nsetAttr \"rShldrBend.rotateZ\" -45;\n\nsetAttr \"lCollar.rotateZ\" 2.5;\nsetAttr \"rCollar.rotateZ\" -2.5;\n\nsetAttr \"lThighBend.rotateZ\" -15;\nsetAttr \"rThighBend.rotateZ\" 15;\n\nsetAttr \"lThighTwist.rotateY\" -10;\nsetAttr \"rThighTwist.rotateY\" 10;\n\nsetAttr \"lFoot.rotateY\" -8.5;\nsetAttr \"rFoot.rotateY\" 8.5;\n\nsetAttr \"lFoot.rotateZ\" 20;\nsetAttr \"rFoot.rotateZ\" -20;" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "This is a custom command to remove facial animations from AdvancedSkeleton controllers. Modified from the Remove Face animation command of the AdvancedSkeleton tool." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "remove AS facial animations" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "ReFaAn" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "puppetRemove.png" 
+        -image1 "puppetRemove.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// This is a custom command to remove facial animations from AdvancedSkeleton controllers.\n// Modified from the Remove Face animation command of the AdvancedSkeleton tool.\n{\nstring $nameSpace=\"\";\nstring $refFiles[]=`file -q -r`;\nstring $sel[]=`ls -sl`;\nstring $tempString[],$tempString2[];\n\nif (!`objExists ($nameSpace+\"FaceControlSet\")`)\n\terror \"No controlSets detected. select a controller\";\n\nselect -cl;\nif (`objExists ($nameSpace+\"FaceControlSet\")`) select -add `sets -q ($nameSpace+\"FaceControlSet\")`;\nif (`objExists ($nameSpace+\"FKHead_M\")`) select -add ($nameSpace+\"FKHead_M\");\nif (`objExists ($nameSpace+\"FKNeck_M\")`) select -add ($nameSpace+\"FKNeck_M\");\n\nstring $animCurves[]=`listConnections -type animCurve -s 1 -d 0`;\nif (size($animCurves))\n\tdelete $animCurves;\n\nif (`objExists ($nameSpace+\"ControlSet\")`) asGoToBuildPoseOptions $nameSpace \"ControlSet\";\nif (`objExists ($nameSpace+\"FaceControlSet\")`) asGoToBuildPoseOptions $nameSpace \"FaceControlSet\";\n\ndgdirty -a;\ncatchQuiet (`select $sel`);\nprint (\"// Face Test animations removed.\\n\");\n}\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

@@ -1,0 +1,27 @@
+// This is a custom command to remove facial animations from AdvancedSkeleton controllers.
+// Modified from the Remove Face animation command of the AdvancedSkeleton tool.
+{
+string $nameSpace="";
+string $refFiles[]=`file -q -r`;
+string $sel[]=`ls -sl`;
+string $tempString[],$tempString2[];
+
+if (!`objExists ($nameSpace+"FaceControlSet")`)
+	error "No controlSets detected. select a controller";
+
+select -cl;
+if (`objExists ($nameSpace+"FaceControlSet")`) select -add `sets -q ($nameSpace+"FaceControlSet")`;
+if (`objExists ($nameSpace+"FKHead_M")`) select -add ($nameSpace+"FKHead_M");
+if (`objExists ($nameSpace+"FKNeck_M")`) select -add ($nameSpace+"FKNeck_M");
+
+string $animCurves[]=`listConnections -type animCurve -s 1 -d 0`;
+if (size($animCurves))
+	delete $animCurves;
+
+if (`objExists ($nameSpace+"ControlSet")`) asGoToBuildPoseOptions $nameSpace "ControlSet";
+if (`objExists ($nameSpace+"FaceControlSet")`) asGoToBuildPoseOptions $nameSpace "FaceControlSet";
+
+dgdirty -a;
+catchQuiet (`select $sel`);
+print ("// Face Test animations removed.\n");
+}

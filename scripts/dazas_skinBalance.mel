@@ -1,0 +1,14 @@
+// Balance the skin weights on the left and right sides.
+
+global proc dazas_skinBalance_UI ()
+{
+  string $dazas_skinBalance_win = window("-t", "Skin Balance", "-w", 600, "-h", 400);
+    paneLayout;
+      string $dazas_skinBalance_sheet = spreadSheetEditor();
+  showWindow($dazas_skinBalance_win);
+}
+
+global proc dazas_skinBalance (float $blc, string $infs[], string $vtxs[], int $relative, float $maxDis, float $atten)
+{
+  
+}

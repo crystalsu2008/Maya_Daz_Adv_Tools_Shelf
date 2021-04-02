@@ -1,0 +1,43 @@
+// This is a custom command to imported facial animations from AdvancedSkeleton controllers.
+// Modified from the Imported Face animation command of the AdvancedSkeleton tool.
+{
+string $ctrl,$attr;
+string $nameSpace="";
+string $tempString[],$tempString2[],$animCurves[];
+string $asMotionFaceFile=`asGetScriptLocation`+"/AdvancedSkeleton5Files/div/asMotionFace.ma";
+
+if (!`objExists ($nameSpace+"FaceControlSet")`)
+	error "No controlSets detected. select a controller";
+
+if (`objExists animationTestFaceFromMoCapLibrary`)
+	{
+	$nameSpace=`getAttr animationTestFaceFromMoCapLibrary.nameSpace`;
+	delete animationTestFaceFromMoCapLibrary;
+	}
+file -r -ignoreVersion -gl -mergeNamespacesOnClash false -namespace "MotionCaptureLibraryFace" -options "v=0;" $asMotionFaceFile;
+
+$animCurves=`ls -type animCurve "MotionCaptureLibraryFace:*"`;
+for ($i=0;$i<size($animCurves);$i++)
+	{
+	//remove old copies, if exists
+	$tempString[0]=`substitute "MotionCaptureLibraryFace:" $animCurves[$i] ""`;
+	$tempString=`ls ($tempString[0]+"*")`;
+	if (size($tempString))
+		delete $tempString;
+
+	$tempString=`duplicate $animCurves[$i]`;
+	tokenize $tempString[0] "_" $tempString2;
+	$ctrl=$nameSpace+$tempString2[0]+"_"+$tempString2[1];
+	$attr=$tempString2[2];
+	if (!`attributeExists $attr $ctrl`)
+		{
+		print ("//Not found:"+$ctrl+"."+$attr+"\n");
+		continue;
+		}
+	 catchQuiet (`connectAttr ($tempString[0]+".output") ($ctrl+"."+$attr)`);
+	}
+file -rr $asMotionFaceFile;
+playbackOptions -min 0 -ast 0 -max 330 -aet 330;
+currentTime 70;
+print "// Test animation applied.\n";
+}

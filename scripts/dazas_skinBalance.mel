@@ -1,4 +1,90 @@
 // Balance the skin weights on the left and right sides.
+/*
+Example:
+dazas_skinBalance(
+    {"Body.vtx[9885]","Body.vtx[9871]","Body.vtx[9867]","Body.vtx[8468]"}, // Vertices
+    {"NoseSideJoint_R", "NostrilJoint_R", "NoseCornerJoint_R"}, // Influences
+    0.5, // Balance
+    1, // Relative or not(Absolutely)
+    1.5, // Max Distance
+    1.0, // Exponential of Attenuation
+    0.05); // Below this value will be ignored
+*/
+global proc dazas_skinBalance (string $vtxs[], string $infs[], float $blc, int $relative, float $maxDis, float $atten, float $ignoreWeight)
+{
+  string $selInfs[] = ls("-sl", "-typ", "transform");
+  ConvertSelectionToVertices();
+  string $selVtxs[] = ls("-sl", "-typ", "float3", "-fl");
+
+  // Check vtxs.
+  if(size($vtxs)==0)
+    $vtxs = $selVtxs;
+  string $buffer[];
+  tokenize($vtxs[0], ".", $buffer);
+  if( !gmatch($buffer[1], "vtx\\[*\\]") )
+    error("Select or enter at least one polygon vertex.");
+  string $mesh = $buffer[0];
+  string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
+  string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
+  string $skinCluster[] = ls("-typ", "skinCluster", $upstreamNodes);
+  if(size($skinCluster)==0)
+    error("The selected or entered vertices are not the skinned object.");
+
+  // Check influences.
+  if(size($infs)==0)
+    $infs = $selInfs;
+  if(size($infs)==0)
+    error("Select or enter at least one influence vertex.");
+
+  string $allInfs[]= skinCluster("-q", "-inf", $skinCluster[0]);
+
+  string $tmpArray[] = stringArrayRemove($infs, $allInfs);
+  $infs = stringArrayRemove($tmpArray, $allInfs);
+
+  if(size($infs)==0)
+    error("The selected or entered influences is invalid.");
+
+  // Determine the prefix and suffix of the file name.
+  int $s = size($infs);
+  string $prefixL, $suffixL, $prefixR, $suffixR;
+  string $midInfs[];
+  for($i=0; $i<$s; $i++)
+  {
+    if( gmatch($infs[$i], "*_[L,R]") )
+    {
+      $prefixL = "";
+      $suffixL = "_L";
+      $prefixR = "";
+      $suffixR = "_R";
+    }
+    else if( gmatch($infs[$i], "[l,r][A-Z]*") )
+    {
+      $prefixL = "l";
+      $suffixL = "";
+      $prefixR = "r";
+      $suffixR = "";
+    }
+    else
+    {
+      $midInfs[size($midInfs)] = $infs[$i];
+    }
+  }
+  $infs = stringArrayRemove($midInfs, $infs);
+  if(size($infs)==0)
+    error("The left or right side influences should be selected for weight balancing.");
+
+  print $infs;
+  print ($prefixL+"\n");
+  print ($suffixL+"\n");
+  print ($prefixR+"\n");
+  print ($suffixR+"\n");
+
+  for($vtx in $vtxs)
+  {
+
+  }
+}
+
 
 global proc dazas_skinBalance_UI ()
 {
@@ -6,9 +92,4 @@ global proc dazas_skinBalance_UI ()
     paneLayout;
       string $dazas_skinBalance_sheet = spreadSheetEditor();
   showWindow($dazas_skinBalance_win);
-}
-
-global proc dazas_skinBalance (float $blc, string $infs[], string $vtxs[], int $relative, float $maxDis, float $atten)
-{
-  
 }

@@ -77,41 +77,6 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 64
-        -enable 1
-        -width 35
-        -height 34
-        -manage 1
-        -visible 1
-        -preventOverride 0
-        -annotation "Locks the weight of the joints outside the Genesis 8 character's head joint." 
-        -enableBackground 0
-        -backgroundColor 0 0 0 
-        -highlightColor 0.321569 0.521569 0.65098 
-        -align "center" 
-        -label "Locks the weight of the joints outside the G8  head" 
-        -labelOffset 0
-        -rotation 0
-        -flipX 0
-        -flipY 0
-        -useAlpha 1
-        -font "plainLabelFont" 
-        -imageOverlayLabel "LWOH" 
-        -overlayLabelColor 0.8 0.8 0.8 
-        -overlayLabelBackColor 0 0 0 0.5 
-        -image "polyNormalLock.png" 
-        -image1 "polyNormalLock.png" 
-        -style "iconOnly" 
-        -marginWidth 1
-        -marginHeight 1
-        -command "// Locks the weight of the Genesis 8 character joints outside the Genesis 8 character's head joint.\n{\n    string $lockWeightsInfs[] = {\"head\",\"neckUpper\", \"hip\", \"abdomenLower\", \"abdomenUpper\",\n        \"chestLower\", \"chestUpper\", \"lCollar\", \"lShldrBend\", \"lShldrTwist\", \"lForearmBend\",\n        \"lForearmTwist\", \"lHand\", \"lCarpal1\", \"lIndex1\", \"lIndex2\", \"lIndex3\", \"lCarpal2\",\n        \"lMid1\", \"lMid2\", \"lMid3\", \"lCarpal3\", \"lRing1\", \"lRing2\", \"lRing3\", \"lCarpal4\",\n        \"lPinky1\", \"lPinky2\", \"lPinky3\", \"lThumb1\", \"lThumb2\", \"lThumb3\",\"neckLower\",\n        \"rCollar\", \"rShldrBend\", \"rShldrTwist\", \"rForearmBend\", \"rForearmTwist\", \"rHand\",\n        \"rCarpal1\", \"rIndex1\", \"rIndex2\", \"rIndex3\", \"rCarpal2\", \"rMid1\", \"rMid2\", \"rMid3\",\n        \"rCarpal3\", \"rRing1\", \"rRing2\", \"rRing3\", \"rCarpal4\", \"rPinky1\", \"rPinky2\", \"rPinky3\",\n        \"rThumb1\", \"rThumb2\", \"rThumb3\", \"lPectoral\", \"rPectoral\", \"pelvis\", \"lThighBend\",\n        \"lThighTwist\", \"lShin\", \"lFoot\", \"lMetatarsals\", \"lToe\", \"lBigToe\", \"lBigToe_2\",\n        \"lSmallToe1\", \"lSmallToe1_2\", \"lSmallToe2\", \"lSmallToe2_2\", \"lSmallToe3\", \"lSmallToe3_2\",\n        \"lSmallToe4\", \"lSmallToe4_2\", \"rThighBend\", \"rThighTwist\", \"rShin\", \"rFoot\", \"rMetatarsals\",\n        \"rToe\", \"rBigToe\", \"rBigToe_2\", \"rSmallToe1\", \"rSmallToe1_2\", \"rSmallToe2\", \"rSmallToe2_2\",\n        \"rSmallToe3\", \"rSmallToe3_2\", \"rSmallToe4\", \"rSmallToe4_2\", \"lEar\", \"rEar\"};\n\n    for( $each in $lockWeightsInfs )\n        setAttr(($each+\".liw\"), 1);\n}" 
-        -sourceType "mel" 
-        -commandRepeatable 1
-        -flat 1
-    ;
-    shelfButton
-        -enableCommandRepeat 1
-        -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
         -width 35
@@ -280,6 +245,111 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "// Copies an already set AdvancedSkeleton Face Fit setting from an already bound Character.\n{\nproc string copyAdvFaceFitEyeBallAttrs( string $obj )\n{\n    float $t[] = getAttr($obj+\".t\");\n    float $r[] = getAttr($obj+\".r\");\n    float $s[] = getAttr($obj+\".s\");\n\n    string $cmd = \"setAttr \"+$obj+\".t \"+string($t[0])+\" \"+string($t[1])+\" \"+string($t[2])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".rx \"+string($r[0])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".ry \"+string($r[1])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".s \"+string($s[0])+\" \"+string($s[1])+\" \"+string($s[2])+\";\\n\";\n\n    return $cmd;\n}\n\nproc string copyAdvFaceFitTongueAttrs( string $obj )\n{\n    float $t[] = getAttr($obj+\".t\");\n    float $r[] = getAttr($obj+\".r\");\n    float $s[] = getAttr($obj+\".s\");\n\n    string $cmd = \"setAttr \"+$obj+\".t \"+string($t[0])+\" \"+string($t[1])+\" \"+string($t[2])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".r \"+string($r[0])+\" \"+string($r[1])+\" \"+string($r[2])+\";\\n\";\n    $cmd = $cmd + \"setAttr \"+$obj+\".s \"+string($s[0])+\" \"+string($s[1])+\" \"+string($s[2])+\";\\n\";\n\n    return $cmd;\n}\n\nglobal proc string advasFaceFitSettingCmd()\n{\n    string $cmds[] = {\"// AdvancedSkeleton Face Fit Cmds.\\n\"};\n    string $cmd;\n\n    // EyeBall\n    appendStringArray($cmds, {\"\\nasCreateFaceFit EyeBall \\\"\\\" 0 0 1 \\\"\\\";\"}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"FitEyeBall\" )}, 1);\n\n    string $selObjs[];\n    string $selectTxFields[] = {\"EyeLid \\\"Outer\\\";\",\n                                \"EyeLid \\\"Main\\\";\",\n                                \"EyeLid \\\"Inner\\\";\",\n                                \"Lip \\\"Outer\\\";\",\n                                \"Lip \\\"Main\\\";\",\n                                \"Lip \\\"Inner\\\";\",\n                                \"EyeBrowInner \\\"\\\";\",\n                                \"EyeBrowOuter \\\"\\\";\",\n                                \"EyeBrowCenter \\\"\\\";\",\n                                \"EyeBrowMid1 \\\"\\\";\",\n                                \"EyeBrowMid2 \\\"\\\";\",\n                                \"EyeBrowMid3 \\\"\\\";\",\n                                \"ForeHead \\\"\\\";\",\n                                \"JawPivot \\\"\\\";\",\n                                \"JawCorner \\\"\\\";\",\n                                \"Jaw \\\"\\\";\",\n                                \"Throat \\\"\\\";\",\n                                \"Cheek \\\"\\\";\",\n                                \"CheekBone \\\"\\\";\",\n                                \"CheekRaiser \\\"\\\";\",\n                                \"SmileBulge \\\"\\\";\",\n                                \"FrownBulge \\\"\\\";\",\n                                \"Nose \\\"\\\";\",\n                                \"NoseUnder \\\"\\\";\",\n                                \"NoseCorner \\\"\\\";\",\n                                \"NoseSide \\\"\\\";\",\n                                \"NoseCenter \\\"\\\";\",\n                                \"Nostril \\\"\\\";\",\n                                \"Pupil \\\"\\\";\",\n                                \"Iris \\\"\\\";\",\n                                \"SmileLine \\\"\\\";\"};\n\n    string $createTxFields[] = {\"EyeLid \\\"Outer\\\" 1 1 0 \\\"\\\";\",\n                                \"EyeLid \\\"Main\\\" 1 1 0 \\\"\\\";\",\n                                \"EyeLid \\\"Inner\\\" 1 1 0 \\\"\\\";\",\n                                \"Lip \\\"Outer\\\" 1 1 0 \\\"\\\";\",\n                                \"Lip \\\"Main\\\" 1 1 0 \\\"\\\";\",\n                                \"Lip \\\"Inner\\\" 1 1 0 \\\"\\\";\",\n                                \"EyeBrowInner \\\"\\\" 0 0 1 \\\"asGreenSG\\\";\",\n                                \"EyeBrowOuter \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"EyeBrowCenter \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"EyeBrowMid1 \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"EyeBrowMid2 \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"EyeBrowMid3 \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"ForeHead \\\"\\\" 0 0 0 \\\"\\\";\",\n                                \"JawPivot \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"JawCorner \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"Jaw \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"Throat \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"Cheek \\\"\\\" 0 0 1 \\\"asGreenSG\\\";\",\n                                \"CheekBone \\\"\\\" 0 0 1 \\\"asBlue2SG\\\";\",\n                                \"CheekRaiser \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"SmileBulge \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"FrownBulge \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"Nose \\\"\\\" 0 0 1 \\\"asGreenSG\\\";\",\n                                \"NoseUnder \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"NoseCorner \\\"\\\" 0 0 1 \\\"asRedSG\\\";\",\n                                \"NoseSide \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"NoseCenter \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"Nostril \\\"\\\" 0 0 1 \\\"asBlueSG\\\";\",\n                                \"Pupil \\\"\\\" 0 0 0 \\\"asRedSG\\\";\",\n                                \"Iris \\\"\\\" 0 0 0 \\\"asGreenSG\\\";\",\n                                \"SmileLine \\\"\\\" 0 0 0 \\\"asRedSG\\\";\"};\n\n    int $s = size($selectTxFields);\n    for($i=0;$i<$s;$i++)\n    {\n        eval(\"asFaceFitReSelect \"+$selectTxFields[$i]);\n        $selObjs = ls(\"-sl\");\n        if(size($selObjs)>0)\n        {\n            $cmd = \"select -r\";\n            for($each in $selObjs)\n                $cmd = $cmd+\" \"+$each;\n            $cmd = $cmd+\";\";\n            appendStringArray($cmds, {$cmd}, 1);\n            appendStringArray($cmds, {\"asCreateFaceFit \"+$createTxFields[$i]}, 1);\n        }\n        select(\"-cl\");\n    }\n\n    // Tongue\n    appendStringArray($cmds, {\"\\nasCreateFaceFit Tongue \\\"\\\" 0 0 0 \\\"asBlueSG\\\";\"}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue0\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue1\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue2\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue3\" )}, 1);\n    appendStringArray($cmds, {copyAdvFaceFitEyeBallAttrs( \"Tongue4\" )}, 1);\n\n    appendStringArray($cmds, {\"\\nasCreateFaceFit UpMidLo \\\"\\\" 0 0 0 \\\"asGreenSG\\\";\"}, 1);\n\n    string $allCmds = stringArrayToString($cmds, \"\\n\");\n    return $allCmds;\n}\n\nproc string asFaceFitSetting_refreshButton_Cmd(string $scroll)\n{\n    string $cmd = \"cmdScrollFieldExecuter(\\\"-edit\\\", \\\"-t\\\", advasFaceFitSettingCmd(), \\\"\"+$scroll+\"\\\")\";\n    return $cmd;\n}\n\nstring $advasFaceFitSettingCmd_Window = window(\"-t\", \"AdvancedSkeleton Face Fit Setting Script\");\n    string $advasFaceFitSettingCmd_form = formLayout(\"-nd\", 100);\n        string $advasFaceFitSettingCmd_refreshButton = button(\"-l\", \"Refresh\");\n        string $advasFaceFitSettingCmd_executeButton = button(\"-l\", \"Execute\");\n        string $advasFaceFitSettingCmd_Scroll = cmdScrollFieldExecuter(\"-t\", advasFaceFitSettingCmd());\n\n    formLayout -edit\n        -attachForm     $advasFaceFitSettingCmd_Scroll         \"top\"    5\n        -attachForm     $advasFaceFitSettingCmd_Scroll         \"left\"   5\n        -attachForm     $advasFaceFitSettingCmd_Scroll         \"right\"  5\n        -attachControl  $advasFaceFitSettingCmd_Scroll         \"bottom\" 5 $advasFaceFitSettingCmd_refreshButton\n\n        -attachNone     $advasFaceFitSettingCmd_refreshButton     \"top\"\n        -attachForm     $advasFaceFitSettingCmd_refreshButton     \"left\"   5\n        -attachPosition $advasFaceFitSettingCmd_refreshButton     \"right\"  5 50\n        -attachForm     $advasFaceFitSettingCmd_refreshButton     \"bottom\" 5\n\n        -attachNone     $advasFaceFitSettingCmd_executeButton   \"top\"\n        -attachPosition $advasFaceFitSettingCmd_executeButton   \"left\"   5 50\n        -attachForm     $advasFaceFitSettingCmd_executeButton   \"right\"  5\n        -attachForm     $advasFaceFitSettingCmd_executeButton   \"bottom\" 5\n    $advasFaceFitSettingCmd_form;\n\n    button(\"-edit\",\n        \"-c\", asFaceFitSetting_refreshButton_Cmd($advasFaceFitSettingCmd_Scroll),\n    $advasFaceFitSettingCmd_refreshButton);\n\n    button(\"-edit\",\n        \"-c\", \"cmdScrollFieldExecuter(\\\"-edit\\\", \\\"-exc\\\", \\\"\"+$advasFaceFitSettingCmd_Scroll+\"\\\")\",\n    $advasFaceFitSettingCmd_executeButton);\n\nshowWindow;\n}\n" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 64
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Locks the weight of the joints outside the Genesis 8 character's head joint." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Locks the weight of the joints outside the G8  head" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "LWOH" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polyNormalLock.png" 
+        -image1 "polyNormalLock.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Locks the weight of the Genesis 8 character joints outside the Genesis 8 character's head joint.\n{\n    string $lockWeightsInfs[] = {\"head\",\"neckUpper\", \"hip\", \"abdomenLower\", \"abdomenUpper\",\n        \"chestLower\", \"chestUpper\", \"lCollar\", \"lShldrBend\", \"lShldrTwist\", \"lForearmBend\",\n        \"lForearmTwist\", \"lHand\", \"lCarpal1\", \"lIndex1\", \"lIndex2\", \"lIndex3\", \"lCarpal2\",\n        \"lMid1\", \"lMid2\", \"lMid3\", \"lCarpal3\", \"lRing1\", \"lRing2\", \"lRing3\", \"lCarpal4\",\n        \"lPinky1\", \"lPinky2\", \"lPinky3\", \"lThumb1\", \"lThumb2\", \"lThumb3\",\"neckLower\",\n        \"rCollar\", \"rShldrBend\", \"rShldrTwist\", \"rForearmBend\", \"rForearmTwist\", \"rHand\",\n        \"rCarpal1\", \"rIndex1\", \"rIndex2\", \"rIndex3\", \"rCarpal2\", \"rMid1\", \"rMid2\", \"rMid3\",\n        \"rCarpal3\", \"rRing1\", \"rRing2\", \"rRing3\", \"rCarpal4\", \"rPinky1\", \"rPinky2\", \"rPinky3\",\n        \"rThumb1\", \"rThumb2\", \"rThumb3\", \"lPectoral\", \"rPectoral\", \"pelvis\", \"lThighBend\",\n        \"lThighTwist\", \"lShin\", \"lFoot\", \"lMetatarsals\", \"lToe\", \"lBigToe\", \"lBigToe_2\",\n        \"lSmallToe1\", \"lSmallToe1_2\", \"lSmallToe2\", \"lSmallToe2_2\", \"lSmallToe3\", \"lSmallToe3_2\",\n        \"lSmallToe4\", \"lSmallToe4_2\", \"rThighBend\", \"rThighTwist\", \"rShin\", \"rFoot\", \"rMetatarsals\",\n        \"rToe\", \"rBigToe\", \"rBigToe_2\", \"rSmallToe1\", \"rSmallToe1_2\", \"rSmallToe2\", \"rSmallToe2_2\",\n        \"rSmallToe3\", \"rSmallToe3_2\", \"rSmallToe4\", \"rSmallToe4_2\", \"lEar\", \"rEar\"};\n\n    for( $each in $lockWeightsInfs )\n        setAttr(($each+\".liw\"), 1);\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "This is a custom command to imported facial animations from AdvancedSkeleton controllers.\nModified from the Imported Face animation command of the AdvancedSkeleton tool." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Import AS facial Test animations" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "ImFaAn" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "puppetFind.png" 
+        -image1 "puppetFind.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// This is a custom command to imported facial animations from AdvancedSkeleton controllers.\n// Modified from the Imported Face animation command of the AdvancedSkeleton tool.\n{\nstring $ctrl,$attr;\nstring $nameSpace=\"\";\nstring $tempString[],$tempString2[],$animCurves[];\nstring $asMotionFaceFile=`asGetScriptLocation`+\"/AdvancedSkeleton5Files/div/asMotionFace.ma\";\n\nif (!`objExists ($nameSpace+\"FaceControlSet\")`)\n\terror \"No controlSets detected. select a controller\";\n\nif (`objExists animationTestFaceFromMoCapLibrary`)\n\t{\n\t$nameSpace=`getAttr animationTestFaceFromMoCapLibrary.nameSpace`;\n\tdelete animationTestFaceFromMoCapLibrary;\n\t}\nfile -r -ignoreVersion -gl -mergeNamespacesOnClash false -namespace \"MotionCaptureLibraryFace\" -options \"v=0;\" $asMotionFaceFile;\n\n$animCurves=`ls -type animCurve \"MotionCaptureLibraryFace:*\"`;\nfor ($i=0;$i<size($animCurves);$i++)\n\t{\n\t//remove old copies, if exists\n\t$tempString[0]=`substitute \"MotionCaptureLibraryFace:\" $animCurves[$i] \"\"`;\n\t$tempString=`ls ($tempString[0]+\"*\")`;\n\tif (size($tempString))\n\t\tdelete $tempString;\n\n\t$tempString=`duplicate $animCurves[$i]`;\n\ttokenize $tempString[0] \"_\" $tempString2;\n\t$ctrl=$nameSpace+$tempString2[0]+\"_\"+$tempString2[1];\n\t$attr=$tempString2[2];\n\tif (!`attributeExists $attr $ctrl`)\n\t\t{\n\t\tprint (\"//Not found:\"+$ctrl+\".\"+$attr+\"\\n\");\n\t\tcontinue;\n\t\t}\n\t catchQuiet (`connectAttr ($tempString[0]+\".output\") ($ctrl+\".\"+$attr)`);\n\t}\nfile -rr $asMotionFaceFile;\nplaybackOptions -min 0 -ast 0 -max 330 -aet 330;\ncurrentTime 70;\nprint \"// Test animation applied.\\n\";\n}\n" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "This is a custom command to remove facial animations from AdvancedSkeleton controllers. Modified from the Remove Face animation command of the AdvancedSkeleton tool." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "remove AS facial Test animations" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "ReFaAn" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "puppetRemove.png" 
+        -image1 "puppetRemove.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// This is a custom command to remove facial animations from AdvancedSkeleton controllers.\n// Modified from the Remove Face animation command of the AdvancedSkeleton tool.\n{\nstring $nameSpace=\"\";\nstring $refFiles[]=`file -q -r`;\nstring $sel[]=`ls -sl`;\nstring $tempString[],$tempString2[];\n\nif (!`objExists ($nameSpace+\"FaceControlSet\")`)\n\terror \"No controlSets detected. select a controller\";\n\nselect -cl;\nif (`objExists ($nameSpace+\"FaceControlSet\")`) select -add `sets -q ($nameSpace+\"FaceControlSet\")`;\nif (`objExists ($nameSpace+\"FKHead_M\")`) select -add ($nameSpace+\"FKHead_M\");\nif (`objExists ($nameSpace+\"FKNeck_M\")`) select -add ($nameSpace+\"FKNeck_M\");\n\nstring $animCurves[]=`listConnections -type animCurve -s 1 -d 0`;\nif (size($animCurves))\n\tdelete $animCurves;\n\nif (`objExists ($nameSpace+\"ControlSet\")`) asGoToBuildPoseOptions $nameSpace \"ControlSet\";\nif (`objExists ($nameSpace+\"FaceControlSet\")`) asGoToBuildPoseOptions $nameSpace \"FaceControlSet\";\n\ndgdirty -a;\ncatchQuiet (`select $sel`);\nprint (\"// Face Test animations removed.\\n\");\n}\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -525,41 +595,6 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "//Set Genesis 8 Character From Bind Pose to T-Pose.\n\nsetAttr \"lShldrBend.rotateZ\" 45;\nsetAttr \"rShldrBend.rotateZ\" -45;\n\nsetAttr \"lCollar.rotateZ\" 2.5;\nsetAttr \"rCollar.rotateZ\" -2.5;\n\nsetAttr \"lThighBend.rotateZ\" -15;\nsetAttr \"rThighBend.rotateZ\" 15;\n\nsetAttr \"lThighTwist.rotateY\" -10;\nsetAttr \"rThighTwist.rotateY\" 10;\n\nsetAttr \"lFoot.rotateY\" -8.5;\nsetAttr \"rFoot.rotateY\" 8.5;\n\nsetAttr \"lFoot.rotateZ\" 20;\nsetAttr \"rFoot.rotateZ\" -20;" 
-        -sourceType "mel" 
-        -commandRepeatable 1
-        -flat 1
-    ;
-    shelfButton
-        -enableCommandRepeat 1
-        -flexibleWidthType 3
-        -flexibleWidthValue 32
-        -enable 1
-        -width 35
-        -height 34
-        -manage 1
-        -visible 1
-        -preventOverride 0
-        -annotation "This is a custom command to remove facial animations from AdvancedSkeleton controllers. Modified from the Remove Face animation command of the AdvancedSkeleton tool." 
-        -enableBackground 0
-        -backgroundColor 0 0 0 
-        -highlightColor 0.321569 0.521569 0.65098 
-        -align "center" 
-        -label "remove AS facial animations" 
-        -labelOffset 0
-        -rotation 0
-        -flipX 0
-        -flipY 0
-        -useAlpha 1
-        -font "plainLabelFont" 
-        -imageOverlayLabel "ReFaAn" 
-        -overlayLabelColor 0.8 0.8 0.8 
-        -overlayLabelBackColor 0 0 0 0.5 
-        -image "puppetRemove.png" 
-        -image1 "puppetRemove.png" 
-        -style "iconOnly" 
-        -marginWidth 1
-        -marginHeight 1
-        -command "// This is a custom command to remove facial animations from AdvancedSkeleton controllers.\n// Modified from the Remove Face animation command of the AdvancedSkeleton tool.\n{\nstring $nameSpace=\"\";\nstring $refFiles[]=`file -q -r`;\nstring $sel[]=`ls -sl`;\nstring $tempString[],$tempString2[];\n\nif (!`objExists ($nameSpace+\"FaceControlSet\")`)\n\terror \"No controlSets detected. select a controller\";\n\nselect -cl;\nif (`objExists ($nameSpace+\"FaceControlSet\")`) select -add `sets -q ($nameSpace+\"FaceControlSet\")`;\nif (`objExists ($nameSpace+\"FKHead_M\")`) select -add ($nameSpace+\"FKHead_M\");\nif (`objExists ($nameSpace+\"FKNeck_M\")`) select -add ($nameSpace+\"FKNeck_M\");\n\nstring $animCurves[]=`listConnections -type animCurve -s 1 -d 0`;\nif (size($animCurves))\n\tdelete $animCurves;\n\nif (`objExists ($nameSpace+\"ControlSet\")`) asGoToBuildPoseOptions $nameSpace \"ControlSet\";\nif (`objExists ($nameSpace+\"FaceControlSet\")`) asGoToBuildPoseOptions $nameSpace \"FaceControlSet\";\n\ndgdirty -a;\ncatchQuiet (`select $sel`);\nprint (\"// Face Test animations removed.\\n\");\n}\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

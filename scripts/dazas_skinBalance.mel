@@ -12,9 +12,10 @@ Negative values lead to a more uneven distribution of weights between the left a
 A value of -1 will result in a maximum weight on one side and a weight of 0 on the other side.
 If the left and right weights are already perfectly even, the relative mode will not play any role.
 In Absolutely mode,
-the value -1 will cause the weights to be fully assigned to the right side(-X).
-A value of 1 will cause the weights to be fully assigned to the left side(X).
-A value of 0 will result in an equal distribution of weights to both sides.
+A value -1 causes the weight of the vertex to be completely biased towards the influences on one side
+and the weight of the influences on the other side to be 0.
+The direction of the weight bias is determined by the location of the vertex.
+A value 1 causes the weights of the vertices to be distributed completely equally to the influences on both sides.
 In the distance mode,
 the Balance parameter value will be ignored.
 the assignment of weights will be determined by the distance from the vertex to the Influences on both sides in the x-axis direction.
@@ -44,7 +45,7 @@ dazas_skinBalance(
     {"Body.vtx[9885]","Body.vtx[9871]","Body.vtx[9867]","Body.vtx[8468]"}, // Vertices
     {"NoseSideJoint_R", "NostrilJoint_R", "NoseCornerJoint_R"}, // Influences
     "dis", // 'Relative','rel' or 'Absolutely','abs' or 'Distance','dis'
-    "use", // 'use' or 'directlyUse' or 'build' or 'onlyBuild'
+    "use", // 'use', 'directlyUse' or 'build'
     0.5,  // Balance Value
     1.5, // Max Distance
     1.0, // Exponential of Attenuation
@@ -54,8 +55,10 @@ global string $gDazasSkinBalskinCluster;
 global string $gDazasSkinBalVtxs[];
 global string $gDazasSkinBalInfsL[];
 global float $gDazasSkinBalWeightsL[];
+global float $gDazasSkinBalInfXPosL[];
 global string $gDazasSkinBalInfsR[];
 global float $gDazasSkinBalWeightsR[];
+global float $gDazasSkinBalInfXPosR[];
 global string $gDazasSkinBalInfsSmaller[];
 global float $gDazasSkinBalWeightsSmaller[];
 global string $gDazasSkinBalInfsLarger[];
@@ -66,7 +69,7 @@ global float $gDazasSkinBalMaxDis;
 global float $gDazasSkinBalAtten;
 
 // Check whether the data is correct or not.
-global proc string dazas_skinBal_checkData (string $vtxs[], string $infsL[], string $infsR[])
+global proc int dazas_skinBal_checkData (string $vtxs[], string $infsL[], string $infsR[])
 {
   global string $gDazasSkinBalskinCluster;
 
@@ -75,6 +78,9 @@ global proc string dazas_skinBal_checkData (string $vtxs[], string $infsL[], str
   global float $gDazasSkinBalWeightsL[];
   global string $gDazasSkinBalInfsR[];
   global float $gDazasSkinBalWeightsR[];
+
+  global float $gDazasSkinBalInfXPosL[];
+  global float $gDazasSkinBalInfXPosR[];
 
   global string $gDazasSkinBalInfsSmaller[];
   global float $gDazasSkinBalWeightsSmaller[];
@@ -86,15 +92,14 @@ global proc string dazas_skinBal_checkData (string $vtxs[], string $infsL[], str
   global float $gDazasSkinBalMaxDis;
   global float $gDazasSkinBalAtten;
 
-  int $result = objExists($gDazasSkinBalskinCluster);
-  if (!$result)
-    return "The Skin Cluster does not exist.";
-
   int $vtxsSize_g = size($gDazasSkinBalVtxs);
   int $infsSizeL_g = size($gDazasSkinBalInfsL);
   int $weightsSizeL_g = size($gDazasSkinBalWeightsL);
   int $infsSizeR_g = size($gDazasSkinBalInfsR);
   int $weightsSizeR_g = size($gDazasSkinBalWeightsR);
+
+  int $infXDisSizeL_g = size($gDazasSkinBalInfXPosL);
+  int $infXDisSizeR_g = size($gDazasSkinBalInfXPosR);
 
   int $infsSmallerSize_g = size($gDazasSkinBalInfsSmaller);
   int $weightsSmallerSize_g = size($gDazasSkinBalWeightsSmaller);
@@ -108,36 +113,42 @@ global proc string dazas_skinBal_checkData (string $vtxs[], string $infsL[], str
   int $infsSizeL = size($infsL);
   int $infsSizeR = size($infsR);
 
-  $result = ($vtxsSize_g != 0 &&
+  int $result = ($vtxsSize_g != 0 &&
             $vtxsSize_g == $infsSizeL_g &&
             $infsSizeL_g == $weightsSizeL_g &&
             $weightsSizeL_g == $infsSizeR_g &&
             $infsSizeR_g == $weightsSizeR_g &&
-            $weightsSizeR_g == $infsSmallerSize_g &&
+            $weightsSizeR_g == $infXDisSizeL_g &&
+            $infXDisSizeL_g == $infXDisSizeR_g &&
+            $infXDisSizeR_g == $infsSmallerSize_g &&
             $infsSmallerSize_g == $weightsSmallerSize_g &&
             $weightsSmallerSize_g == $infsLargerSize_g &&
             $infsLargerSize_g == $weightsLargerSize_g &&
             $weightsLargerSize_g == $intensitySize_g &&
             $intensitySize_g == $xDisSize_g);
   if (!$result)
-    return "Data is empty or data is corrupt.";
+    return 0; //"Data is empty or data is corrupt.";
   else if ($vtxsSize > 0)
   {
+    $result = objExists($gDazasSkinBalskinCluster);
+    if (!$result)
+      return 2; //"The Skin Cluster does not exist.";
+
     $result = ($vtxsSize_g == $vtxsSize &&
               $vtxsSize == $infsSizeL &&
               $infsSizeL == $infsSizeR);
     if (!$result)
-      return "The data does not match the currently entered vertices and influences.";
+      return 3; //"The data does not match the currently entered vertices and influences.";
 
     int $i;
     for ($i=0; $i<$vtxsSize; $i++)
     {
-      if ($gDazasSkinBalVtxs[$i] != $vtxs[$i]) return "The data does not match the currently entered vertices and influences.";
-      else if  ($gDazasSkinBalInfsL[$i] != $infsL[$i]) return "The data does not match the currently entered vertices and influences.";
-      else if  ($gDazasSkinBalInfsR[$i] != $infsR[$i]) return "The data does not match the currently entered vertices and influences.";
+      if ($gDazasSkinBalVtxs[$i] != $vtxs[$i]) return 4; //"The data does not match the currently entered vertices and influences.";
+      else if  ($gDazasSkinBalInfsL[$i] != $infsL[$i]) return 4; //"The data does not match the currently entered vertices and influences.";
+      else if  ($gDazasSkinBalInfsR[$i] != $infsR[$i]) return 4; //"The data does not match the currently entered vertices and influences.";
     }
   }
-  return "";
+  return 1;
 }
 
 // Clear data.
@@ -150,6 +161,9 @@ global proc int dazas_skinBal_clearData ()
   global float $gDazasSkinBalWeightsL[];
   global string $gDazasSkinBalInfsR[];
   global float $gDazasSkinBalWeightsR[];
+
+  global float $gDazasSkinBalInfXPosL[];
+  global float $gDazasSkinBalInfXPosR[];
 
   global string $gDazasSkinBalInfsSmaller[];
   global float $gDazasSkinBalWeightsSmaller[];
@@ -168,6 +182,9 @@ global proc int dazas_skinBal_clearData ()
   clear($gDazasSkinBalWeightsL);
   clear($gDazasSkinBalInfsR);
   clear($gDazasSkinBalWeightsR);
+
+  clear($gDazasSkinBalInfXPosL);
+  clear($gDazasSkinBalInfXPosR);
 
   clear($gDazasSkinBalInfsSmaller);
   clear($gDazasSkinBalWeightsSmaller);
@@ -193,6 +210,9 @@ global proc int dazas_skinBal_printData ()
   global string $gDazasSkinBalInfsR[];
   global float $gDazasSkinBalWeightsR[];
 
+  global float $gDazasSkinBalInfXPosL[];
+  global float $gDazasSkinBalInfXPosR[];
+
   global string $gDazasSkinBalInfsSmaller[];
   global float $gDazasSkinBalWeightsSmaller[];
   global string $gDazasSkinBalInfsLarger[];
@@ -212,10 +232,32 @@ global proc int dazas_skinBal_printData ()
   for ($i=0; $i<$s; $i++)
   {
     print("\n"+$gDazasSkinBalVtxs[$i]+":\n");
-    print("\tLeft --> "+$gDazasSkinBalInfsL[$i]+": "+$gDazasSkinBalWeightsL[$i]+" | Intensity: "+$gDazasSkinBalIntensity[$i]+" | X-Distence: "+$gDazasSkinBalXDis[$i]+"\n");
-    print("\tRight --> "+$gDazasSkinBalInfsR[$i]+": "+$gDazasSkinBalWeightsR[$i]+" | Intensity: "+$gDazasSkinBalIntensity[$i]+" | X-Distence: "+$gDazasSkinBalXDis[$i]+"\n");
-    print("\tSmaller --> "+$gDazasSkinBalInfsSmaller[$i]+": "+$gDazasSkinBalWeightsSmaller[$i]+" | Intensity: "+$gDazasSkinBalIntensity[$i]+" | X-Distence: "+$gDazasSkinBalXDis[$i]+"\n");
-    print("\tLarger --> "+$gDazasSkinBalInfsLarger[$i]+": "+$gDazasSkinBalWeightsLarger[$i]+" | Intensity: "+$gDazasSkinBalIntensity[$i]+" | X-Distence: "+$gDazasSkinBalXDis[$i]+"\n");
+    print("\tLeft --> "+$gDazasSkinBalInfsL[$i]+": "+$gDazasSkinBalWeightsL[$i]+" | X-Position: "+$gDazasSkinBalInfXPosL[$i]+"\n");
+    print("\tRight --> "+$gDazasSkinBalInfsR[$i]+": "+$gDazasSkinBalWeightsR[$i]+" | X-Position: "+$gDazasSkinBalInfXPosR[$i]+"\n");
+    print("\tSmaller --> "+$gDazasSkinBalInfsSmaller[$i]+": "+$gDazasSkinBalWeightsSmaller[$i]+"\n");
+    print("\tLarger --> "+$gDazasSkinBalInfsLarger[$i]+": "+$gDazasSkinBalWeightsLarger[$i]+"\n");
+    print("\tIntensity: "+$gDazasSkinBalIntensity[$i]+"\n");
+    print("\tX-Distence: "+$gDazasSkinBalXDis[$i]+"\n");
+  }
+  return 1;
+}
+
+// Select data vertices.
+global proc int dazas_skinBal_selectData (int $mode, string $vtx, string $inf)
+{
+  global string $gDazasSkinBalVtxs[];
+  global string $gDazasSkinBalInfsL[];
+  global string $gDazasSkinBalInfsR[];
+
+  string $modes[] = {"-d", "-add"};
+
+  if ($vtx){
+    select($modes[$mode], $gDazasSkinBalVtxs);
+  }
+
+  if ($inf) {
+    select($modes[$mode], $gDazasSkinBalInfsL);
+    select($modes[$mode], $gDazasSkinBalInfsR);
   }
   return 1;
 }
@@ -231,6 +273,9 @@ global proc int dazas_skinBal_buildData (string $skinCluster, string $vtxs[], st
   global string $gDazasSkinBalInfsR[];
   global float $gDazasSkinBalWeightsR[];
 
+  global float $gDazasSkinBalInfXPosL[];
+  global float $gDazasSkinBalInfXPosR[];
+
   global string $gDazasSkinBalInfsSmaller[];
   global float $gDazasSkinBalWeightsSmaller[];
   global string $gDazasSkinBalInfsLarger[];
@@ -245,12 +290,13 @@ global proc int dazas_skinBal_buildData (string $skinCluster, string $vtxs[], st
   int $i;
   if (!$s)
   {
+    //print("No object was selected. Only the 'Maximum Distance' and 'Attenuation Exponential' data is updated.");
     $gDazasSkinBalMaxDis = $maxDis;
     $gDazasSkinBalAtten = $atten;
     int $ss = size($gDazasSkinBalXDis);
     for ($i=0; $i<$ss; $i++)
     {
-      $gDazasSkinBalIntensity[$i] = pow(($maxDis-$gDazasSkinBalXDis[$i])/$maxDis, $atten);
+      $gDazasSkinBalIntensity[$i] = pow(($maxDis-abs($gDazasSkinBalXDis[$i]))/$maxDis, $atten);
     }
   }
   else
@@ -281,12 +327,18 @@ global proc int dazas_skinBal_buildData (string $skinCluster, string $vtxs[], st
         $gDazasSkinBalInfsSmaller[$i] = $infsR[$i];
         $gDazasSkinBalInfsLarger[$i] = $infsL[$i];
       }
+      float $infPosL[] = xform("-ws", "-q", "-t", $infsL[$i]);
+      float $infPosR[] = xform("-ws", "-q", "-t", $infsR[$i]);
+      $gDazasSkinBalInfXPosL[$i] = $infPosL[0];
+      $gDazasSkinBalInfXPosR[$i] = $infPosR[0];
     }
   }
   return 1;
 }
 
-// Processing data.
+////////////////////////
+//  Processing data.  //
+////////////////////////
 global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $skinCluster, int $check, int $build, float $maxDis, float $atten, float $ignoreWeight)
 {
   ////////////////////////////////////////////////////////
@@ -336,7 +388,7 @@ global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $
   progressBar -edit
     -beginProgress
     -isInterruptable true
-    -status "Processing data..."
+    -status "Preparing vertices data..."
     -maxValue (max(1, size($vtxs)*size($infsL)))
     $gMainProgressBar;
 
@@ -360,8 +412,8 @@ global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $
       float $wt = $wl + $wr;
       if ($wt <= $ignoreWeight) continue;
 
-      color( "-rgb", 0, 1, 1, $infsL[$i] );
-      color( "-rgb", 0, 1, 1, $infsR[$i] );
+      //color( "-rgb", 0, 1, 1, $infsL[$i] );
+      //color( "-rgb", 0, 1, 1, $infsR[$i] );
 
       int $id = size($daVtxs);
       $daVtxs[$id] = $vtx;
@@ -371,7 +423,7 @@ global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $
       $daWeightR[$id] = $wr;
 
       $intensity[$id] = pow(($maxDis-$xdis)/$maxDis, $atten);
-      $xDis[$id] = $xdis;
+      $xDis[$id] = $pos[0];
     }
   }
 
@@ -384,19 +436,24 @@ global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $
   //////////////////////////////////////
 
   int $result;
-  string $checkDataResult;
+  int $checkDataResult;
+  string $checkDataInfo[] = {"\nData is empty or data is corrupt. Please select the appropriate vertices and influences to rebuild the data.\n",
+                            "\nThe data is healthy.\n",
+                            "\nThe Skin Cluster does not exist.\n",
+                            "\nThe data does not match the currently entered vertices and influences.\n"};
   if ($check)
   {
     $checkDataResult = dazas_skinBal_checkData($daVtxs, $daInfsL, $daInfsR);
-    if ($checkDataResult != "" && $build)
+    if ($checkDataResult != 1 && $build)
     {
-      print("Data is invalid or does not match the currently entered vertices and influences. Rebuild the data using the current input data.\n");
+      print("\nData is invalid or does not match the currently entered vertices and influences. Rebuild the data using the current input data.\n");
+      dazas_skinBal_clearData();
       $result = dazas_skinBal_buildData($skinCluster, $daVtxs, $daInfsL, $daInfsR, $daWeightL, $daWeightR, $intensity, $xDis, $maxDis, $atten);
     }
-    else if ($checkDataResult != "")
+    else if ($checkDataResult != 1)
     {
       $result = 0;
-      error($checkDataResult);
+      error($checkDataInfo[$checkDataResult]);
     }
     else
     {
@@ -413,6 +470,7 @@ global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $
     }
   }
 
+  select $daVtxs;
   return $result;
 }
 
@@ -481,7 +539,146 @@ global proc int dazas_skinBal_relative (float $blc)
   return 1;
 }
 
-// Main
+global proc int dazas_skinBal_absolutely (float $blc)
+{
+  global string $gDazasSkinBalskinCluster;
+  global string $gDazasSkinBalVtxs[];
+  global string $gDazasSkinBalInfsL[];
+  global float $gDazasSkinBalWeightsL[];
+  global string $gDazasSkinBalInfsR[];
+  global float $gDazasSkinBalWeightsR[];
+  global string $gDazasSkinBalInfsSmaller[];
+  global float $gDazasSkinBalWeightsSmaller[];
+  global string $gDazasSkinBalInfsLarger[];
+  global float $gDazasSkinBalWeightsLarger[];
+  global float $gDazasSkinBalIntensity[];
+  global float $gDazasSkinBalXDis[];
+  //global float $gDazasSkinBalMaxDis;
+  //global float $gDazasSkinBalAtten;
+
+  string $skinCluster = $gDazasSkinBalskinCluster;
+  string $vtxs[] = $gDazasSkinBalVtxs;
+  string $infsL[] = $gDazasSkinBalInfsL;
+  float $weightsL[] = $gDazasSkinBalWeightsL;
+  string $infsR[] = $gDazasSkinBalInfsR;
+  float $weightsR[] = $gDazasSkinBalWeightsR;
+  string $infsSm[] = $gDazasSkinBalInfsSmaller;
+  float $weightsSm[] = $gDazasSkinBalWeightsSmaller;
+  string $infsLa[] = $gDazasSkinBalInfsLarger;
+  float $weightsLa[] = $gDazasSkinBalWeightsLarger;
+  float $intensity[] = $gDazasSkinBalIntensity;
+  float $xDis[] = $gDazasSkinBalXDis;
+  //float $maxDis = $gDazasSkinBalMaxDis;
+  //float $atten = $gDazasSkinBalAtten;
+
+  int $s = size($vtxs);
+  int $i;
+  float $nmlblc = 1.0-(0.5+0.5*$blc);
+
+  global string $gMainProgressBar;  // This is defined on maya startup
+  progressBar -edit
+    -beginProgress
+    -isInterruptable true
+    -status "Balancing the vertex weights..."
+    -maxValue $s
+    $gMainProgressBar;
+
+  for ($i=0; $i<$s; $i++)
+  {
+    float $halfWeight = 0.5 * ($weightsL[$i] + $weightsR[$i]);
+    float $transferWeight = $halfWeight + sign($xDis[$i]) * $nmlblc * $halfWeight;
+    float $wl = (1.0-$intensity[$i]) * $weightsL[$i] + $intensity[$i] * $transferWeight;
+    float $wr = 2*$halfWeight - $wl;
+    skinPercent( "-tv", $infsL[$i], $wl, "-tv", $infsR[$i], $wr, $skinCluster, $vtxs[$i] );
+
+    if(`progressBar -query -isCancelled $gMainProgressBar`)
+      break;
+    progressBar -edit
+      -step 1 $gMainProgressBar;
+  }
+
+  progressBar -edit
+    -endProgress
+    $gMainProgressBar;
+
+  return 1;
+}
+
+global proc int dazas_skinBal_distance ()
+{
+  global string $gDazasSkinBalskinCluster;
+  global string $gDazasSkinBalVtxs[];
+  global string $gDazasSkinBalInfsL[];
+  global float $gDazasSkinBalWeightsL[];
+  global string $gDazasSkinBalInfsR[];
+  global float $gDazasSkinBalWeightsR[];
+  global float $gDazasSkinBalInfXPosL[];
+  global float $gDazasSkinBalInfXPosR[];
+
+  global string $gDazasSkinBalInfsSmaller[];
+  global float $gDazasSkinBalWeightsSmaller[];
+  global string $gDazasSkinBalInfsLarger[];
+  global float $gDazasSkinBalWeightsLarger[];
+  global float $gDazasSkinBalIntensity[];
+  global float $gDazasSkinBalXDis[];
+  //global float $gDazasSkinBalMaxDis;
+  //global float $gDazasSkinBalAtten;
+
+  string $skinCluster = $gDazasSkinBalskinCluster;
+  string $vtxs[] = $gDazasSkinBalVtxs;
+  string $infsL[] = $gDazasSkinBalInfsL;
+  float $weightsL[] = $gDazasSkinBalWeightsL;
+  string $infsR[] = $gDazasSkinBalInfsR;
+  float $weightsR[] = $gDazasSkinBalWeightsR;
+  float $infPosL[] = $gDazasSkinBalInfXPosL;
+  float $infPosR[] = $gDazasSkinBalInfXPosR;
+
+  string $infsSm[] = $gDazasSkinBalInfsSmaller;
+  float $weightsSm[] = $gDazasSkinBalWeightsSmaller;
+  string $infsLa[] = $gDazasSkinBalInfsLarger;
+  float $weightsLa[] = $gDazasSkinBalWeightsLarger;
+  float $intensity[] = $gDazasSkinBalIntensity;
+  float $xPos[] = $gDazasSkinBalXDis;
+  //float $maxDis = $gDazasSkinBalMaxDis;
+  //float $atten = $gDazasSkinBalAtten;
+
+  int $s = size($vtxs);
+  int $i;
+
+  global string $gMainProgressBar;  // This is defined on maya startup
+  progressBar -edit
+    -beginProgress
+    -isInterruptable true
+    -status "Balancing the vertex weights..."
+    -maxValue $s
+    $gMainProgressBar;
+
+  for ($i=0; $i<$s; $i++)
+  {
+    float $dis = $infPosL[$i] - $infPosR[$i];
+    float $disVtx = clamp(0, $dis, $xPos[$i]-$infPosR[$i]);
+
+    float $totalWeight = $weightsL[$i] + $weightsR[$i];
+    float $wl = (1.0-$intensity[$i]) * $weightsL[$i] + $intensity[$i] * ($disVtx / $dis * $totalWeight);
+    float $wr = $totalWeight - $wl;
+    skinPercent( "-tv", $infsL[$i], $wl, "-tv", $infsR[$i], $wr, $skinCluster, $vtxs[$i] );
+
+    if(`progressBar -query -isCancelled $gMainProgressBar`)
+      break;
+    progressBar -edit
+      -step 1 $gMainProgressBar;
+  }
+
+  progressBar -edit
+    -endProgress
+    $gMainProgressBar;
+
+  return 1;
+}
+
+////////////
+//  Main  //
+////////////
 global proc dazas_skinBalance (string $vtxs[], string $infs[], string $mode, string $data, float $blc, float $maxDis, float $atten, float $ignoreWeight)
 {
   int $result;
@@ -496,7 +693,7 @@ global proc dazas_skinBalance (string $vtxs[], string $infs[], string $mode, str
   {
     string $skinCluster[];
     int $inputSize = size(ls("-sl")) + size($vtxs) + size($infs);
-    if ($inputSize>0 || $data == "build" || $data == "onlyBuild")
+    if ($inputSize > 0)// || $data == "build")
     {
       //-- Checking Parameters --//
 
@@ -510,14 +707,14 @@ global proc dazas_skinBalance (string $vtxs[], string $infs[], string $mode, str
       string $buffer[];
       tokenize($vtxs[0], ".", $buffer);
       if (!gmatch($buffer[1], "vtx\\[*\\]"))
-        error ("\nSelect or enter at least one polygon vertex.");
+        error ("\nSelect or enter at least one polygon vertex.\n");
       $vtxs = sort($vtxs);
       string $mesh = $buffer[0];
       string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
       string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
       $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
       if (size($skinCluster)==0)
-        error ("\nThe selected or entered vertices are not the skinned object.");
+        error ("\nThe selected or entered vertices are not the skinned object.\n");
 
       // Check influences.
       if (size($infs)==0)
@@ -538,54 +735,208 @@ global proc dazas_skinBalance (string $vtxs[], string $infs[], string $mode, str
 
       $result = dazas_skinBal_dataProc ({}, {}, "", 1, 0, $maxDis, $atten, $ignoreWeight);
       if (!$result) {
-        error("The data is empty or corrupted. Please rebuild the data and run again.");
+        error("\nThe data is empty or corrupted. Please rebuild the data and run again.\n");
       }
     }
 
     //-- Building Datas --//
 
-    if ($data == "use") {
+    if ($data == "use" || $data == "build") {
       $result = dazas_skinBal_dataProc ($vtxs, $infs, $skinCluster[0], 1, 1, $maxDis, $atten, $ignoreWeight);
-      if ($result == -1)
-        error ("Select or enter at least one left or right side influence for weight balancing.\n");
-    } else {
-      $result = dazas_skinBal_dataProc ($vtxs, $infs, $skinCluster[0], 0, 1, $maxDis, $atten, $ignoreWeight);
-      if ($result == -1)
-        error ("Select or enter at least one left or right side influence for weight balancing.\n");
+    }
+    else {
+      error ("\n'"+$data+"' is not the correct type of data parameter.Please choose from types 'use', 'directlyUse' and 'build'.\n");
     }
   }
 
-  ////////////////////////////////
-  //// Balancing skin weights ////
-  ////////////////////////////////
-  if ($data != "onlyBuild")
+  //////////////////////////////////
+  ////  Balancing skin weights  ////
+  //////////////////////////////////
+  if ($data != "build")
   {
     switch ($mode)
     {
       case "Relative":
       case "rel":
         dazas_skinBal_relative ($blc);
-        print("Relative\n");
         break;
       case "Absolutely":
       case "abs":
-        print("Banana\n"); // Executed if "b" or "B"
+        dazas_skinBal_absolutely ($blc);
         break;
       case "Distance":
       case "dis":
-        print("Banana\n"); // Executed if "b" or "B"
+        dazas_skinBal_distance ();
         break;
       default:
-        error ("Please select from the following modes. 'Relative','rel' or 'Absolutely','abs' or 'Distance','dis'");
+        error ("\nPlease select from the following modes. 'Relative','rel' or 'Absolutely','abs' or 'Distance','dis'.\n");
         break;
     }
   }
 }
 
+//////////
+//  UI  //
+//////////
+
+global proc dazas_skinBal_UI_checkData (string $dataStatusText)
+{
+  int $checkDataResult = dazas_skinBal_checkData({},{},{});
+  string $checkDataInfo[] = {"\nData is empty or data is corrupt.\n",
+                            "\nThe data is healthy.\n",
+                            "\nThe Skin Cluster does not exist.\n",
+                            "\nThe data does not match the currently entered vertices and influences.\n"};
+  float $dataStatusBgc[];
+  string $dataStatus;
+  if ($checkDataResult==1) {
+    $dataStatus = "Healthy";
+    $dataStatusBgc = {0,1,0};
+  } else {
+    $dataStatus = "Abnormal";
+    $dataStatusBgc = {1,0,0};
+  }
+
+  text("-e", "-l",$dataStatus, "-bgc",$dataStatusBgc[0],$dataStatusBgc[1],$dataStatusBgc[2], $dataStatusText);
+  print($checkDataInfo[$checkDataResult]);
+}
+
+global proc dazas_skinBal_UI_balance (string $dataMode, string $modeRadio, string $balSlider, string $maxDisSlider, string $expSlider, string $ignoredSlider, string $dataStatusText)
+{
+  string $mode[] = {"rel", "abs", "dis"};
+  int $modeId = radioButtonGrp("-q", "-sl", $modeRadio);
+  float $bal = floatSliderGrp("-q", "-v", $balSlider);
+  float $maxDis  = floatSliderGrp("-q", "-v", $maxDisSlider);
+  float $exp =  floatSliderGrp("-q", "-v", $expSlider);
+  float $ignored =  floatSliderGrp("-q", "-v", $ignoredSlider);
+  dazas_skinBalance({}, {}, $mode[$modeId-1], $dataMode, $bal, $maxDis, $exp, $ignored);
+  if ($dataMode == "build") dazas_skinBal_UI_checkData($dataStatusText);
+}
+
+global proc dazas_skinBal_UI_relative (string $balSlider)
+{
+  dazas_skinBal_relative(floatSliderGrp("-q", "-v", $balSlider));
+}
+
+global proc dazas_skinBal_UI_absolutely (string $balSlider)
+{
+  dazas_skinBal_absolutely(floatSliderGrp("-q", "-v", $balSlider));
+}
+
+global proc dazas_skinBal_UI_interactiveCheck_cc (string $checkBox, string $modeRadio, string $balSlider)
+{
+  int $on = checkBoxGrp("-q", "-v1", $checkBox);
+  if ($on)
+  {
+    string $mode[] = {"rel", "abs", "dis"};
+    int $modeId = radioButtonGrp("-q", "-sl", $modeRadio);
+    if ($mode[$modeId-1] == "rel")
+    {
+      string $cmd = "dazas_skinBal_UI_relative(\""+$balSlider+"\");";
+      floatSliderGrp("-e", "-cc",$cmd, "-dc",$cmd, $balSlider);
+    }
+    else if ($mode[$modeId-1] == "abs")
+    {
+      string $cmd = "dazas_skinBal_UI_absolutely(\""+$balSlider+"\");";
+      floatSliderGrp("-e", "-cc",$cmd, "-dc",$cmd, $balSlider);
+    }
+    else
+    {
+        floatSliderGrp("-e", "-cc","", "-dc","", $balSlider);
+    }
+  }
+  else
+  {
+      floatSliderGrp("-e", "-cc","", "-dc","", $balSlider);
+  }
+}
+
 global proc dazas_skinBalance_UI ()
 {
-  string $dazas_skinBalance_win = window("-t", "Skin Balance", "-w", 600, "-h", 400);
-    paneLayout;
-      string $dazas_skinBalance_sheet = spreadSheetEditor();
-  showWindow($dazas_skinBalance_win);
+  string $dazasSkinBal_UI_win = window("-t", "Skin Balance", "-w", 450, "-h", 250);
+    string $dazasSkinBal_UI_form = formLayout("-numberOfDivisions", 100);
+      columnLayout("-adj",1,  "-cat","both",0);
+        rowLayout("-nc",5, "-cl5","right","center","center","center","center", "-ct5","both","both","both","both","both", "-co5",0,5,0,0,0);
+          text("-l","Data Status:", "-w",100);
+          string $dazasSkinBal_UI_dataStatusText = text("-l","", "-w",80);
+          button("-l","Check", "-w",80, "-c",("dazas_skinBal_UI_checkData(\""+$dazasSkinBal_UI_dataStatusText+"\");"));
+          button("-l","Print", "-w",80, "-c","dazas_skinBal_printData();");
+          //string $dazasSkinBal_UI_buildButton = button("-l","Build", "-w",80);
+          button("-l","Clear", "-w",80, "-c",("dazas_skinBal_clearData(); dazas_skinBal_UI_checkData(\""+$dazasSkinBal_UI_dataStatusText+"\");"));
+          setParent ..;
+        //radioButtonGrp("-nrb",2,  "-l","Data",  "-la2","Use","Build",  "-sl",1,  "-cw",1,80);
+        string $dazasSkinBal_UI_selDataCheck = checkBoxGrp("-l", "Select Data", "-ncb",2, "-la2","Vertices","Influences", "-cw",1,80);
+        string $dazasSkinBal_UI_modeRadio = radioButtonGrp("-nrb",3,  "-l","Mode",  "-la3","Relative","Absolutely","Distance",  "-sl",1,  "-cw",1,80);
+        string $dazasSkinBal_UI_maxDisSlider = floatSliderGrp("-l","Maximum Distance",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",1.5);
+        string $dazasSkinBal_UI_expSlider = floatSliderGrp("-l","Attenuation Exponential",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",1);
+        string $dazasSkinBal_UI_ignoredSlider = floatSliderGrp("-l","Ignore Weight",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",0.1);
+        string $dazasSkinBal_UI_interactiveCheck = checkBoxGrp("-l", "Interactive",  "-ncb",1);
+        string $dazasSkinBal_UI_balSlider = floatSliderGrp("-l","Balance",  "-f",true,  "-cat",3,"right",100,  "-min",-1,  "-max",1,  "-pre",3, "-v",0);
+        text("-l","            Note:", "-al","left", "-en",0, "-fn","boldLabelFont");
+        text("-l","                 It is highly recommended to first return the character's", "-al","left", "-en",0, "-fn","obliqueLabelFont");
+        text("-l","                 Bind Pose before Create/Update the skin balance data.", "-al","left", "-en",0, "-fn","obliqueLabelFont");
+        text("-l","                 After creating the data, you can balance the skin weights", "-al","left", "-en",0, "-fn","obliqueLabelFont");
+        text("-l","                 at any pose.", "-al","left", "-en",0, "-fn","obliqueLabelFont");
+        setParent ..;
+      string $dazasSkinBal_UI_buildButton = button("-l","Create/Update Data");
+      string $dazasSkinBal_UI_balanceButton = button("-l","BALANCE");
+      string $dazasSkinBal_UI_closeButton = button("-l","Close", "-c",("deleteUI -wnd "+$dazasSkinBal_UI_win+";"));
+      setParent ..;
+
+    formLayout("-edit",
+      "-an",$dazasSkinBal_UI_buildButton,"top",
+      "-af",$dazasSkinBal_UI_buildButton,"left",5,
+      "-af",$dazasSkinBal_UI_buildButton,"bottom",5,
+      "-ap",$dazasSkinBal_UI_buildButton,"right",5,33,
+
+      "-an",$dazasSkinBal_UI_balanceButton,"top",
+      "-ac",$dazasSkinBal_UI_balanceButton,"left",5,$dazasSkinBal_UI_buildButton,
+      "-af",$dazasSkinBal_UI_balanceButton,"bottom",5,
+      "-ap",$dazasSkinBal_UI_balanceButton,"right",5,67,
+
+      "-an",$dazasSkinBal_UI_closeButton,"top",
+      "-ac",$dazasSkinBal_UI_closeButton,"left",5,$dazasSkinBal_UI_balanceButton,
+      "-af",$dazasSkinBal_UI_closeButton,"bottom",5,
+      "-af",$dazasSkinBal_UI_closeButton,"right",5,
+    $dazasSkinBal_UI_form);
+
+    checkBoxGrp("-e",
+      "-on1", "dazas_skinBal_selectData(1, 1, 0);",
+      "-of1", "dazas_skinBal_selectData(0, 1, 0);",
+      "-on2", "dazas_skinBal_selectData(1, 0, 1);",
+      "-of2", "dazas_skinBal_selectData(0, 0, 1);",
+    $dazasSkinBal_UI_selDataCheck);
+
+    radioButtonGrp("-e",
+      "-cc", ("dazas_skinBal_UI_interactiveCheck_cc(\""+
+        $dazasSkinBal_UI_interactiveCheck +"\", \"" +
+        $dazasSkinBal_UI_modeRadio +"\", \"" +
+        $dazasSkinBal_UI_balSlider +"\");"),
+    $dazasSkinBal_UI_modeRadio);
+
+    checkBoxGrp("-e",
+      "-cc", ("dazas_skinBal_UI_interactiveCheck_cc(\""+
+        $dazasSkinBal_UI_interactiveCheck +"\", \"" +
+        $dazasSkinBal_UI_modeRadio +"\", \"" +
+        $dazasSkinBal_UI_balSlider +"\");"),
+    $dazasSkinBal_UI_interactiveCheck);
+
+    button("-e", "-c",("dazas_skinBal_UI_balance(\"build\", \""+
+      $dazasSkinBal_UI_modeRadio +"\", \"" +
+      $dazasSkinBal_UI_balSlider +"\", \"" +
+      $dazasSkinBal_UI_maxDisSlider +"\", \"" +
+      $dazasSkinBal_UI_expSlider +"\", \"" +
+      $dazasSkinBal_UI_ignoredSlider +"\", \"" +
+      $dazasSkinBal_UI_dataStatusText +"\");"), $dazasSkinBal_UI_buildButton);
+
+    button("-e", "-c",("dazas_skinBal_UI_balance(\"use\", \""+
+      $dazasSkinBal_UI_modeRadio +"\", \"" +
+      $dazasSkinBal_UI_balSlider +"\", \"" +
+      $dazasSkinBal_UI_maxDisSlider +"\", \"" +
+      $dazasSkinBal_UI_expSlider +"\", \"" +
+      $dazasSkinBal_UI_ignoredSlider +"\", \"" +
+      $dazasSkinBal_UI_dataStatusText +"\");"), $dazasSkinBal_UI_balanceButton);
+
+    dazas_skinBal_UI_checkData($dazasSkinBal_UI_dataStatusText);
+
+  showWindow($dazasSkinBal_UI_win);
 }

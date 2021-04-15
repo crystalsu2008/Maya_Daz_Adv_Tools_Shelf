@@ -243,8 +243,8 @@ global proc int dazas_skinBal_printData ()
   return 1;
 }
 
-// Select data vertices.
-global proc int dazas_skinBal_selectData (int $mode, string $vtx, string $inf)
+// Select data vertices an influence.
+global proc int dazas_skinBal_selectData (int $mode, int $vtx, int $inf)
 {
   global string $gDazasSkinBalVtxs[];
   global string $gDazasSkinBalInfsL[];

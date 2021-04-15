@@ -1,0 +1,63 @@
+// Blend the two sets of skin weights of the vertices according to the given percentage.
+/*
+Example:
+dazas_blendSkinWeights(
+    {"Body.vtx[9885]","Body.vtx[9871]","Body.vtx[9867]","Body.vtx[8468]"}, // Vertices
+    "Blend", // 'RecordA','reca', 'RecordB','recb', or 'Blend','ble'
+    0.5, // Blend Value
+    0); // Do not open UI
+*/
+
+global string $gDazasBleSkiWei_Vtxs[];
+global string $gDazasBleSkiWei_Infs[];
+global float $gDazasBleSkiWei_Weights_A[];
+global float $gDazasBleSkiWei_Weights_B[];
+
+///////////////////////
+//  Data Processing  //
+///////////////////////
+global proc int dazas_bleSkiWei_dataProc (string $vtxs[], string $set)
+{
+  return 1;
+}
+
+global proc int dazas_skinBal_blend (float $set)
+{
+  return 1;
+}
+
+////////////
+//  Main  //
+////////////
+global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, int $UI)
+{
+  if (!$UI)
+  {
+    switch ($mode)
+    {
+      case "RecordA":
+      case "reca":
+        dazas_bleSkiWei_dataProc($vtxs, "A");
+        break;
+      case "RecordB":
+      case "recb":
+        dazas_bleSkiWei_dataProc($vtxs, "B");
+        break;
+      case "Blend":
+      case "ble":
+        dazas_skinBal_blend($blend);
+        break;
+      default:
+        error ("\nPlease select from the following modes. ''RecordA','reca', 'RecordB','recb', or 'Blend','ble'.\n");
+        break;
+    }
+
+      if (size($vtxs)==0)
+        $vtxs = ls("-sl", "-typ", "float3", "-fl");
+      string $buffer[];
+      tokenize($vtxs[0], ".", $buffer);
+      if (!gmatch($buffer[1], "vtx\\[*\\]"))
+        error ("\nSelect or enter at least one polygon vertex.\n");
+      $vtxs = sort($vtxs);
+  }
+}

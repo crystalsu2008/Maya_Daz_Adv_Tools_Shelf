@@ -41,7 +41,7 @@ The Ignore Weight parameter determines the minimum sum of left and right weights
 The vertices on the left and right Influences with a sum of weights less than this parameter are ignored.
 
 Example:
-dazas_skinBalance(
+dazas_balanceSkinWeights(
     {"Body.vtx[9885]","Body.vtx[9871]","Body.vtx[9867]","Body.vtx[8468]"}, // Vertices
     {"NoseSideJoint_R", "NostrilJoint_R", "NoseCornerJoint_R"}, // Influences
     "dis", // 'Relative','rel' or 'Absolutely','abs' or 'Distance','dis'
@@ -49,7 +49,8 @@ dazas_skinBalance(
     0.5,  // Balance Value
     1.5, // Max Distance
     1.0, // Exponential of Attenuation
-    0.05); // Below this value will be ignored
+    0.05, // Below this value will be ignored
+    0);
 */
 global string $gDazasSkinBalskinCluster;
 global string $gDazasSkinBalVtxs[];
@@ -336,9 +337,9 @@ global proc int dazas_skinBal_buildData (string $skinCluster, string $vtxs[], st
   return 1;
 }
 
-////////////////////////
-//  Processing data.  //
-////////////////////////
+///////////////////////
+//  Data Processing  //
+///////////////////////
 global proc int dazas_skinBal_dataProc (string $vtxs[], string $infs[], string $skinCluster, int $check, int $build, float $maxDis, float $atten, float $ignoreWeight)
 {
   ////////////////////////////////////////////////////////
@@ -679,102 +680,127 @@ global proc int dazas_skinBal_distance ()
 ////////////
 //  Main  //
 ////////////
-global proc dazas_skinBalance (string $vtxs[], string $infs[], string $mode, string $data, float $blc, float $maxDis, float $atten, float $ignoreWeight)
+global proc dazas_balanceSkinWeights (string $vtxs[], string $infs[], string $mode, string $data, float $blc, float $maxDis, float $atten, float $ignoreWeight, int $UI)
 {
-  int $result;
-  /////////////////////////////
-  //// Parameter Analysis  ////
-  /////////////////////////////
-
-  if ($data == "directlyUse") {
-    // Balance vertex weights directly using existing data, without data checking.
-  }
-  else
+  if ($UI)
   {
-    string $skinCluster[];
-    int $inputSize = size(ls("-sl")) + size($vtxs) + size($infs);
-    if ($inputSize > 0)// || $data == "build")
-    {
-      //-- Checking Parameters --//
-
-      string $selInfs[] = ls("-sl", "-typ", "transform");
-      ConvertSelectionToVertices();
-      string $selVtxs[] = ls("-sl", "-typ", "float3", "-fl");
-
-      // Check vtxs.
-      if (size($vtxs)==0)
-        $vtxs = $selVtxs;
-      string $buffer[];
-      tokenize($vtxs[0], ".", $buffer);
-      if (!gmatch($buffer[1], "vtx\\[*\\]"))
-        error ("\nSelect or enter at least one polygon vertex.\n");
-      $vtxs = sort($vtxs);
-      string $mesh = $buffer[0];
-      string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
-      string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
-      $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
-      if (size($skinCluster)==0)
-        error ("\nThe selected or entered vertices are not the skinned object.\n");
-
-      // Check influences.
-      if (size($infs)==0)
-        $infs = $selInfs;
-
-      string $allInfs[] = skinCluster("-q", "-inf", $skinCluster[0]);
-      string $tmpArray[] = stringArrayRemove($infs, $allInfs);
-      $infs = stringArrayRemove($tmpArray, $allInfs);
-
-      if (size($infs)==0) {
-        $infs = $allInfs; // If no influence is specified, all influences are used.
-      }
-      $infs = sort($infs);
-    }
-    else
-    {
-      //-- Only check the integrity of existing data. --//
-
-      $result = dazas_skinBal_dataProc ({}, {}, "", 1, 0, $maxDis, $atten, $ignoreWeight);
-      if (!$result) {
-        error("\nThe data is empty or corrupted. Please rebuild the data and run again.\n");
-      }
-    }
-
-    //-- Building Datas --//
-
-    if ($data == "use" || $data == "build") {
-      $result = dazas_skinBal_dataProc ($vtxs, $infs, $skinCluster[0], 1, 1, $maxDis, $atten, $ignoreWeight);
-    }
-    else {
-      error ("\n'"+$data+"' is not the correct type of data parameter.Please choose from types 'use', 'directlyUse' and 'build'.\n");
-    }
-  }
-
-  //////////////////////////////////
-  ////  Balancing skin weights  ////
-  //////////////////////////////////
-  if ($data != "build")
-  {
+    int $md;
     switch ($mode)
     {
       case "Relative":
       case "rel":
-        dazas_skinBal_relative ($blc);
+        $md = 1;
         break;
       case "Absolutely":
       case "abs":
-        dazas_skinBal_absolutely ($blc);
+        $md = 2;
         break;
       case "Distance":
       case "dis":
-        dazas_skinBal_distance ();
+        $md = 3;
         break;
       default:
         error ("\nPlease select from the following modes. 'Relative','rel' or 'Absolutely','abs' or 'Distance','dis'.\n");
         break;
     }
+    dazas_balanceSkinWeights_UI($md, $blc, $maxDis, $atten, $ignoreWeight);
+  }
+  else
+  {
+    int $result;
+    /////////////////////////////
+    //// Parameter Analysis  ////
+    /////////////////////////////
+
+    if ($data == "directlyUse") {
+      // Balance vertex weights directly using existing data, without data checking.
+    }
+    else
+    {
+      string $skinCluster[];
+      int $inputSize = size(ls("-sl")) + size($vtxs) + size($infs);
+      if ($inputSize > 0)// || $data == "build")
+      {
+        //-- Checking Parameters --//
+
+        string $selInfs[] = ls("-sl", "-typ", "transform");
+        ConvertSelectionToVertices();
+        string $selVtxs[] = ls("-sl", "-typ", "float3", "-fl");
+
+        // Check vtxs.
+        if (size($vtxs)==0)
+          $vtxs = $selVtxs;
+        string $buffer[];
+        tokenize($vtxs[0], ".", $buffer);
+        if (!gmatch($buffer[1], "vtx\\[*\\]"))
+          error ("\nSelect or enter at least one polygon vertex.\n");
+        $vtxs = sort($vtxs);
+        string $mesh = $buffer[0];
+        string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
+        string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
+        $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
+        if (size($skinCluster)==0)
+          error ("\nThe selected or entered vertices are not the skinned object.\n");
+
+        // Check influences.
+        if (size($infs)==0)
+          $infs = $selInfs;
+
+        string $allInfs[] = skinCluster("-q", "-inf", $skinCluster[0]);
+        string $tmpArray[] = stringArrayRemove($infs, $allInfs);
+        $infs = stringArrayRemove($tmpArray, $allInfs);
+
+        if (size($infs)==0) {
+          $infs = $allInfs; // If no influence is specified, all influences are used.
+        }
+        $infs = sort($infs);
+      }
+      else
+      {
+        //-- Only check the integrity of existing data. --//
+
+        $result = dazas_skinBal_dataProc ({}, {}, "", 1, 0, $maxDis, $atten, $ignoreWeight);
+        if (!$result) {
+          error("\nThe data is empty or corrupted. Please rebuild the data and run again.\n");
+        }
+      }
+
+      //-- Building Datas --//
+
+      if ($data == "use" || $data == "build") {
+        $result = dazas_skinBal_dataProc ($vtxs, $infs, $skinCluster[0], 1, 1, $maxDis, $atten, $ignoreWeight);
+      }
+      else {
+        error ("\n'"+$data+"' is not the correct type of data parameter.Please choose from types 'use', 'directlyUse' and 'build'.\n");
+      }
+    }
+
+    //////////////////////////////////
+    ////  Balancing skin weights  ////
+    //////////////////////////////////
+    if ($data != "build")
+    {
+      switch ($mode)
+      {
+        case "Relative":
+        case "rel":
+          dazas_skinBal_relative ($blc);
+          break;
+        case "Absolutely":
+        case "abs":
+          dazas_skinBal_absolutely ($blc);
+          break;
+        case "Distance":
+        case "dis":
+          dazas_skinBal_distance ();
+          break;
+        default:
+          error ("\nPlease select from the following modes. 'Relative','rel' or 'Absolutely','abs' or 'Distance','dis'.\n");
+          break;
+      }
+    }
   }
 }
-
 //////////
 //  UI  //
 //////////
@@ -808,7 +834,7 @@ global proc dazas_skinBal_UI_balance (string $dataMode, string $modeRadio, strin
   float $maxDis  = floatSliderGrp("-q", "-v", $maxDisSlider);
   float $exp =  floatSliderGrp("-q", "-v", $expSlider);
   float $ignored =  floatSliderGrp("-q", "-v", $ignoredSlider);
-  dazas_skinBalance({}, {}, $mode[$modeId-1], $dataMode, $bal, $maxDis, $exp, $ignored);
+  dazas_balanceSkinWeights({}, {}, $mode[$modeId-1], $dataMode, $bal, $maxDis, $exp, $ignored, 0);
   if ($dataMode == "build") dazas_skinBal_UI_checkData($dataStatusText);
 }
 
@@ -850,7 +876,7 @@ global proc dazas_skinBal_UI_interactiveCheck_cc (string $checkBox, string $mode
   }
 }
 
-global proc dazas_skinBalance_UI ()
+global proc dazas_balanceSkinWeights_UI (int $mode, float $blc, float $maxDis, float $atten, float $ignoreWeight)
 {
   string $dazasSkinBal_UI_win = window("-t", "Skin Balance", "-w", 450, "-h", 250);
     string $dazasSkinBal_UI_form = formLayout("-numberOfDivisions", 100);
@@ -865,12 +891,12 @@ global proc dazas_skinBalance_UI ()
           setParent ..;
         //radioButtonGrp("-nrb",2,  "-l","Data",  "-la2","Use","Build",  "-sl",1,  "-cw",1,80);
         string $dazasSkinBal_UI_selDataCheck = checkBoxGrp("-l", "Select Data", "-ncb",2, "-la2","Vertices","Influences", "-cw",1,80);
-        string $dazasSkinBal_UI_modeRadio = radioButtonGrp("-nrb",3,  "-l","Mode",  "-la3","Relative","Absolutely","Distance",  "-sl",1,  "-cw",1,80);
-        string $dazasSkinBal_UI_maxDisSlider = floatSliderGrp("-l","Maximum Distance",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",1.5);
-        string $dazasSkinBal_UI_expSlider = floatSliderGrp("-l","Attenuation Exponential",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",1);
-        string $dazasSkinBal_UI_ignoredSlider = floatSliderGrp("-l","Ignore Weight",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",0.1);
+        string $dazasSkinBal_UI_modeRadio = radioButtonGrp("-nrb",3,  "-l","Mode",  "-la3","Relative","Absolutely","Distance",  "-sl",$mode,  "-cw",1,80);
+        string $dazasSkinBal_UI_maxDisSlider = floatSliderGrp("-l","Maximum Distance",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",$maxDis);
+        string $dazasSkinBal_UI_expSlider = floatSliderGrp("-l","Attenuation Exponential",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",$atten);
+        string $dazasSkinBal_UI_ignoredSlider = floatSliderGrp("-l","Ignore Weight",  "-f",true,  "-cat",3,"right",100, "-pre",3, "-v",$ignoreWeight);
         string $dazasSkinBal_UI_interactiveCheck = checkBoxGrp("-l", "Interactive",  "-ncb",1);
-        string $dazasSkinBal_UI_balSlider = floatSliderGrp("-l","Balance",  "-f",true,  "-cat",3,"right",100,  "-min",-1,  "-max",1,  "-pre",3, "-v",0);
+        string $dazasSkinBal_UI_balSlider = floatSliderGrp("-l","Balance",  "-f",true,  "-cat",3,"right",100,  "-min",-1,  "-max",1,  "-pre",3, "-v",$blc);
         text("-l","            Note:", "-al","left", "-en",0, "-fn","boldLabelFont");
         text("-l","                 It is highly recommended to first return the character's", "-al","left", "-en",0, "-fn","obliqueLabelFont");
         text("-l","                 Bind Pose before Create/Update the skin balance data.", "-al","left", "-en",0, "-fn","obliqueLabelFont");

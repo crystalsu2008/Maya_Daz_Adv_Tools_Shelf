@@ -17,10 +17,7 @@ global string $gDazasBleSkiWei_Infs_B[];
 global float $gDazasBleSkiWei_Weights_A[];
 global float $gDazasBleSkiWei_Weights_B[];
 
-///////////////////////
-//  Data Processing  //
-///////////////////////
-
+//------------------------------------------ Data Tools -----------------------------------------//
 // Data checking function with return values in the order of
 // Cluster, Vertices, weight A, weight B and Match.
 global proc int[] dazas_bleSkiWei_checkData ()
@@ -155,7 +152,7 @@ global proc int dazas_bleSkiWei_clearData ()
 }
 
 // Select data vertices an influence.
-global proc int dazas_bleSkiWei_selectData (int $mode, int $vtx, int $inf)
+global proc int dazas_bleSkiWei_selectData (int $mode, int $vtx, int $infA, int $infB)
 {
   global string $gDazasBleSkiWei_Vtxs[];
   global string $gDazasBleSkiWei_Infs_A[];
@@ -167,8 +164,11 @@ global proc int dazas_bleSkiWei_selectData (int $mode, int $vtx, int $inf)
     select($modes[$mode], $gDazasBleSkiWei_Vtxs);
   }
 
-  if ($inf) {
+  if ($infA) {
     select($modes[$mode], $gDazasBleSkiWei_Infs_A);
+  }
+
+  if ($infB) {
     select($modes[$mode], $gDazasBleSkiWei_Infs_B);
   }
   return 1;
@@ -586,3 +586,77 @@ global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, 
     }
   }
 }
+
+//===============================================================================================//
+//--------------------------------------------- UI ----------------------------------------------//
+//                                                                                               //
+global proc dazas_blendSkinWeights_UI (float $blend)
+{
+  string $dazas_bleSkiWei_UI_win = window("-t", "Skin Blend", "-w", 460, "-h", 250);
+    string $dazas_bleSkiWei_UI_form = formLayout("-numberOfDivisions", 100);
+      string $dazas_bleSkiWei_UI_column = columnLayout("-adj",1,  "-cat","both",0);
+        rowLayout("-nc",5);//"-cl3","center","center","center", "-ct3","both","both","both"
+          text("-l","", "-w",80);
+          text("-l","Vertex", "-w",100);
+          text("-l","A", "-w",100);
+          text("-l","B", "-w",100);
+          text("-l","", "-w",80);
+          setParent ..;
+        rowLayout("-nc",5);//, "-cl3","center","center","center", "-ct3","both","both","both");
+          text("-l","", "-w",80);
+          string $dazas_bleSkiWei_UI_vtxStatusText = text("-l","", "-w",100, "-bgc",1,0,0);
+          string $dazas_bleSkiWei_UI_AStatusText = text("-l","", "-w",100, "-bgc",1,0,0);
+          string $dazas_bleSkiWei_UI_BStatusText = text("-l","", "-w",100, "-bgc",1,0,0);
+          setParent ..;
+        rowLayout("-nc",5);
+          text("-l","", "-w",80);
+          button("-l","Record Vertices", "-w",100);
+          button("-l","Record A", "-w",100);
+          button("-l","Record B", "-w",100);
+          setParent ..;
+        rowLayout("-nc",5);
+          text("-l","", "-w",80);
+          button("-l","Check", "-w",100);
+          button("-l","Print", "-w",100);
+          button("-l","Clear", "-w",100);
+          setParent ..;
+        string $dazas_bleSkiWei_UI_selDataCheck =
+          checkBoxGrp("-l", "Select", "-ncb",3, "-la3","Vertices","Influences A","Influences B", "-cw4",80,100,100,100);
+        separator -style "in" -h 10;
+        string $dazas_bleSkiWei_UI_interactiveCheck = checkBoxGrp("-l", "Interactive", "-ncb",1);
+        string $dazas_bleSkiWei_UI_bleSlider = floatSliderGrp("-l","Blend", "-f",true, "-cat",3,"right",30, "-min",0, "-max",1, "-pre",3, "-v",$blend);
+        separator -style "in" -h 10;
+        rowLayout("-nc",5);
+          text("-l","", "-w",100);
+          iconTextButton("-st","iconOnly", "-i1","weightHammer.png", "-l","Hammer");
+          text("-l","", "-w",50);
+          iconTextButton("-st","iconOnly", "-i1","clearCanvas.png", "-l","Prune");
+          floatSliderGrp("-l","Prune below:", "-f",1, "-cw3",70,50,70, "-min",0, "-max",1, "-pre",4, "-v",0.01);
+        setParent ..;
+      setParent ..;
+      string $dazas_bleSkiWei_UI_blendButton = button("-l","BLEND");
+      string $dazas_bleSkiWei_UI_closeButton = button("-l","Close", "-c",("deleteUI -wnd "+$dazas_bleSkiWei_UI_win+";"));
+      setParent ..;
+
+    formLayout("-edit",
+      "-af",$dazas_bleSkiWei_UI_column,"top",0,
+      "-af",$dazas_bleSkiWei_UI_column,"left",0,
+      "-ac",$dazas_bleSkiWei_UI_column,"bottom",0,$dazas_bleSkiWei_UI_blendButton,
+      "-af",$dazas_bleSkiWei_UI_column,"right",0,
+
+      "-an",$dazas_bleSkiWei_UI_blendButton,"top",
+      "-af",$dazas_bleSkiWei_UI_blendButton,"left",5,
+      "-af",$dazas_bleSkiWei_UI_blendButton,"bottom",5,
+      "-ap",$dazas_bleSkiWei_UI_blendButton,"right",5,50,
+
+      "-an",$dazas_bleSkiWei_UI_closeButton,"top",
+      "-ac",$dazas_bleSkiWei_UI_closeButton,"left",5,$dazas_bleSkiWei_UI_blendButton,
+      "-af",$dazas_bleSkiWei_UI_closeButton,"bottom",5,
+      "-af",$dazas_bleSkiWei_UI_closeButton,"right",5,
+    $dazas_bleSkiWei_UI_form);
+
+  showWindow($dazas_bleSkiWei_UI_win);
+}
+//                                                                                               //
+//-----------------------------------------------------------------------------------------------//
+//===============================================================================================//

@@ -10,8 +10,8 @@ dazas_blendSkinWeights(
 
 global string $gDazasBleSkiWei_SkinCluster;
 global string $gDazasBleSkiWei_Vtxs[];
-global int $gDazasBleSkiWei_VtxsDataPoints_A[];
-global int $gDazasBleSkiWei_VtxsDataPoints_B[];
+global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+global int $gDazasBleSkiWei_VtxsDataPointers_B[];
 global string $gDazasBleSkiWei_Infs_A[];
 global string $gDazasBleSkiWei_Infs_B[];
 global float $gDazasBleSkiWei_Weights_A[];
@@ -21,31 +21,137 @@ global float $gDazasBleSkiWei_Weights_B[];
 //  Data Processing  //
 ///////////////////////
 
+// Data checking function with return values in the order of
+// Cluster, Vertices, weight A, weight B and Match.
 global proc int[] dazas_bleSkiWei_checkData ()
 {
   global string $gDazasBleSkiWei_SkinCluster;
   global string $gDazasBleSkiWei_Vtxs[];
-  global int $gDazasBleSkiWei_VtxsDataPoints_A[];
-  global int $gDazasBleSkiWei_VtxsDataPoints_B[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
   global string $gDazasBleSkiWei_Infs_A[];
   global string $gDazasBleSkiWei_Infs_B[];
   global float $gDazasBleSkiWei_Weights_A[];
   global float $gDazasBleSkiWei_Weights_B[];
 
-  int $result_cluster, $result_vtx, $result_a, $result_b;
+  int $result_cluster=1, $result_vtx=1, $result_a=1, $result_b=1, $result_match=1;
 
+  //-- Check Skin Cluster --//
   if ($gDazasBleSkiWei_SkinCluster=="") {
     $result_cluster = 0; // The Skin Cluster data is empty.
-  } else if (!objExists($gDazasSkinBalskinCluster)) {
+  } else if (!objExists($gDazasBleSkiWei_SkinCluster)) {
     $result_cluster = -1; // The Skin Cluster does not exist.
   } else {
     $result_cluster = 1;
   }
 
+  //-- Check Vertices --//
+  if (!size($gDazasBleSkiWei_Vtxs)) {
+    $result_vtx = 0; // The Vertices data is empty.
+  } else {
+    $result_vtx = 1;
+  }
 
+  int $s = size($gDazasBleSkiWei_Vtxs);
 
+  //-- Check Weights A --//
+  if (!size($gDazasBleSkiWei_VtxsDataPointers_A)) {
+    $result_a = 0; // The Weight A data is empty.
+  } else if (size($gDazasBleSkiWei_Vtxs) != size($gDazasBleSkiWei_VtxsDataPointers_A)-1) {
+    $result_a = -1; // The number of pointers to data A does not match the number of vertices.
+  } else {
+    int $i;
+    for ($i=0; $i<$s; $i++)
+    {
+      int $pa = $gDazasBleSkiWei_VtxsDataPointers_A[$i];
+      int $pa1 = $gDazasBleSkiWei_VtxsDataPointers_A[$i+1];
+      for ($j=$pa; $j<$pa1; $j++)
+      {
+        if ($gDazasBleSkiWei_Infs_A[$j]=="") {
+          $result_a = -2; // Data A is incomplete or corrupted.
+          break;
+        }
+      }
+    }
+  }
 
-  return {$result_cluster, $result_vtx, $result_a, $result_b};
+  //-- Check Weights B --//
+  if (!size($gDazasBleSkiWei_VtxsDataPointers_B)) {
+    $result_b = 0; // The Weight B data is empty.
+    } else if (size($gDazasBleSkiWei_Vtxs) != size($gDazasBleSkiWei_VtxsDataPointers_B)-1) {
+      $result_a = -1; // The number of pointers to data B does not match the number of vertices.
+    } else {
+    int $i;
+    for ($i=0; $i<$s; $i++)
+    {
+      int $pb = $gDazasBleSkiWei_VtxsDataPointers_B[$i];
+      int $pb1 = $gDazasBleSkiWei_VtxsDataPointers_B[$i+1];
+      for ($j=$pb; $j<$pb1; $j++)
+      {
+        if ($gDazasBleSkiWei_Infs_B[$j]=="") {
+          $result_b = -2; // Data B is incomplete or corrupted.
+          break;
+        }
+      }
+    }
+  }
+
+  //-- Check data matching --//
+  if ($result_a==1 && $result_b==1) {
+    if (size($gDazasBleSkiWei_Infs_A) != size($gDazasBleSkiWei_Infs_B)) {
+      $result_match = -1; // Data A is not the same length as data B.
+    } else {
+      int $i;
+      for ($i=0; $i<$s; $i++)
+      {
+        int $pa = $gDazasBleSkiWei_VtxsDataPointers_A[$i];
+        int $pb = $gDazasBleSkiWei_VtxsDataPointers_B[$i];
+        if ($pa != $pb) {
+            $result_match = -2; // The two sets of weight data pointers of A and B do not match.
+            break;
+        } else {
+          int $pa1 = $gDazasBleSkiWei_VtxsDataPointers_A[$i+1];
+          for ($j=$pa; $j<$pa1; $j++) {
+            if ($gDazasBleSkiWei_Infs_B[$j] != $gDazasBleSkiWei_Infs_A[$j]) {
+              $result_match = -3; // The Influences data in Data A and B do not match.
+              break;
+            }
+          }
+          if (!$result_match) break;
+        }
+      }
+    }
+  } else {
+    $result_match = 0; // Data A or Data B is incomplete and cannot be matched.
+  }
+
+  return {$result_cluster, $result_vtx, $result_a, $result_b, $result_match};
+}
+
+// Clear data.
+global proc int dazas_bleSkiWei_clearData ()
+{
+  global string $gDazasBleSkiWei_SkinCluster;
+  global string $gDazasBleSkiWei_Vtxs[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
+  global string $gDazasBleSkiWei_Infs_A[];
+  global string $gDazasBleSkiWei_Infs_B[];
+  global float $gDazasBleSkiWei_Weights_A[];
+  global float $gDazasBleSkiWei_Weights_B[];
+
+  $gDazasBleSkiWei_SkinCluster = "";
+
+  clear($gDazasBleSkiWei_Vtxs);
+  clear($gDazasBleSkiWei_VtxsDataPointers_A);
+  clear($gDazasBleSkiWei_VtxsDataPointers_B);
+  clear($gDazasBleSkiWei_Infs_A);
+  clear($gDazasBleSkiWei_Infs_B);
+
+  clear($gDazasBleSkiWei_Weights_A);
+  clear($gDazasBleSkiWei_Weights_B);
+
+  return 1;
 }
 
 // Select data vertices an influence.
@@ -68,49 +174,239 @@ global proc int dazas_bleSkiWei_selectData (int $mode, int $vtx, int $inf)
   return 1;
 }
 
-global proc int dazas_bleSkiWei_printData()
+global proc int dazas_bleSkiWei_getVtxDataInfoById (int $i, string $combined_infs[], float $combined_weights_A[], float $combined_weights_B[])
 {
-  global string $gDazasBleSkiWei_SkinCluster;
   global string $gDazasBleSkiWei_Vtxs[];
-  global int $gDazasBleSkiWei_VtxsDataPoints_A[];
-  global int $gDazasBleSkiWei_VtxsDataPoints_B[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
   global string $gDazasBleSkiWei_Infs_A[];
   global string $gDazasBleSkiWei_Infs_B[];
   global float $gDazasBleSkiWei_Weights_A[];
   global float $gDazasBleSkiWei_Weights_B[];
 
-  print("\nThe Skin Cluster is "+$gDazasBleSkiWei_SkinCluster+"\n");
+  string $current_infs_B[] = stringArrayGetRange($gDazasBleSkiWei_Infs_B, $gDazasBleSkiWei_VtxsDataPointers_B[$i], $gDazasBleSkiWei_VtxsDataPointers_B[$i+1]);
+  float $current_Weights_B[] = floatArrayGetRange($gDazasBleSkiWei_Weights_B, $gDazasBleSkiWei_VtxsDataPointers_B[$i], $gDazasBleSkiWei_VtxsDataPointers_B[$i+1]);
+
+  // Record the weight of the influencs in group A and find the same influencs in group B to record their weight.
+  int $p=0, $combined_id=0;
+  for ($p=$gDazasBleSkiWei_VtxsDataPointers_A[$i]; $p<$gDazasBleSkiWei_VtxsDataPointers_A[$i+1]; $p++)
+  {
+    $combined_infs[$combined_id] = $gDazasBleSkiWei_Infs_A[$p];
+    $combined_weights_A[$combined_id] = $gDazasBleSkiWei_Weights_A[$p];
+
+    int $current_infs_B_id = stringArrayFind($gDazasBleSkiWei_Infs_A[$p], 0, $current_infs_B);
+    if ($current_infs_B_id>-1)
+    {
+      $combined_weights_B[$combined_id] = $current_Weights_B[$current_infs_B_id];
+      floatArrayRemoveAtIndex($current_infs_B_id, $current_Weights_B);
+      stringArrayRemoveAtIndex($current_infs_B_id, $current_infs_B);
+    }
+    else
+    {
+      $combined_weights_B[$combined_id] = 0.0;
+    }
+    $combined_id++;
+  }
+
+  // Finding the remaining influencs in group B should be inserted in the appropriate place in the combined influencs array.
+  // Combine the remaining group B influencs into the combined influencs array.
+  int $num_of_remaining_B = size($current_infs_B);
+  int $j;
+  for ($j=0; $j<$num_of_remaining_B; $j++)
+  {
+    int $insertPointer = stringArrayFindInsertPointer($current_infs_B[$j], $combined_infs);
+    stringArrayInsertAtIndex($insertPointer, $combined_infs, $current_infs_B[$j]);
+    floatArrayInsertAtIndex($insertPointer, $combined_weights_A, 0.0);
+    floatArrayInsertAtIndex($insertPointer, $combined_weights_B, $current_Weights_B[$j]);
+  }
+
+  return 1;
+}
+
+global proc int dazas_bleSkiWei_printData ()
+{
+  global string $gDazasBleSkiWei_SkinCluster;
+  global string $gDazasBleSkiWei_Vtxs[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
+  global string $gDazasBleSkiWei_Infs_A[];
+  global string $gDazasBleSkiWei_Infs_B[];
+  global float $gDazasBleSkiWei_Weights_A[];
+  global float $gDazasBleSkiWei_Weights_B[];
+
+  print("\n//=================================================================//");
+  print("\n//------------------- Vertices Skin Weight Data -------------------//");
+  print("\nThe Skin Cluster is '"+$gDazasBleSkiWei_SkinCluster+"'.");
 
   int $s = size($gDazasBleSkiWei_Vtxs);
   int $i;
   for ($i=0; $i<$s; $i++)
   {
-    print("\n"+$gDazasBleSkiWei_Vtxs[$i]+"\n");
-    int $pa = $gDazasBleSkiWei_VtxsDataPoints_A[$i];
-    int $pa1 = $gDazasBleSkiWei_VtxsDataPoints_A[$i+1];
-    $pa1 = $pa1==0 ? size($gDazasBleSkiWei_Infs_A) : $pa1;
-    for ($j=$pa; $j<$pa1; $j++)
-    {
-      print("\n\tA: "+$gDazasBleSkiWei_Vtxs[$i]+" --- "+$gDazasBleSkiWei_Infs_A[$j]+" --- "+$gDazasBleSkiWei_Weights_A[$j]+"\n");
-    }
+    string $combined_infs[];
+    float $combined_weights_A[], $combined_weights_B[];
 
-    int $pb = $gDazasBleSkiWei_VtxsDataPoints_B[$i];
-    int $pb1 = $gDazasBleSkiWei_VtxsDataPoints_B[$i+1];
-    $pb1 = $pb1==0 ? size($gDazasBleSkiWei_Infs_B) : $pb1;
-    for ($j=$pb; $j<$pb1; $j++)
+    dazas_bleSkiWei_getVtxDataInfoById($i, $combined_infs, $combined_weights_A, $combined_weights_B);
+
+    print("\n\n"+$gDazasBleSkiWei_Vtxs[$i]);
+
+    int $j, $combined_s = size($combined_infs);
+    for ($j=0; $j<$combined_s; $j++)
     {
-      print("\n\tB: "+$gDazasBleSkiWei_Vtxs[$i]+" --- "+$gDazasBleSkiWei_Infs_B[$j]+" --- "+$gDazasBleSkiWei_Weights_B[$j]+"\n");
+      string $inf = $combined_infs[$j];
+      string $wa = string($combined_weights_A[$j]);
+      string $wb = string($combined_weights_B[$j]);
+      int $sinf = size($inf), $swa = size($wa), $swb = size($wb);
+      for ($l=$sinf; $l<20; $l++) $inf=$inf+" ";
+      for ($l=$swa; $l<15; $l++) $wa=$wa+" ";
+      for ($l=$swb; $l<15; $l++) $wb=$wb+" ";
+
+      print("\n\t"+$inf+"  A: "+$wa+"  B: "+$wb);
     }
   }
+  print("\n//-----------------------------------------------------------------//");
+  print("\n//=================================================================//\n");
   return 1;
 }
+
+//===============================================================================================//
+//----------------------------------- Data Matching Functions -----------------------------------//
+//                                                                                               //
+global proc float[] floatArrayGetRange (float $list[], int $startPointer, int $endPointer)
+{
+  int $s = size($list);
+  $startPointer=min($s, $startPointer);
+  $endPointer=min($s, $endPointer);
+
+  float $newList[];
+  int $i, $newid=0;
+  for ($i=$startPointer; $i<$endPointer; $i++)
+  {
+    $newList[$newid] = $list[$i];
+    $newid++;
+  }
+  return $newList;
+}
+
+global proc string[] stringArrayGetRange (string $list[], int $startPointer, int $endPointer)
+{
+  int $s = size($list);
+  $startPointer=min($s, $startPointer);
+  $endPointer=min($s, $endPointer);
+
+  string $newList[];
+  int $i, $newid=0;
+  for ($i=$startPointer; $i<$endPointer; $i++)
+  {
+    $newList[$newid] = $list[$i];
+    $newid++;
+  }
+  return $newList;
+}
+
+global proc int stringArrayFindInsertPointer (string $item, string $list[])
+{
+  int $s = size($list);
+  int $i;
+  for ($i=0; $i<$s; $i++)
+  {
+    string $tmp[] = sort({$item, $list[$i]});
+    if ($tmp[0] == $item)
+      return $i;
+  }
+  return $s;
+}
+
+global proc int dazas_bleSkiWei_matchData ()
+{
+  global string $gDazasBleSkiWei_Vtxs[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
+  global string $gDazasBleSkiWei_Infs_A[];
+  global string $gDazasBleSkiWei_Infs_B[];
+  global float $gDazasBleSkiWei_Weights_A[];
+  global float $gDazasBleSkiWei_Weights_B[];
+
+  string $matched_Infs[];
+  int $matched_Pointer[];
+  float $matched_Weights_A[];
+  float $matched_Weights_B[];
+  $matched_Pointer[0] = 0;
+
+  int $i, $s = size($gDazasBleSkiWei_Vtxs);
+  for ($i=0; $i<$s; $i++)
+  {
+    string $current_infs_B[] = stringArrayGetRange($gDazasBleSkiWei_Infs_B, $gDazasBleSkiWei_VtxsDataPointers_B[$i], $gDazasBleSkiWei_VtxsDataPointers_B[$i+1]);
+    float $current_Weights_B[] = floatArrayGetRange($gDazasBleSkiWei_Weights_B, $gDazasBleSkiWei_VtxsDataPointers_B[$i], $gDazasBleSkiWei_VtxsDataPointers_B[$i+1]);
+
+    string $combined_infs[];
+    float $combined_weights_A[], $combined_weights_B[];
+
+    // Record the weight of the influencs in group A and find the same influencs in group B to record their weight.
+    int $p=0, $combined_id=0;
+    for ($p=$gDazasBleSkiWei_VtxsDataPointers_A[$i]; $p<$gDazasBleSkiWei_VtxsDataPointers_A[$i+1]; $p++)
+    {
+      $combined_infs[$combined_id] = $gDazasBleSkiWei_Infs_A[$p];
+      $combined_weights_A[$combined_id] = $gDazasBleSkiWei_Weights_A[$p];
+
+      int $current_infs_B_id = stringArrayFind($gDazasBleSkiWei_Infs_A[$p], 0, $current_infs_B);
+      if ($current_infs_B_id>-1)
+      {
+        $combined_weights_B[$combined_id] = $current_Weights_B[$current_infs_B_id];
+        floatArrayRemoveAtIndex($current_infs_B_id, $current_Weights_B);
+        stringArrayRemoveAtIndex($current_infs_B_id, $current_infs_B);
+      }
+      else
+      {
+        $combined_weights_B[$combined_id] = 0.0;
+      }
+      $combined_id++;
+    }
+
+    // Finding the remaining influencs in group B should be inserted in the appropriate place in the combined influencs array.
+    // Combine the remaining group B influencs into the combined influencs array.
+    int $num_of_remaining_B = size($current_infs_B);
+    int $j;
+    for ($j=0; $j<$num_of_remaining_B; $j++)
+    {
+      int $insertPointer = stringArrayFindInsertPointer($current_infs_B[$j], $combined_infs);
+      stringArrayInsertAtIndex($insertPointer, $combined_infs, $current_infs_B[$j]);
+      floatArrayInsertAtIndex($insertPointer, $combined_weights_A, 0.0);
+      floatArrayInsertAtIndex($insertPointer, $combined_weights_B, $current_Weights_B[$j]);
+    }
+
+    // Append the Combined data into the Matched data array.
+    int $num_of_combined_infs = size($combined_infs);
+    int $l, $matched_id;
+    for ($l=0; $l<$num_of_combined_infs; $l++)
+    {
+      $matched_id = size($matched_Infs);
+      $matched_Infs[$matched_id] = $combined_infs[$l];
+      $matched_Weights_A[$matched_id] = $combined_weights_A[$l];
+      $matched_Weights_B[$matched_id] = $combined_weights_B[$l];
+    }
+
+    // Matched Pointer
+    $matched_Pointer[$i+1] = size($matched_Infs);
+  }
+
+  $gDazasBleSkiWei_VtxsDataPointers_A = $matched_Pointer;
+  $gDazasBleSkiWei_VtxsDataPointers_B = $matched_Pointer;
+  $gDazasBleSkiWei_Infs_A = $matched_Infs;
+  $gDazasBleSkiWei_Infs_B = $matched_Infs;
+  $gDazasBleSkiWei_Weights_A = $matched_Weights_A;
+  $gDazasBleSkiWei_Weights_B = $matched_Weights_B;
+  return 1;
+}
+//                                                                                               //
+//-----------------------------------------------------------------------------------------------//
+//===============================================================================================//
 
 global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
 {
   global string $gDazasBleSkiWei_SkinCluster;
   global string $gDazasBleSkiWei_Vtxs[];
 
-  int $result;
+  int $result = 1;
 
   // Check vtxs.
   if (size($vtxs)==0)
@@ -120,7 +416,8 @@ global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
 
   if (!gmatch($buffer[1], "vtx\\[*\\]"))
   {
-    $result = 0; // Select or enter at least one polygon vertex.
+    $result = 0;
+    error("\nNo valid vertices are entered.\n");
   }
   else
   {
@@ -130,7 +427,8 @@ global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
     $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
     if (size($skinCluster)==0)
     {
-      $result = -1; // The selected or entered vertices are not the skinned object.
+      $result = -1;
+      error("\nThe selected or entered vertices are not the skinned object.\n");
     }
     else
     {
@@ -139,15 +437,15 @@ global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
     }
   }
 
-  return 1;
+  return $result;
 }
 
-global proc int dazas_bleSkiWei_recordWeights (string $set)
+global proc int dazas_bleSkiWei_recordWeights (string $group)
 {
   global string $gDazasBleSkiWei_SkinCluster;
   global string $gDazasBleSkiWei_Vtxs[];
-  global int $gDazasBleSkiWei_VtxsDataPoints_A[];
-  global int $gDazasBleSkiWei_VtxsDataPoints_B[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
   global string $gDazasBleSkiWei_Infs_A[];
   global string $gDazasBleSkiWei_Infs_B[];
   global float $gDazasBleSkiWei_Weights_A[];
@@ -155,24 +453,18 @@ global proc int dazas_bleSkiWei_recordWeights (string $set)
 
   string $skinCluster = $gDazasBleSkiWei_SkinCluster;
   string $vtxs[] = $gDazasBleSkiWei_Vtxs;
-  int $pa[] = $gDazasBleSkiWei_VtxsDataPoints_A;
-  int $pb[] = $gDazasBleSkiWei_VtxsDataPoints_B;
-  string $infs_a[] = $gDazasBleSkiWei_Infs_A;
-  string $infs_b[] = $gDazasBleSkiWei_Infs_B;
-  float $weights_A[] = $gDazasBleSkiWei_Weights_A;
-  float $weights_B[] = $gDazasBleSkiWei_Weights_B;
 
   string $daInfs_A[], $daInfs_B[];
   float $daWeight_A[], $daWeight_B[];
   int $daPA[], $daPB[];
 
   string $allInfs[] = sort(skinCluster("-q", "-inf", $skinCluster));
+  int $i, $s = size($vtxs);
 
-  switch ($set)
+  switch ($group)
   {
     case "A":
     case "a":
-      int $s = size($vtxs);
       for ($i=0; $i<$s; $i++)
       {
         string $vtx = $vtxs[$i];
@@ -180,31 +472,82 @@ global proc int dazas_bleSkiWei_recordWeights (string $set)
         for ($inf in $allInfs)
         {
           float $w = skinPercent( "-t", $inf, "-q", $skinCluster, $vtx);
-          if ($w <= 0) continue;
-
-          int $id = size($daInfs_A);
-          $daInfs_A[$id] = $inf;
-          $daWeight_A[$id] = $w;
+          if ($w > 0) {
+            int $id = size($daInfs_A);
+            $daInfs_A[$id] = $inf;
+            $daWeight_A[$id] = $w;
+          }
         }
       }
-      $gDazasBleSkiWei_VtxsDataPoints_A = $daPA;
+      $daPA[$s] = size($daInfs_A);
+      $gDazasBleSkiWei_VtxsDataPointers_A = $daPA;
       $gDazasBleSkiWei_Infs_A = $daInfs_A;
       $gDazasBleSkiWei_Weights_A = $daWeight_A;
       break;
     case "B":
     case "b":
-
+      for ($i=0; $i<$s; $i++)
+      {
+        string $vtx = $vtxs[$i];
+        $daPB[$i] = size($daInfs_B);
+        for ($inf in $allInfs)
+        {
+          float $w = skinPercent( "-t", $inf, "-q", $skinCluster, $vtx);
+          if ($w > 0) {
+            int $id = size($daInfs_B);
+            $daInfs_B[$id] = $inf;
+            $daWeight_B[$id] = $w;
+          }
+        }
+      }
+      $daPB[$s] = size($daInfs_B);
+      $gDazasBleSkiWei_VtxsDataPointers_B = $daPB;
+      $gDazasBleSkiWei_Infs_B = $daInfs_B;
+      $gDazasBleSkiWei_Weights_B = $daWeight_B;
       break;
     default:
       error ("\nPlease select the correct data set from the following parameters. 'A','a' or 'B','b'.\n");
       break;
   }
+
+  // Return: 0-Cluster, 1-Vertices, 2-weight A, 3-weight B and 4-Match.
+  int $checkDataResult[] = dazas_bleSkiWei_checkData();
+  if ($checkDataResult[4]<0) //The weights of groups A and B are normal but the lengths do not match.
+  {
+    int $matchResult = dazas_bleSkiWei_matchData();
+  }
+
   return 1;
 }
 
-global proc int dazas_bleSkiWei_blend (float $blend)
+global proc string dazas_bleSkiWei_blendCmds (float $blend)
 {
-  return 1;
+  global string $gDazasBleSkiWei_SkinCluster;
+  global string $gDazasBleSkiWei_Vtxs[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
+  global string $gDazasBleSkiWei_Infs_A[];
+  global string $gDazasBleSkiWei_Infs_B[];
+  global float $gDazasBleSkiWei_Weights_A[];
+  global float $gDazasBleSkiWei_Weights_B[];
+
+  string $cmd = "";
+  int $i, $s=size($gDazasBleSkiWei_Vtxs);
+  for ($i=0; $i<$s; $i++)
+  {
+    $cmd = $cmd + "skinPercent(";
+    int $startP = $gDazasBleSkiWei_VtxsDataPointers_A[$i];
+    int $endP = $gDazasBleSkiWei_VtxsDataPointers_A[$i+1];
+    int $p, $id;
+    for ($p=$startP; $p<$endP; $p++)
+    {
+      string $inf = $gDazasBleSkiWei_Infs_A[$p];
+      float $w = $gDazasBleSkiWei_Weights_B[$p]*$blend + $gDazasBleSkiWei_Weights_A[$p]*(1-$blend);
+      $cmd = $cmd+"\"-tv\", \""+$inf+"\", "+string($w)+", ";
+    }
+    $cmd = $cmd+"\""+$gDazasBleSkiWei_SkinCluster+"\", \""+$gDazasBleSkiWei_Vtxs[$i]+"\");\n";
+  }
+  return $cmd;
 }
 
 ////////////
@@ -212,22 +555,30 @@ global proc int dazas_bleSkiWei_blend (float $blend)
 ////////////
 global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, int $UI)
 {
+  string $recordVerticesError[] = {"\nNo valid vertices are entered.\n",
+    "\nThe selected or entered vertices are not the skinned object.\n"};
   if (!$UI)
   {
+    int $checkDataResult[];
     switch ($mode)
     {
       case "RecordA":
-      case "reca":
-        dazas_bleSkiWei_recordVertices($vtxs);
+      case "ra":
+        // Return: 0-Cluster, 1-Vertices, 2-weight A, 3-weight B and 4-Match.
+        $checkDataResult = dazas_bleSkiWei_checkData();
+        if ($checkDataResult[1] != 1) dazas_bleSkiWei_recordVertices($vtxs);
         dazas_bleSkiWei_recordWeights("A");
         break;
       case "RecordB":
-      case "recb":
-
+      case "rb":
+        // Return: 0-Cluster, 1-Vertices, 2-weight A, 3-weight B and 4-Match.
+        $checkDataResult = dazas_bleSkiWei_checkData();
+        if ($checkDataResult[1] != 1) dazas_bleSkiWei_recordVertices($vtxs);
+        dazas_bleSkiWei_recordWeights("B");
         break;
       case "Blend":
-      case "ble":
-        dazas_bleSkiWei_blend($blend);
+      case "b":
+        eval(dazas_bleSkiWei_blendCmds($blend));
         break;
       default:
         error ("\nPlease select from the following modes. 'RecordA','reca', 'RecordB','recb', or 'Blend','ble'.\n");

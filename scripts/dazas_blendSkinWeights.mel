@@ -345,21 +345,29 @@ global proc int dazas_bleSkiWei_matchData ()
     int $p=0, $combined_id=0;
     for ($p=$gDazasBleSkiWei_VtxsDataPointers_A[$i]; $p<$gDazasBleSkiWei_VtxsDataPointers_A[$i+1]; $p++)
     {
-      $combined_infs[$combined_id] = $gDazasBleSkiWei_Infs_A[$p];
-      $combined_weights_A[$combined_id] = $gDazasBleSkiWei_Weights_A[$p];
-
       int $current_infs_B_id = stringArrayFind($gDazasBleSkiWei_Infs_A[$p], 0, $current_infs_B);
       if ($current_infs_B_id>-1)
       {
-        $combined_weights_B[$combined_id] = $current_Weights_B[$current_infs_B_id];
+        if ($gDazasBleSkiWei_Weights_A[$p]!=0 || $current_Weights_B[$current_infs_B_id]!=0)
+        {
+          $combined_infs[$combined_id] = $gDazasBleSkiWei_Infs_A[$p];
+          $combined_weights_A[$combined_id] = $gDazasBleSkiWei_Weights_A[$p];
+          $combined_weights_B[$combined_id] = $current_Weights_B[$current_infs_B_id];
+          $combined_id++;
+        }
         floatArrayRemoveAtIndex($current_infs_B_id, $current_Weights_B);
         stringArrayRemoveAtIndex($current_infs_B_id, $current_infs_B);
       }
       else
       {
-        $combined_weights_B[$combined_id] = 0.0;
+        if ($gDazasBleSkiWei_Weights_A[$p]!=0)
+        {
+          $combined_infs[$combined_id] = $gDazasBleSkiWei_Infs_A[$p];
+          $combined_weights_A[$combined_id] = $gDazasBleSkiWei_Weights_A[$p];
+          $combined_weights_B[$combined_id] = 0.0;
+          $combined_id++;
+        }
       }
-      $combined_id++;
     }
 
     // Finding the remaining influencs in group B should be inserted in the appropriate place in the combined influencs array.
@@ -368,10 +376,13 @@ global proc int dazas_bleSkiWei_matchData ()
     int $j;
     for ($j=0; $j<$num_of_remaining_B; $j++)
     {
-      int $insertPointer = stringArrayFindInsertPointer($current_infs_B[$j], $combined_infs);
-      stringArrayInsertAtIndex($insertPointer, $combined_infs, $current_infs_B[$j]);
-      floatArrayInsertAtIndex($insertPointer, $combined_weights_A, 0.0);
-      floatArrayInsertAtIndex($insertPointer, $combined_weights_B, $current_Weights_B[$j]);
+      if ($current_Weights_B[$j]!=0)
+      {
+        int $insertPointer = stringArrayFindInsertPointer($current_infs_B[$j], $combined_infs);
+        stringArrayInsertAtIndex($insertPointer, $combined_infs, $current_infs_B[$j]);
+        floatArrayInsertAtIndex($insertPointer, $combined_weights_A, 0.0);
+        floatArrayInsertAtIndex($insertPointer, $combined_weights_B, $current_Weights_B[$j]);
+      }
     }
 
     // Append the Combined data into the Matched data array.
@@ -421,6 +432,17 @@ global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
   }
   else
   {
+    // Return: 0-Cluster, 1-Vertices, 2-weight A, 3-weight B and 4-Match.
+    int $cdr[] = dazas_bleSkiWei_checkData();
+    if($cdr[2] > 0 || $cdr[3] > 0 || $cdr[4] > 0) {
+      string $yesOrNot = confirmDialog("-t","Warning:", "-m","Re-recording the vertices will clear the current data. Are you sure?",
+        "-b","Yes", "-b","No", "-db","Yes", "-cb","No", "-ds","No");
+      if ($yesOrNot=="Yes")
+        dazas_bleSkiWei_clearData();
+      else
+        return 0;
+    }
+
     string $mesh = $buffer[0];
     string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
     string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
@@ -585,53 +607,246 @@ global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, 
         break;
     }
   }
+  else
+  {
+    dazas_blendSkinWeights_UI($blend);
+  }
 }
 
 //===============================================================================================//
 //--------------------------------------------- UI ----------------------------------------------//
 //                                                                                               //
+global proc dazas_bleSkiWei_UI_refresh (string $clusterStatusText, string $vtxStatusText, string $AStatusText, string $BStatusText, string $matchStatusText)
+{
+  // Return: 0-Cluster, 1-Vertices, 2-weight A, 3-weight B and 4-Match.
+  int $checkDataResult[] = dazas_bleSkiWei_checkData();
+
+  //-- Check Skin Cluster --//
+  //
+  string $cluster_Status;
+  float $cluster_StatusBgc[];
+  switch (string($checkDataResult[0]))
+  {
+    case "0": // The Skin Cluster data is empty.
+      print("\nThe Skin Cluster data is empty.\n");
+      text("-e", "-l","Empty", "-bgc",1,0,0, $clusterStatusText);
+      break;
+    case "-1": // The Skin Cluster does not exist.
+      print("\nThe Skin Cluster does not exist.\n");
+      text("-e", "-l","Not Exist", "-bgc",1,0,0, $clusterStatusText);
+      break;
+    case "1": // Success.
+    print("\nThe Skin Cluster is Valid.\n");
+      text("-e", "-l","Valid", "-bgc",0,1,0, $clusterStatusText);
+      break;
+  }
+
+  //-- Check Vertices --//
+  //
+  switch (string($checkDataResult[1]))
+  {
+    case "0": // The Vertices data is empty.
+      print("The Vertices data is empty.\n");
+      text("-e", "-l","Empty", "-bgc",1,0,0, $vtxStatusText);
+      break;
+    case "1": // Success.
+      print("The Vertices data is Valid.\n");
+      text("-e", "-l","Valid", "-bgc",0,1,0, $vtxStatusText);
+      break;
+  }
+
+  //-- Check Weights A --//
+  //
+  switch (string($checkDataResult[2]))
+  {
+    case "0": // The Weight A data is empty.
+      print("The Weight A data is empty.\n");
+      text("-e", "-l","Empty", "-bgc",1,0,0, $AStatusText);
+      break;
+    case "-1": // The number of pointers to data A does not match the number of vertices.
+      print("The number of pointers to data A does not match the number of vertices.\n");
+      text("-e", "-l","Not Match", "-bgc",1,0,0, $AStatusText);
+      break;
+    case "-2": // Data A is incomplete or corrupted.
+      print("The Weight A data is incomplete or corrupted.\n");
+      text("-e", "-l","Corrupted", "-bgc",1,0,0, $AStatusText);
+      break;
+    case "1": // Success.
+      print("The Weight A data is Valid.\n");
+      text("-e", "-l","Valid", "-bgc",0,1,0, $AStatusText);
+      break;
+  }
+
+  //-- Check Weights B --//
+  //
+  switch (string($checkDataResult[3]))
+  {
+    case "0": // The Weight A data is empty.
+      print("The Weight B data is empty.\n");
+      text("-e", "-l","Empty", "-bgc",1,0,0, $BStatusText);
+      break;
+    case "-1": // The number of pointers to data A does not match the number of vertices.
+      print("The number of pointers to data B does not match the number of vertices.\n");
+      text("-e", "-l","Not Match", "-bgc",1,0,0, $BStatusText);
+      break;
+    case "-2": // Data A is incomplete or corrupted.
+      print("The Weight B data is incomplete or corrupted.\n");
+      text("-e", "-l","Corrupted", "-bgc",1,0,0, $BStatusText);
+      break;
+    case "1": // Success.
+      print("The Weight B data is Valid.\n");
+      text("-e", "-l","Valid", "-bgc",0,1,0, $BStatusText);
+      break;
+  }
+
+  //-- Check Match --//
+  //
+  switch (string($checkDataResult[4]))
+  {
+    case "0": // Data A or Data B is incomplete and cannot be matched.
+      print("Weights A or Weights B is incomplete and cannot be matched.\n");
+      text("-e", "-l","Can't", "-bgc",1,0,0, $matchStatusText);
+      break;
+    case "-1": // Data A is not the same length as data B.
+      print("Weights data A is not the same length as Weights data B.\n");
+      text("-e", "-l","Length Not Match", "-bgc",1,0,0, $matchStatusText);
+      break;
+    case "-2": // The two sets of weight data pointers of A and B do not match.
+      print("The two sets of weight data pointers of A and B do not match.\n");
+      text("-e", "-l","Pointer Not Match", "-bgc",1,0,0, $matchStatusText);
+      break;
+    case "-3": // The Influences data in Data A and B do not match.
+      print("The Influences data in weight data A and B do not match.\n");
+      text("-e", "-l","Influence Not Match", "-bgc",1,0,0, $matchStatusText);
+      break;
+    case "1": // Success.
+      print("The two sets of weight data of A and B are matched with each other.\n");
+      text("-e", "-l","Matched", "-bgc",0,1,0, $matchStatusText);
+      break;
+  }
+  //text("-e", "-l",$cluster_Status, "-bgc",$cluster_StatusBgc[0],$cluster_StatusBgc[1],$cluster_StatusBgc[2], $dazas_bleSkiWei_UI_vtxStatusText);
+}
+
+global proc dazas_bleSkiWei_UI_clearData (string $refresh_cmd)
+{
+  dazas_bleSkiWei_clearData();
+  eval($refresh_cmd);
+}
+
+global proc dazas_bleSkiWei_UI_pruneWeights (string $pruneSlider)
+{
+  global string $gDazasBleSkiWei_SkinCluster;
+
+  string $vtxs[] = ls("-sl", "-typ", "float3", "-fl");
+  string $buffer[];
+  tokenize($vtxs[0], ".", $buffer);
+  if (!gmatch($buffer[1], "vtx\\[*\\]"))
+  {
+    $result = 0;
+    error("\nSelect a skin shape or skin shape vertices.\n");
+  }
+  else
+  {
+    float $prune = floatSliderGrp("-q", "-v", $pruneSlider);
+    skinPercent("-prw",$prune, $gDazasBleSkiWei_SkinCluster, $vtxs);
+    print("\nZero the weights that are below "+$prune+" at the following vertices:\n");
+    print($vtxs);
+  }
+}
+
+global proc dazas_bleSkiWei_UI_recordVertices (string $refresh_cmd)
+{
+  dazas_bleSkiWei_recordVertices({});
+  eval($refresh_cmd);
+}
+
+global proc dazas_bleSkiWei_UI_recordA (string $refresh_cmd)
+{
+  dazas_blendSkinWeights(
+    {}, // Vertices
+    "ra", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'
+    0.0, // Blend Value
+    0); // Do not open UI
+  eval($refresh_cmd);
+}
+
+global proc dazas_bleSkiWei_UI_recordB (string $refresh_cmd)
+{
+  dazas_blendSkinWeights(
+    {}, // Vertices
+    "rb", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'
+    0.0, // Blend Value
+    0); // Do not open UI
+  eval($refresh_cmd);
+}
+
+global proc dazas_bleSkiWei_UI_interactiveCheck_cc (string $checkBox, string $bleSlider)
+{
+  int $on = checkBoxGrp("-q", "-v1", $checkBox);
+  if ($on)
+  {
+    floatSliderGrp("-e", "-cc","dazas_bleSkiWei_UI_blend(\""+$bleSlider+"\");",
+      "-dc","dazas_bleSkiWei_UI_blend(\""+$bleSlider+"\");",
+      $bleSlider);
+  }
+  else
+  {
+    floatSliderGrp("-e", "-cc","", "-dc","", $bleSlider);
+  }
+}
+
+global proc dazas_bleSkiWei_UI_blend (string $bleSlider)
+{
+  float $bal = floatSliderGrp("-q", "-v", $bleSlider);
+  dazas_blendSkinWeights(
+    {}, // Vertices
+    "b", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'
+    $bal, // Blend Value
+    0); // Do not open UI
+}
+
 global proc dazas_blendSkinWeights_UI (float $blend)
 {
   string $dazas_bleSkiWei_UI_win = window("-t", "Skin Blend", "-w", 460, "-h", 250);
     string $dazas_bleSkiWei_UI_form = formLayout("-numberOfDivisions", 100);
       string $dazas_bleSkiWei_UI_column = columnLayout("-adj",1,  "-cat","both",0);
         rowLayout("-nc",5);//"-cl3","center","center","center", "-ct3","both","both","both"
-          text("-l","", "-w",80);
+          text("-l","Cluster", "-w",80);
           text("-l","Vertex", "-w",100);
-          text("-l","A", "-w",100);
-          text("-l","B", "-w",100);
-          text("-l","", "-w",80);
+          text("-l","Weight A", "-w",100);
+          text("-l","Weight B", "-w",100);
+          text("-l","Match", "-w",80);
           setParent ..;
         rowLayout("-nc",5);//, "-cl3","center","center","center", "-ct3","both","both","both");
-          text("-l","", "-w",80);
-          string $dazas_bleSkiWei_UI_vtxStatusText = text("-l","", "-w",100, "-bgc",1,0,0);
-          string $dazas_bleSkiWei_UI_AStatusText = text("-l","", "-w",100, "-bgc",1,0,0);
-          string $dazas_bleSkiWei_UI_BStatusText = text("-l","", "-w",100, "-bgc",1,0,0);
+          string $dazas_bleSkiWei_UI_clusterStatusText = text("-l","", "-w",80);
+          string $dazas_bleSkiWei_UI_vtxStatusText = text("-l","", "-w",100);
+          string $dazas_bleSkiWei_UI_AStatusText = text("-l","", "-w",100);
+          string $dazas_bleSkiWei_UI_BStatusText = text("-l","", "-w",100);
+          string $dazas_bleSkiWei_UI_matchStatusText = text("-l","", "-w",80);
           setParent ..;
         rowLayout("-nc",5);
           text("-l","", "-w",80);
-          button("-l","Record Vertices", "-w",100);
-          button("-l","Record A", "-w",100);
-          button("-l","Record B", "-w",100);
+          string $dazas_bleSkiWei_UI_recordVtxButton = button("-l","Record Vertices", "-w",100);
+          string $dazas_bleSkiWei_UI_recordAButton = button("-l","Record A", "-w",100);
+          string $dazas_bleSkiWei_UI_recordBButton = button("-l","Record B", "-w",100);
           setParent ..;
         rowLayout("-nc",5);
           text("-l","", "-w",80);
-          button("-l","Check", "-w",100);
-          button("-l","Print", "-w",100);
-          button("-l","Clear", "-w",100);
+          string $dazas_bleSkiWei_UI_checkButton = button("-l","Check", "-w",100);
+          button("-l","Print", "-w",100, "-c","dazas_bleSkiWei_printData();");
+          string $dazas_bleSkiWei_UI_clearButton = button("-l","Clear", "-w",100);
           setParent ..;
-        string $dazas_bleSkiWei_UI_selDataCheck =
-          checkBoxGrp("-l", "Select", "-ncb",3, "-la3","Vertices","Influences A","Influences B", "-cw4",80,100,100,100);
+        string $dazas_bleSkiWei_UI_selDataCheck = checkBoxGrp("-l", "Select", "-ncb",3, "-la3","Vertices","Influences A","Influences B", "-cw4",80,100,100,100);
         separator -style "in" -h 10;
         string $dazas_bleSkiWei_UI_interactiveCheck = checkBoxGrp("-l", "Interactive", "-ncb",1);
         string $dazas_bleSkiWei_UI_bleSlider = floatSliderGrp("-l","Blend", "-f",true, "-cat",3,"right",30, "-min",0, "-max",1, "-pre",3, "-v",$blend);
         separator -style "in" -h 10;
         rowLayout("-nc",5);
           text("-l","", "-w",100);
-          iconTextButton("-st","iconOnly", "-i1","weightHammer.png", "-l","Hammer");
+          iconTextButton("-st","iconOnly", "-i1","weightHammer.png", "-l","Hammer", "-c","WeightHammer;");
           text("-l","", "-w",50);
-          iconTextButton("-st","iconOnly", "-i1","clearCanvas.png", "-l","Prune");
-          floatSliderGrp("-l","Prune below:", "-f",1, "-cw3",70,50,70, "-min",0, "-max",1, "-pre",4, "-v",0.01);
+          $dazas_bleSkiWei_UI_pruneButton = iconTextButton("-st","iconOnly", "-i1","clearCanvas.png", "-l","Prune");
+          $dazas_bleSkiWei_UI_pruneSlider = floatSliderGrp("-l","Prune below:", "-f",1, "-cw3",70,50,70, "-min",0, "-max",1, "-pre",4, "-v",0.01);
         setParent ..;
       setParent ..;
       string $dazas_bleSkiWei_UI_blendButton = button("-l","BLEND");
@@ -656,6 +871,50 @@ global proc dazas_blendSkinWeights_UI (float $blend)
     $dazas_bleSkiWei_UI_form);
 
   showWindow($dazas_bleSkiWei_UI_win);
+
+  string $dazas_bleSkiWei_UI_refresh_cmd = "dazas_bleSkiWei_UI_refresh(\""+
+    $dazas_bleSkiWei_UI_clusterStatusText+"\", \""+
+    $dazas_bleSkiWei_UI_vtxStatusText+"\", \""+
+    $dazas_bleSkiWei_UI_AStatusText+"\", \""+
+    $dazas_bleSkiWei_UI_BStatusText+"\", \""+
+    $dazas_bleSkiWei_UI_matchStatusText+"\");";
+
+  eval($dazas_bleSkiWei_UI_refresh_cmd);
+
+  button("-e", "-c","dazas_bleSkiWei_UI_recordVertices(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_recordVtxButton);
+
+  button("-e", "-c","dazas_bleSkiWei_UI_recordA(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_recordAButton);
+
+  button("-e", "-c","dazas_bleSkiWei_UI_recordB(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_recordBButton);
+
+  button("-e", "-c","eval(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_checkButton);
+
+  button("-e", "-c","dazas_bleSkiWei_UI_clearData(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_clearButton);
+
+  checkBoxGrp("-e",
+    "-on1", "dazas_bleSkiWei_selectData(1, 1, 0, 0);",
+    "-of1", "dazas_bleSkiWei_selectData(0, 1, 0, 0);",
+    "-on2", "dazas_bleSkiWei_selectData(1, 0, 1, 0);",
+    "-of2", "dazas_bleSkiWei_selectData(0, 0, 1, 0);",
+    "-on3", "dazas_bleSkiWei_selectData(1, 0, 0, 1);",
+    "-of3", "dazas_bleSkiWei_selectData(0, 0, 0, 1);",
+    $dazas_bleSkiWei_UI_selDataCheck);
+
+  iconTextButton("-e", "-c","dazas_bleSkiWei_UI_pruneWeights(\""+$dazas_bleSkiWei_UI_pruneSlider+"\");",
+    $dazas_bleSkiWei_UI_pruneButton);
+
+  checkBoxGrp("-e", "-cc", ("dazas_bleSkiWei_UI_interactiveCheck_cc(\""+
+    $dazas_bleSkiWei_UI_interactiveCheck +"\", \"" +
+    $dazas_bleSkiWei_UI_bleSlider +"\");"),
+    $dazas_bleSkiWei_UI_interactiveCheck);
+
+  button("-e", "-c","dazas_bleSkiWei_UI_blend(\""+$dazas_bleSkiWei_UI_bleSlider+"\");",
+    $dazas_bleSkiWei_UI_blendButton);
 }
 //                                                                                               //
 //-----------------------------------------------------------------------------------------------//

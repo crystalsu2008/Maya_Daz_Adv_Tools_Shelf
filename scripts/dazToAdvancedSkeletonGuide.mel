@@ -73,6 +73,6 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
           button("-l","Delete Eye & Jaw", "-w",160, "-c","delete Eye Jaw1;");
           text("-l", "");
           button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_DeleteEyeAndJaw\")");
-          etParent ..;
+          setParent ..;
 showWindow $dazToAsGuide_Window;
 }

@@ -1,5 +1,6 @@
 // List Mesh Upstream Geometry Nodes.
-global proc string[] dazas_listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth) {
+global proc string[] dazas_listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)
+{
     string $plugs[];
     if(nodeType($startNode) == "mesh")
     {

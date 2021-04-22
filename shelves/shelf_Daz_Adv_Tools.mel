@@ -664,7 +664,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_blendSkinWeights(\n    {}, // Vertices\n    \"b\", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'\n    0.5, // Blend Value\n    1); // open UI" 
+        -command "dazas_blendSkinWeights(\n    {}, // Vertices\n    \"b\", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'\n    0.5, // Blend Value\n\t0, // Do not echo skinPercent commands.\n    1); // open UI" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

@@ -5,6 +5,7 @@ dazas_blendSkinWeights(
     {"Body.vtx[2364]","Body.vtx[2422]","Body.vtx[2334]","Body.vtx[6074]"}, // Vertices
     "Blend", // 'RecordA','reca', 'RecordB','recb', or 'Blend','ble'
     0.5, // Blend Value
+    0, // Do not echo skinPercent commands.
     0); // Do not open UI
 */
 
@@ -412,6 +413,75 @@ global proc int dazas_bleSkiWei_matchData ()
 //-----------------------------------------------------------------------------------------------//
 //===============================================================================================//
 
+global proc int dazas_bleSkiWei_removeVerticesData (string $vtxs[])
+{
+  global string $gDazasBleSkiWei_Vtxs[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
+  global string $gDazasBleSkiWei_Infs_A[];
+  global string $gDazasBleSkiWei_Infs_B[];
+  global float $gDazasBleSkiWei_Weights_A[];
+  global float $gDazasBleSkiWei_Weights_B[];
+
+  int $result = 1;
+
+  // Check vtxs.
+  if (size($vtxs)==0)
+    $vtxs = sort(ls("-sl", "-typ", "float3", "-fl"));
+  string $buffer[];
+  tokenize($vtxs[0], ".", $buffer);
+
+  // Check Matching: 0-Cluster, 1-Vertices, 2-weight A, 3-weight B and 4-Match.
+  int $checkDataResult[] = dazas_bleSkiWei_checkData();
+
+  if (!gmatch($buffer[1], "vtx\\[*\\]"))
+  {
+    $result = 0; // No valid vertices are entered.
+  }
+  else if ($checkDataResult[4] != 1)
+  {
+    $result = -1; // The two sets of weight data of A and B do not match and the vertex data cannot be removed.
+  }
+  else
+  {
+    for ($vtx in $vtxs)
+    {
+      int $index = stringArrayFind( $vtx, 0, $gDazasBleSkiWei_Vtxs );
+      if ($index != -1)
+      {
+        // Removes the influence object as well as the weight data.
+        int $p;
+        int $ps=$gDazasBleSkiWei_VtxsDataPointers_A[$index];
+        int $pe=$gDazasBleSkiWei_VtxsDataPointers_A[$index+1];
+        for ($p=$pe-1; $p>=$ps; $p--)
+        {
+          floatArrayRemoveAtIndex($p, $gDazasBleSkiWei_Weights_B);
+          floatArrayRemoveAtIndex($p, $gDazasBleSkiWei_Weights_A);
+          stringArrayRemoveAtIndex($p, $gDazasBleSkiWei_Infs_B);
+          stringArrayRemoveAtIndex($p, $gDazasBleSkiWei_Infs_A);
+        }
+
+        // Removes the data pointer.
+        int $removeLength = $pe-$ps;
+        int $i, $s=size($gDazasBleSkiWei_VtxsDataPointers_A);
+        for ($i=$index+1; $i<$s; $i++)
+        {
+          $gDazasBleSkiWei_VtxsDataPointers_B[$i] -= $removeLength;
+          $gDazasBleSkiWei_VtxsDataPointers_A[$i] -= $removeLength;
+        }
+        intArrayRemoveAtIndex($index, $gDazasBleSkiWei_VtxsDataPointers_B);
+        intArrayRemoveAtIndex($index, $gDazasBleSkiWei_VtxsDataPointers_A);
+
+        // Removes the Vertex Data.
+        stringArrayRemoveAtIndex($index, $gDazasBleSkiWei_Vtxs);
+
+        $result = 1;
+      }
+    }
+  }
+  return $result;
+}
+
 global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
 {
   global string $gDazasBleSkiWei_SkinCluster;
@@ -443,9 +513,13 @@ global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
         return 0;
     }
 
-    string $mesh = $buffer[0];
-    string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
-    string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
+    string $meshShapes[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
+    string $upstreamNodes[];
+    string $mesh;
+    for($mesh in $meshShapes)
+    {
+      $upstreamNodes = stringArrayCatenate($upstreamNodes, dazas_listUpstream($mesh, {$mesh}, 0, 20));
+    }
     $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
     if (size($skinCluster)==0)
     {
@@ -572,10 +646,41 @@ global proc string dazas_bleSkiWei_blendCmds (float $blend)
   return $cmd;
 }
 
+global proc string dazas_bleSkiWei_echoAndBlendCmds (float $blend)
+{
+  global string $gDazasBleSkiWei_SkinCluster;
+  global string $gDazasBleSkiWei_Vtxs[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_A[];
+  global int $gDazasBleSkiWei_VtxsDataPointers_B[];
+  global string $gDazasBleSkiWei_Infs_A[];
+  global string $gDazasBleSkiWei_Infs_B[];
+  global float $gDazasBleSkiWei_Weights_A[];
+  global float $gDazasBleSkiWei_Weights_B[];
+
+  string $cmd = "";
+  int $i, $s=size($gDazasBleSkiWei_Vtxs);
+  for ($i=0; $i<$s; $i++)
+  {
+    $cmd = $cmd + "skinPercent(";
+    int $startP = $gDazasBleSkiWei_VtxsDataPointers_A[$i];
+    int $endP = $gDazasBleSkiWei_VtxsDataPointers_A[$i+1];
+    int $p, $id;
+    for ($p=$startP; $p<$endP; $p++)
+    {
+      string $inf = $gDazasBleSkiWei_Infs_A[$p];
+      float $w = $gDazasBleSkiWei_Weights_B[$p]*$blend + $gDazasBleSkiWei_Weights_A[$p]*(1-$blend);
+      $cmd = $cmd+"\"-tv\", \""+$inf+"\", "+string($w)+", ";
+    }
+    $cmd = $cmd+"\""+$gDazasBleSkiWei_SkinCluster+"\", \""+$gDazasBleSkiWei_Vtxs[$i]+"\");\n";
+  }
+  print("\n"+$cmd);
+  return $cmd;
+}
+
 ////////////
 //  Main  //
 ////////////
-global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, int $UI)
+global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, int $echo, int $UI)
 {
   string $recordVerticesError[] = {"\nNo valid vertices are entered.\n",
     "\nThe selected or entered vertices are not the skinned object.\n"};
@@ -600,7 +705,8 @@ global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, 
         break;
       case "Blend":
       case "b":
-        eval(dazas_bleSkiWei_blendCmds($blend));
+        if ($echo) {eval(dazas_bleSkiWei_echoAndBlendCmds($blend));}
+        else {eval(dazas_bleSkiWei_blendCmds($blend));}
         break;
       default:
         error ("\nPlease select from the following modes. 'RecordA','reca', 'RecordB','recb', or 'Blend','ble'.\n");
@@ -609,7 +715,7 @@ global proc dazas_blendSkinWeights (string $vtxs[], string $mode, float $blend, 
   }
   else
   {
-    dazas_blendSkinWeights_UI($blend);
+    dazas_blendSkinWeights_UI($echo, $blend);
   }
 }
 
@@ -733,6 +839,12 @@ global proc dazas_bleSkiWei_UI_clearData (string $refresh_cmd)
   eval($refresh_cmd);
 }
 
+global proc dazas_bleSkiWei_UI_removeSelVtx (string $refresh_cmd)
+{
+  dazas_bleSkiWei_removeVerticesData({});
+  eval($refresh_cmd);
+}
+
 global proc dazas_bleSkiWei_UI_pruneWeights (string $pruneSlider)
 {
   global string $gDazasBleSkiWei_SkinCluster;
@@ -754,6 +866,38 @@ global proc dazas_bleSkiWei_UI_pruneWeights (string $pruneSlider)
   }
 }
 
+global proc dazas_bleSkiWei_UI_weightHammer (string $autoRecCheck, string $autoPruneCheck, string $pruneSlider, string $refresh_cmd)
+{
+  if (checkBoxGrp("-q", "-v1", $autoRecCheck))
+  {
+    string $vtxs[] = sort(ls("-sl", "-typ", "float3", "-fl"));
+    string $buffer[];
+    tokenize($vtxs[0], ".", $buffer);
+
+    if (!gmatch($buffer[1], "vtx\\[*\\]"))
+    {
+      error("\nNo valid vertices are entered.\n");
+    }
+    else
+    {
+      dazas_bleSkiWei_clearData();
+      dazas_bleSkiWei_recordVertices($vtxs);
+      if (checkBoxGrp("-q", "-v1", $autoPruneCheck))
+        dazas_bleSkiWei_UI_pruneWeights($pruneSlider);
+      dazas_bleSkiWei_recordWeights("A");
+      WeightHammer;
+      if (checkBoxGrp("-q", "-v1", $autoPruneCheck))
+        dazas_bleSkiWei_UI_pruneWeights($pruneSlider);
+      dazas_bleSkiWei_recordWeights("B");
+      eval($refresh_cmd);
+    }
+  }
+  else
+  {
+    WeightHammer;
+  }
+}
+
 global proc dazas_bleSkiWei_UI_recordVertices (string $refresh_cmd)
 {
   dazas_bleSkiWei_recordVertices({});
@@ -766,6 +910,7 @@ global proc dazas_bleSkiWei_UI_recordA (string $refresh_cmd)
     {}, // Vertices
     "ra", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'
     0.0, // Blend Value
+    0, // Do not echo skinPercent commands.
     0); // Do not open UI
   eval($refresh_cmd);
 }
@@ -776,17 +921,22 @@ global proc dazas_bleSkiWei_UI_recordB (string $refresh_cmd)
     {}, // Vertices
     "rb", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'
     0.0, // Blend Value
+    0, // Do not echo skinPercent commands.
     0); // Do not open UI
   eval($refresh_cmd);
 }
 
-global proc dazas_bleSkiWei_UI_interactiveCheck_cc (string $checkBox, string $bleSlider)
+global proc dazas_bleSkiWei_UI_interactiveCheck_cc (string $interactiveCheck, string $echoCheck, string $bleSlider)
 {
-  int $on = checkBoxGrp("-q", "-v1", $checkBox);
-  if ($on)
+  int $echo = checkBoxGrp("-q", "-v1", $echoCheck);
+  string $bleCmds[] = {"dazas_bleSkiWei_blendCmds","dazas_bleSkiWei_echoAndBlendCmds"};
+  if (checkBoxGrp("-q", "-v1", $interactiveCheck))
   {
-    floatSliderGrp("-e", "-cc","dazas_bleSkiWei_UI_blend(\""+$bleSlider+"\");",
+    /*floatSliderGrp("-e", "-cc","dazas_bleSkiWei_UI_blend(\""+$bleSlider+"\");",
       "-dc","dazas_bleSkiWei_UI_blend(\""+$bleSlider+"\");",
+      $bleSlider);*/
+    floatSliderGrp("-e", "-cc","eval("+$bleCmds[$echo]+"(floatSliderGrp(\"-q\", \"-v\", \""+$bleSlider+"\")));",
+      "-dc","eval("+$bleCmds[$echo]+"(floatSliderGrp(\"-q\", \"-v\", \""+$bleSlider+"\")));",
       $bleSlider);
   }
   else
@@ -795,17 +945,19 @@ global proc dazas_bleSkiWei_UI_interactiveCheck_cc (string $checkBox, string $bl
   }
 }
 
-global proc dazas_bleSkiWei_UI_blend (string $bleSlider)
+global proc dazas_bleSkiWei_UI_blend (string $echoCheck, string $bleSlider)
 {
-  float $bal = floatSliderGrp("-q", "-v", $bleSlider);
-  dazas_blendSkinWeights(
-    {}, // Vertices
-    "b", // 'RecordA','ra', 'RecordB','rb', or 'Blend','b'
-    $bal, // Blend Value
-    0); // Do not open UI
+  if (checkBoxGrp("-q", "-v1", $echoCheck))
+  {
+    eval(dazas_bleSkiWei_echoAndBlendCmds(floatSliderGrp("-q", "-v", $bleSlider)));
+  }
+  else
+  {
+    eval(dazas_bleSkiWei_blendCmds(floatSliderGrp("-q", "-v", $bleSlider)));
+  }
 }
 
-global proc dazas_blendSkinWeights_UI (float $blend)
+global proc dazas_blendSkinWeights_UI (int $echo, float $blend)
 {
   string $dazas_bleSkiWei_UI_win = window("-t", "Skin Blend", "-w", 460, "-h", 250);
     string $dazas_bleSkiWei_UI_form = formLayout("-numberOfDivisions", 100);
@@ -832,22 +984,30 @@ global proc dazas_blendSkinWeights_UI (float $blend)
           setParent ..;
         rowLayout("-nc",5);
           text("-l","", "-w",80);
-          string $dazas_bleSkiWei_UI_checkButton = button("-l","Check", "-w",100);
-          button("-l","Print", "-w",100, "-c","dazas_bleSkiWei_printData();");
-          string $dazas_bleSkiWei_UI_clearButton = button("-l","Clear", "-w",100);
+          string $dazas_bleSkiWei_UI_checkButton = button("-l","Check", "-w",70);
+          button("-l","Print", "-w",70, "-c","dazas_bleSkiWei_printData();");
+          string $dazas_bleSkiWei_UI_clearButton = button("-l","Clear", "-w",68);
+          string $dazas_bleSkiWei_UI_removeSelVtxButton = button("-l","Remove Sel Vtx", "-w",90);
           setParent ..;
         string $dazas_bleSkiWei_UI_selDataCheck = checkBoxGrp("-l", "Select", "-ncb",3, "-la3","Vertices","Influences A","Influences B", "-cw4",80,100,100,100);
         separator -style "in" -h 10;
-        string $dazas_bleSkiWei_UI_interactiveCheck = checkBoxGrp("-l", "Interactive", "-ncb",1);
+        rowLayout("-nc",2);
+          string $dazas_bleSkiWei_UI_interactiveCheck = checkBoxGrp("-l", "Interactive", "-ncb",1);
+          string $dazas_bleSkiWei_UI_echoCheck = checkBoxGrp("-l", "Echo Commands", "-ncb",1);
+          setParent ..;
         string $dazas_bleSkiWei_UI_bleSlider = floatSliderGrp("-l","Blend", "-f",true, "-cat",3,"right",30, "-min",0, "-max",1, "-pre",3, "-v",$blend);
         separator -style "in" -h 10;
-        rowLayout("-nc",5);
-          text("-l","", "-w",100);
-          iconTextButton("-st","iconOnly", "-i1","weightHammer.png", "-l","Hammer", "-c","WeightHammer;");
-          text("-l","", "-w",50);
+        rowLayout("-nc",5, "-cl5","left","left","left","left","left");
+          text("-l","", "-w",80);
+          string $dazas_bleSkiWei_UI_hammerButton = iconTextButton("-st","iconOnly", "-i1","weightHammer.png", "-l","Hammer");
+          string $dazas_bleSkiWei_UI_hammerAutoRecCheck = checkBoxGrp("-l", "Auto Record", "-ncb",1, "-cw2",80,0);
+          string $dazas_bleSkiWei_UI_hammerAutoPruCheck = checkBoxGrp("-l", "Auto Prune", "-ncb",1, "-cw2",80,0);
+          setParent ..;
+        rowLayout("-nc",5, "-cl5","left","left","left","left","left");
+          text("-l","", "-w",80);
           $dazas_bleSkiWei_UI_pruneButton = iconTextButton("-st","iconOnly", "-i1","clearCanvas.png", "-l","Prune");
-          $dazas_bleSkiWei_UI_pruneSlider = floatSliderGrp("-l","Prune below:", "-f",1, "-cw3",70,50,70, "-min",0, "-max",1, "-pre",4, "-v",0.01);
-        setParent ..;
+          $dazas_bleSkiWei_UI_pruneSlider = floatSliderGrp("-l","Prune below:", "-f",1, "-cw3",80,50,100, "-min",0, "-max",1, "-pre",4, "-v",0.01);
+          setParent ..;
       setParent ..;
       string $dazas_bleSkiWei_UI_blendButton = button("-l","BLEND");
       string $dazas_bleSkiWei_UI_closeButton = button("-l","Close", "-c",("deleteUI -wnd "+$dazas_bleSkiWei_UI_win+";"));
@@ -893,6 +1053,9 @@ global proc dazas_blendSkinWeights_UI (float $blend)
   button("-e", "-c","eval(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
     $dazas_bleSkiWei_UI_checkButton);
 
+  button("-e", "-c","dazas_bleSkiWei_UI_removeSelVtx(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_removeSelVtxButton);
+
   button("-e", "-c","dazas_bleSkiWei_UI_clearData(\""+encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
     $dazas_bleSkiWei_UI_clearButton);
 
@@ -905,15 +1068,32 @@ global proc dazas_blendSkinWeights_UI (float $blend)
     "-of3", "dazas_bleSkiWei_selectData(0, 0, 0, 1);",
     $dazas_bleSkiWei_UI_selDataCheck);
 
-  iconTextButton("-e", "-c","dazas_bleSkiWei_UI_pruneWeights(\""+$dazas_bleSkiWei_UI_pruneSlider+"\");",
+  iconTextButton("-e", "-c","dazas_bleSkiWei_UI_weightHammer(\""+
+    $dazas_bleSkiWei_UI_hammerAutoRecCheck+"\", \""+
+    $dazas_bleSkiWei_UI_hammerAutoPruCheck+"\", \""+
+    $dazas_bleSkiWei_UI_pruneSlider+"\", \""+
+    encodeString($dazas_bleSkiWei_UI_refresh_cmd)+"\");",
+    $dazas_bleSkiWei_UI_hammerButton);
+
+  iconTextButton("-e", "-c","dazas_bleSkiWei_UI_pruneWeights(\""+
+    $dazas_bleSkiWei_UI_pruneSlider+"\");",
     $dazas_bleSkiWei_UI_pruneButton);
 
   checkBoxGrp("-e", "-cc", ("dazas_bleSkiWei_UI_interactiveCheck_cc(\""+
-    $dazas_bleSkiWei_UI_interactiveCheck +"\", \"" +
+    $dazas_bleSkiWei_UI_interactiveCheck +"\", \""+
+    $dazas_bleSkiWei_UI_echoCheck +"\", \"" +
     $dazas_bleSkiWei_UI_bleSlider +"\");"),
     $dazas_bleSkiWei_UI_interactiveCheck);
 
-  button("-e", "-c","dazas_bleSkiWei_UI_blend(\""+$dazas_bleSkiWei_UI_bleSlider+"\");",
+  checkBoxGrp("-e", "-cc", ("dazas_bleSkiWei_UI_interactiveCheck_cc(\""+
+    $dazas_bleSkiWei_UI_interactiveCheck +"\", \""+
+    $dazas_bleSkiWei_UI_echoCheck +"\", \"" +
+    $dazas_bleSkiWei_UI_bleSlider +"\");"),
+    $dazas_bleSkiWei_UI_echoCheck);
+
+  button("-e", "-c","dazas_bleSkiWei_UI_blend(\""+
+    $dazas_bleSkiWei_UI_echoCheck +"\", \"" +
+    $dazas_bleSkiWei_UI_bleSlider+"\");",
     $dazas_bleSkiWei_UI_blendButton);
 }
 //                                                                                               //

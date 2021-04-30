@@ -7,7 +7,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -34,7 +34,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "//source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";\ndazToAdvancedSkeletonGuide();" 
+        -command "source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";\ndazToAdvancedSkeletonGuide();" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -567,14 +567,14 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 64
+        -flexibleWidthValue 32
         -enable 1
         -width 35
         -height 34
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Set Genesis 8 Character From Bind Pose to T-Pose. Go to Bind Pose then run this script." 
+        -annotation "Set Genesis 8 Character to T-Pose." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
@@ -594,7 +594,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "//Set Genesis 8 Character From Bind Pose to T-Pose.\n\nsetAttr \"lShldrBend.rotateZ\" 45;\nsetAttr \"rShldrBend.rotateZ\" -45;\n\nsetAttr \"lCollar.rotateZ\" 2.5;\nsetAttr \"rCollar.rotateZ\" -2.5;\n\nsetAttr \"lThighBend.rotateZ\" -15;\nsetAttr \"rThighBend.rotateZ\" 15;\n\nsetAttr \"lThighTwist.rotateY\" -10;\nsetAttr \"rThighTwist.rotateY\" 10;\n\nsetAttr \"lFoot.rotateY\" -8.5;\nsetAttr \"rFoot.rotateY\" 8.5;\n\nsetAttr \"lFoot.rotateZ\" 20;\nsetAttr \"rFoot.rotateZ\" -20;" 
+        -command "//Set Genesis 8 Character to T-Pose.\ndazas_setGen8CharacterToTPose();" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -672,7 +672,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -700,6 +700,111 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "reflectionToggle;" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 64
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Mirror Daz character's joints transform on the left and right sides." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Mirror Daz character's joints X to -X" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "<<--" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "QR_mirrorGuidesRightToLeft.png" 
+        -image1 "QR_mirrorGuidesRightToLeft.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "dazas_mirrorDazJointsTrans(0);" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 64
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Mirror Daz character's joints transform on the left and right sides." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Mirror Daz character's joints -X to X" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "-->>" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "QR_mirrorGuidesLeftToRight.png" 
+        -image1 "QR_mirrorGuidesLeftToRight.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "dazas_mirrorDazJointsTrans(1);" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Record the object's transform attributes into an mel script. Select the object and run this script.\n" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "objects Transform Into Cmds" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Cmd" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "alignStack.png" 
+        -image1 "alignStack.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Record the object's transform attributes into an mel script. Select the object and run this script.\n{\n  string $objs[] = ls(\"-sl\", \"-tr\");\n  string $cmd;\n\n  for ($obj in $objs)\n  {\n      float $t[] = getAttr($obj+\".t\");\n      float $r[] = getAttr($obj+\".r\");\n      float $s[] = getAttr($obj+\".s\");\n      $cmd += \"\\nsetAttr (\\\"\"+$obj+\".t\\\", \"+$t[0]+\", \"+$t[1]+\", \"+$t[2]+\");\\n\";\n      $cmd += \"setAttr (\\\"\"+$obj+\".r\\\", \"+$r[0]+\", \"+$r[1]+\", \"+$r[2]+\");\\n\";\n      $cmd += \"setAttr (\\\"\"+$obj+\".s\\\", \"+$s[0]+\", \"+$s[1]+\", \"+$s[2]+\");\\n\";\n  }\n\n  print $cmd;\n}" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

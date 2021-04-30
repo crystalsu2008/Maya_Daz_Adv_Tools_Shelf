@@ -1,25 +1,55 @@
-// Mirror Daz joints transform from +x to -x.
+// Mirror Daz character's joints transform on the left and right sides.
+global proc string[] dazas_mirrorDazJointsTrans_getTwoJoints(string $jName, string $dir)
+{
+  string $dazJoints[] = {("l"+$jName), ("r"+$jName)};
+  string $advJoints[] = {($jName+"_L"), ($jName+"_R")};
+
+  if(objExists($dazJoints[0]))
+  {
+    if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right to left")
+      return {$dazJoints[1], $dazJoints[0]};
+    else
+      return {$dazJoints[0], $dazJoints[1]};
+  }
+  else if(objExists($advJoints[0]))
+  {
+    if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right to left")
+      return {$advJoints[1], $advJoints[0]};
+    else
+      return {$advJoints[0], $advJoints[1]};
+  }
+  return {};
+}
+
 global proc dazas_mirrorDazJointsTrans(string $dir)
 {
-  string $so = "l";
-  string $de = "r";
-  if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right to left") {
-    $so = "r"; $de = "l";
-  }
-
   float $tm[] = {-1.0, 1.0, 1.0};
   float $rm[] = {1.0, -1.0, -1.0};
 
   string $allJoints[] = {
+    "ThighBend", "ThighTwist", "Shin", "Foot", "Metatarsals",
+    "Toe", "SmallToe4", "SmallToe4_2", "SmallToe4_3",
+    "SmallToe3", "SmallToe3_2", "SmallToe3_3",
+    "SmallToe2", "SmallToe2_2", "SmallToe2_3",
+    "SmallToe1", "SmallToe1_2", "SmallToe1_3",
+    "BigToe", "BigToe_2", "BigToe_3",
     "Collar", "ShldrBend", "ShldrTwist", "ForearmBend", "ForearmTwist", "Hand",
-    "Thumb1", "Thumb2", "Thumb3", "Thumb4", "Carpal1", "Index1", "Index2", "Index3",
-    "Index4", "Carpal2", "Mid1", "Mid2", "Mid3", "Mid4", "Carpal3", "Ring1", "Ring2",
-    "Ring3", "Ring4", "Carpal4", "Pinky1", "Pinky2", "Pinky3", "Pinky4"};
+    "Thumb1", "Thumb2", "Thumb3", "Thumb4",
+    "Carpal1", "Index1", "Index2", "Index3", "Index4",
+    "Carpal2", "Mid1", "Mid2", "Mid3", "Mid4",
+    "Carpal3", "Ring1", "Ring2", "Ring3", "Ring4",
+    "Carpal4", "Pinky1", "Pinky2", "Pinky3", "Pinky4",
+    "Pectoral", "Ear"};
 
-  for($joint in $allJoints) {
-    $t = getAttr($so+$joint+".t");
-    setAttr($de+$joint+".t", $t[0]*$tm[0], $t[1]*$tm[1], $t[2]*$tm[2]);
-    $r = getAttr($so+$joint+".r");
-    setAttr($de+$joint+".r", $r[0]*$rm[0], $r[1]*$rm[1], $r[2]*$rm[2]);
+  for($joint in $allJoints)
+  {
+    string $twoJoint[] = dazas_mirrorDazJointsTrans_getTwoJoints($joint ,$dir);
+    if(size($twoJoint))
+    {
+      $t = getAttr($twoJoint[0]+".t");
+      setAttr($twoJoint[1]+".t", $t[0]*$tm[0], $t[1]*$tm[1], $t[2]*$tm[2]);
+      $r = getAttr($twoJoint[0]+".r");
+      setAttr($twoJoint[1]+".r", $r[0]*$rm[0], $r[1]*$rm[1], $r[2]*$rm[2]);
+    }
   }
 }

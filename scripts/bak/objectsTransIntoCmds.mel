@@ -1,0 +1,17 @@
+// Record the object's transform attributes into an mel script. Select the object and run this script.
+{
+  string $objs[] = ls("-sl", "-tr");
+  string $cmd;
+
+  for ($obj in $objs)
+  {
+      float $t[] = getAttr($obj+".t");
+      float $r[] = getAttr($obj+".r");
+      float $s[] = getAttr($obj+".s");
+      $cmd += "\nsetAttr (\""+$obj+".t\", "+$t[0]+", "+$t[1]+", "+$t[2]+");\n";
+      $cmd += "setAttr (\""+$obj+".r\", "+$r[0]+", "+$r[1]+", "+$r[2]+");\n";
+      $cmd += "setAttr (\""+$obj+".s\", "+$s[0]+", "+$s[1]+", "+$s[2]+");\n";
+  }
+
+  print $cmd;
+}

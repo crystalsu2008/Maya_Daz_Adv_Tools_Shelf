@@ -23,10 +23,11 @@ global proc string dazToAsGuides_cmd(string $script, string $suf, string $cmd)
 global proc dazToAsGuide_help(string $image)
 {
   string $folder = toNativePath("dazToAdvancedSkeletonGuide/");
-  string $fileName = dazToAsGuidePath()+$folder+"dazToAsGuide_help__"+$image+".jpg";
-  window;
-    paneLayout;
-      image -image $fileName;
+  string $fileName = dazToAsGuidePath()+$folder+"dazToAsGuide_help__"+$image;
+  window("-t","Help");
+    //paneLayout;
+    columnLayout("-adj", 1);
+      image("-image", $fileName);
   showWindow;
 }
 
@@ -39,40 +40,53 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
 
         rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
           text("-l", "Description");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_Description\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_Description.jpg\")");
           setParent ..;
 
         rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
           button("-l","Go To Bind Pose", "-w",160, "-c","gotoBindPose");
           text("-l", "");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_GoToBindPose\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_GoToBindPose.jpg\")");
           setParent ..;
 
         rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
           button("-l","Go To T-Pose", "-w",160, "-c",dazToAsGuides_cmd("dazas_setGen8CharacterToTPose","mel",""));
           text("-l", "");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_GoToT-Pose\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_GoToT-Pose.png\")");
           setParent ..;
 
         rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
           text("-l", "Open NameMatcher");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_OpenNameMatcher\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_OpenNameMatcher.jpg\")");
           setParent ..;
 
         rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
           text("-l", "Set Template");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_SetTemplate\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_SetTemplate.jpg\")");
           setParent ..;
 
         rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
           text("-l", "Place FitSkeleton");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_PlaceFitSkeleton\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_PlaceFitSkeleton.jpg\")");
           setParent ..;
 
         rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
           button("-l","Delete Eye & Jaw", "-w",160, "-c","delete Eye Jaw1;");
           text("-l", "");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAs_DeleteEyeAndJaw\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_DeleteEyeAndJaw.jpg\")");
           setParent ..;
+
+        rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+          text("-l", "Fine-tune FitSkeleton");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_Fine-tuneFitSkeleton.png\")");
+          setParent ..;
+
+        rowLayout("-adj",1, "-nc",3, "-cl3","left","left","left", "-ct3","left","left","right", "-co3",15,15,15);
+          text("-l", "Orient Joint");
+          //button("-l","?", "-w",24, "-c","dazToAsGuide_help(\"applayAdvSke_Fine-tuneFitSkeleton.png\")");
+          iconTextButton("-st","iconOnly", "-i1","orientJoint.png", "-l","Orient Joint", "-c","OrientJointOptions;");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_Fine-tuneFitSkeleton.png\")");
+          setParent ..;
+
 showWindow $dazToAsGuide_Window;
 }

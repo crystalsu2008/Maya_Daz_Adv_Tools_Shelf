@@ -32,7 +32,7 @@ global proc dazas_setGen8CharacterToTPose()
   setAttr "rFoot.rotateZ" -17;
 
   setAttr "hip.translateY" 18.2;*/
-  
+
 setAttr ("hip.t", -0.000492013467, 18.15910648, 1.39156425);
 setAttr ("hip.r", 0, 0, 0);
 setAttr ("hip.s", 1, 1, 1);
@@ -45,23 +45,23 @@ setAttr ("lThighBend.t", 3.480287234, -3.549865723, -0.5538402796);
 setAttr ("lThighBend.r", -1.375691328, 0.1913498499, -15.11417537);
 setAttr ("lThighBend.s", 1, 1, 1);
 
-setAttr ("lThighTwist.t", 1.033323293, -3.964401284, -0.1350535853);
+setAttr ("lThighTwist.t", 1.056883183, -3.958114653, -0.1349287428);
 setAttr ("lThighTwist.r", 0, -10, 0);
 setAttr ("lThighTwist.s", 1, 1, 1);
 
-setAttr ("lShin.t", 0.8639615384, -3.339085517, -0.2043758588);
+setAttr ("lShin.t", 0.8732271267, -3.336560019, -0.2060045226);
 setAttr ("lShin.r", 5, 0, -7.454425035e-15);
 setAttr ("lShin.s", 1, 1, 1);
 
-setAttr ("lFoot.t", 1.524603844, -5.513239384, -0.0946867764);
-setAttr ("lFoot.r", -5, -8.5, 20);
+setAttr ("lFoot.t", 1.487991195, -5.523211697, -0.08785881917);
+setAttr ("lFoot.r", -4.903286909, -8.920835203, 20.17633366);
 setAttr ("lFoot.s", 1, 1, 1);
 
-setAttr ("lMetatarsals.t", -0.1378445625, -0.1341392994, -0.1903312802);
+setAttr ("lMetatarsals.t", -0.09977016878, -0.1345597998, -0.2082965611);
 setAttr ("lMetatarsals.r", -3.180554681e-15, 0, -7.951386704e-15);
 setAttr ("lMetatarsals.s", 1, 1, 1);
 
-setAttr ("lToe.t", 1.571616173, -1.250760794, 3.295916319);
+setAttr ("lToe.t", 1.572068516, -1.250765674, 3.295698419);
 setAttr ("lToe.r", 0, 0, 0);
 setAttr ("lToe.s", 1, 1, 1);
 
@@ -129,23 +129,23 @@ setAttr ("rThighBend.t", -3.480287234, -3.549865723, -0.5538402796);
 setAttr ("rThighBend.r", -1.375691328, -0.1913498499, 15.11417537);
 setAttr ("rThighBend.s", 1, 1, 1);
 
-setAttr ("rThighTwist.t", -1.033323293, -3.964401284, -0.1350535853);
+setAttr ("rThighTwist.t", -1.056883183, -3.958114653, -0.1349287428);
 setAttr ("rThighTwist.r", 0, 10, -0);
 setAttr ("rThighTwist.s", 1, 1, 1);
 
-setAttr ("rShin.t", -0.8639615384, -3.339085517, -0.2043758588);
+setAttr ("rShin.t", -0.8732271267, -3.336560019, -0.2060045226);
 setAttr ("rShin.r", 5, -0, 7.454425035e-15);
 setAttr ("rShin.s", 1, 1, 1);
 
-setAttr ("rFoot.t", -1.524603844, -5.513239384, -0.0946867764);
-setAttr ("rFoot.r", -5, 8.5, -20);
+setAttr ("rFoot.t", -1.487991195, -5.523211697, -0.08785881917);
+setAttr ("rFoot.r", -4.903286909, 8.920835203, -20.17633366);
 setAttr ("rFoot.s", 1, 1, 1);
 
-setAttr ("rMetatarsals.t", 0.1378445625, -0.1341392994, -0.1903312802);
+setAttr ("rMetatarsals.t", 0.09977016878, -0.1345597998, -0.2082965611);
 setAttr ("rMetatarsals.r", -3.180554681e-15, -0, 7.951386704e-15);
 setAttr ("rMetatarsals.s", 1, 1, 1);
 
-setAttr ("rToe.t", -1.571616173, -1.250760794, 3.295916319);
+setAttr ("rToe.t", -1.572068516, -1.250765674, 3.295698419);
 setAttr ("rToe.r", 0, -0, -0);
 setAttr ("rToe.s", 1, 1, 1);
 
@@ -226,18 +226,18 @@ setAttr ("chestUpper.r", 0, 0, 0);
 setAttr ("chestUpper.s", 1, 1, 1);
 
 setAttr ("lCollar.t", 1.302600517, 3.295757294, -0.5030192137);
-setAttr ("lCollar.r", 0, -3.975693352e-16, 2.5);
+setAttr ("lCollar.r", -0.3667608971, 0.03047285628, 3.131201406);
 setAttr ("lCollar.s", 1, 1, 1);
 
-setAttr ("lShldrBend.t", 3.372059226, -0.1850776672, -0.396353364);
-setAttr ("lShldrBend.r", 7.204273678, -0.1589755428, 47.64571233);
+setAttr ("lShldrBend.t", 3.372105469, -0.184236839, -0.3963507804);
+setAttr ("lShldrBend.r", 5.431598353, -0.1091926179, 46.60375151);
 setAttr ("lShldrBend.s", 1, 1, 1);
 
-setAttr ("lShldrTwist.t", 1.808886051, -2.450487137, -0.1949385405);
+setAttr ("lShldrTwist.t", 1.867700266, -2.401625603, -0.2031361231);
 setAttr ("lShldrTwist.r", 0, 0, 0);
 setAttr ("lShldrTwist.s", 1, 1, 1);
 
-setAttr ("lForearmBend.t", 2.300415993, -2.631999969, -0.592195034);
+setAttr ("lForearmBend.t", 2.302656324, -2.62967954, -0.5899907804);
 setAttr ("lForearmBend.r", 0, 0, 0);
 setAttr ("lForearmBend.s", 1, 1, 1);
 
@@ -245,7 +245,7 @@ setAttr ("lForearmTwist.t", 1.755465508, -1.846828461, 0.8172482252);
 setAttr ("lForearmTwist.r", 0, 0, 0);
 setAttr ("lForearmTwist.s", 1, 1, 1);
 
-setAttr ("lHand.t", 1.658496857, -2.03459549, 0.6882718801);
+setAttr ("lHand.t", 1.657998851, -2.03501554, 0.6883179472);
 setAttr ("lHand.r", -1.987846676e-15, -2.484808345e-15, -7.532075295e-15);
 setAttr ("lHand.s", 1, 1, 1);
 
@@ -346,18 +346,18 @@ setAttr ("lPinky4.r", 0, 0, 0);
 setAttr ("lPinky4.s", 1, 1, 1);
 
 setAttr ("rCollar.t", -1.302600517, 3.295757294, -0.5030192137);
-setAttr ("rCollar.r", 0, 3.975693352e-16, -2.5);
+setAttr ("rCollar.r", -0.3667608971, -0.03047285628, -3.131201406);
 setAttr ("rCollar.s", 1, 1, 1);
 
-setAttr ("rShldrBend.t", -3.372059226, -0.1850776672, -0.396353364);
-setAttr ("rShldrBend.r", 7.204273678, 0.1589755428, -47.64571233);
+setAttr ("rShldrBend.t", -3.372105469, -0.184236839, -0.3963507804);
+setAttr ("rShldrBend.r", 5.431598353, 0.1091926179, -46.60375151);
 setAttr ("rShldrBend.s", 1, 1, 1);
 
-setAttr ("rShldrTwist.t", -1.808886051, -2.450487137, -0.1949385405);
+setAttr ("rShldrTwist.t", -1.867700266, -2.401625603, -0.2031361231);
 setAttr ("rShldrTwist.r", 0, -0, -0);
 setAttr ("rShldrTwist.s", 1, 1, 1);
 
-setAttr ("rForearmBend.t", -2.300415993, -2.631999969, -0.592195034);
+setAttr ("rForearmBend.t", -2.302656324, -2.62967954, -0.5899907804);
 setAttr ("rForearmBend.r", 0, -0, -0);
 setAttr ("rForearmBend.s", 1, 1, 1);
 
@@ -365,7 +365,7 @@ setAttr ("rForearmTwist.t", -1.755465508, -1.846828461, 0.8172482252);
 setAttr ("rForearmTwist.r", 0, -0, -0);
 setAttr ("rForearmTwist.s", 1, 1, 1);
 
-setAttr ("rHand.t", -1.658496857, -2.03459549, 0.6882718801);
+setAttr ("rHand.t", -1.657998851, -2.03501554, 0.6883179472);
 setAttr ("rHand.r", -1.987846676e-15, 2.484808345e-15, 7.532075295e-15);
 setAttr ("rHand.s", 1, 1, 1);
 

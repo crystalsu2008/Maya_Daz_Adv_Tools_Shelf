@@ -742,7 +742,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 64
+        -flexibleWidthValue 32
         -enable 1
         -width 35
         -height 34
@@ -805,6 +805,41 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "// Record the object's transform attributes into an mel script. Select the object and run this script.\n{\n  string $objs[] = ls(\"-sl\", \"-tr\");\n  string $cmd;\n\n  for ($obj in $objs)\n  {\n      float $t[] = getAttr($obj+\".t\");\n      float $r[] = getAttr($obj+\".r\");\n      float $s[] = getAttr($obj+\".s\");\n      $cmd += \"\\nsetAttr (\\\"\"+$obj+\".t\\\", \"+$t[0]+\", \"+$t[1]+\", \"+$t[2]+\");\\n\";\n      $cmd += \"setAttr (\\\"\"+$obj+\".r\\\", \"+$r[0]+\", \"+$r[1]+\", \"+$r[2]+\");\\n\";\n      $cmd += \"setAttr (\\\"\"+$obj+\".s\\\", \"+$s[0]+\", \"+$s[1]+\", \"+$s[2]+\");\\n\";\n  }\n\n  print $cmd;\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Match the extra toe joints of the advanced skeleton FitSkeleton with the toe joints of the daz character." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "fitSkeleton Extra Toes Match G8 Toes" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "MaToe" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "teMatchPoses.png" 
+        -image1 "teMatchPoses.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "dazas_fitSkeletonExtraToesMatchG8Toes();" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

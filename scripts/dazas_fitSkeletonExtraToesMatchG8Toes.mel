@@ -1,0 +1,34 @@
+// Match the extra toe joints of the advanced skeleton FitSkeleton with the toe joints of the daz character.
+global proc dazas_fitSkeletonExtraToesMatchG8Toes()
+{
+  string $g8Joints[] = {
+    "rBigToe", "rBigToe_2", "rBigToe_3",
+    "rSmallToe1", "rSmallToe1_2", "rSmallToe1_3",
+    "rSmallToe2", "rSmallToe2_2", "rSmallToe2_3",
+    "rSmallToe3", "rSmallToe3_2", "rSmallToe3_3",
+    "rSmallToe4", "rSmallToe4_2", "rSmallToe4_3"
+  };
+
+  string $fitJoints[] = {
+    "BigToe1", "BigToe2", "BigToe3",
+    "LongToe1", "LongToe2", "LongToe3",
+    "MiddleToe1", "MiddleToe2", "MiddleToe3",
+    "RingToe1", "RingToe2", "RingToe3",
+    "PinkyToe1", "PinkyToe2", "PinkyToe3"
+  };
+
+  parent("PinkyToe1","RingToe1","MiddleToe1","LongToe1","BigToe1","Knee|Ankle|Toes");
+  reorder("-r",5, "Knee|Ankle|Toes|ToesEnd");
+  delete("Root|Ankle");
+
+  int $i, $s = size($fitJoints);
+  for ($i=0; $i<$s; $i++)
+  {
+    float $p[] = xform("-q", "-t", "-ws", $g8Joints[$i]);
+    xform("-ws", "-t", $p[0], $p[1], $p[2], $fitJoints[$i]);
+  }
+
+  delete("LongToe4", "MiddleToe4", "RingToe4", "PinkyToe4");
+
+  joint("-e", "-oj","xyz", "-sao","yup", "-zso", $fitJoints);
+}

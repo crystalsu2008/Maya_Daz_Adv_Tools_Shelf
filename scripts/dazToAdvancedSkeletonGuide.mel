@@ -82,10 +82,9 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
           setParent ..;
 
         rowLayout("-adj",1, "-nc",3, "-cl3","left","left","left", "-ct3","left","left","right", "-co3",15,15,15);
-          text("-l", "Orient Joint");
-          //button("-l","?", "-w",24, "-c","dazToAsGuide_help(\"applayAdvSke_Fine-tuneFitSkeleton.png\")");
+          text("-l", "Orient Joints");
           iconTextButton("-st","iconOnly", "-i1","orientJoint.png", "-l","Orient Joint", "-c","OrientJointOptions;");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_Fine-tuneFitSkeleton.png\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_orientJoints.png\")");
           setParent ..;
 
 showWindow $dazToAsGuide_Window;

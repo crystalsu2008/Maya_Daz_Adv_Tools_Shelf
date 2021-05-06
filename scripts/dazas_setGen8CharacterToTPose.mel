@@ -2,506 +2,135 @@
 //Go to Bind Pose then run this script.
 global proc dazas_setGen8CharacterToTPose()
 {
-  /*setAttr "lShldrBend.rotateZ" 45;
-  setAttr "rShldrBend.rotateZ" -45;
-
-  setAttr "lCollar.rotateZ" 2.5;
-  setAttr "rCollar.rotateZ" -2.5;
-
-  setAttr "lThighBend.rotateZ" -12;
-  setAttr "rThighBend.rotateZ" 12;
-
-  setAttr "lThighTwist.rotateX" 1;
-  setAttr "rThighTwist.rotateX" 1;
-  setAttr "lThighTwist.rotateY" -10;
-  setAttr "rThighTwist.rotateY" 10;
-  setAttr "lThighTwist.rotateZ" -6;
-  setAttr "rThighTwist.rotateZ" 6;
-
-  setAttr "lShin.rotateX" 4;
-  setAttr "rShin.rotateX" 4;
-  setAttr "lShin.rotateZ" 3;
-  setAttr "rShin.rotateZ" -3;
-
-  setAttr "lFoot.rotateX" -3;
-  setAttr "lFoot.rotateY" -8.5;
-  setAttr "lFoot.rotateZ" 17;
-
-  setAttr "rFoot.rotateX" -3;
-  setAttr "rFoot.rotateY" 8.5;
-  setAttr "rFoot.rotateZ" -17;
-
-  setAttr "hip.translateY" 18.2;*/
-
-setAttr ("hip.t", -0.000492013467, 18.15910648, 1.39156425);
-setAttr ("hip.r", 0, 0, 0);
-setAttr ("hip.s", 1, 1, 1);
-
-setAttr ("pelvis.t", 0.0002944434818, 0.641866684, -0.03981399536);
-setAttr ("pelvis.r", 0, 0, 0);
-setAttr ("pelvis.s", 1, 1, 1);
-
-setAttr ("lThighBend.t", 3.480287234, -3.549865723, -0.5538402796);
-setAttr ("lThighBend.r", -1.375691328, 0.1913498499, -15.11417537);
-setAttr ("lThighBend.s", 1, 1, 1);
-
-setAttr ("lThighTwist.t", 1.056883183, -3.958114653, -0.1349287428);
-setAttr ("lThighTwist.r", 0, -10, 0);
-setAttr ("lThighTwist.s", 1, 1, 1);
-
-setAttr ("lShin.t", 0.8732271267, -3.336560019, -0.2060045226);
-setAttr ("lShin.r", 5, 0, -7.454425035e-15);
-setAttr ("lShin.s", 1, 1, 1);
-
-setAttr ("lFoot.t", 1.487991195, -5.523211697, -0.08785881917);
-setAttr ("lFoot.r", -4.903286909, -8.920835203, 20.17633366);
-setAttr ("lFoot.s", 1, 1, 1);
-
-setAttr ("lMetatarsals.t", -0.09977016878, -0.1345597998, -0.2082965611);
-setAttr ("lMetatarsals.r", -3.180554681e-15, 0, -7.951386704e-15);
-setAttr ("lMetatarsals.s", 1, 1, 1);
-
-setAttr ("lToe.t", 1.572068516, -1.250765674, 3.295698419);
-setAttr ("lToe.r", 0, 0, 0);
-setAttr ("lToe.s", 1, 1, 1);
-
-setAttr ("lSmallToe4.t", 1.250813484, 0.05882537365, -0.4788851738);
-setAttr ("lSmallToe4.r", 0, 0, 0);
-setAttr ("lSmallToe4.s", 1, 1, 1);
-
-setAttr ("lSmallToe4_2.t", 0.09958744049, -0.08619976044, 0.3142945766);
-setAttr ("lSmallToe4_2.r", 0, 0, 0);
-setAttr ("lSmallToe4_2.s", 1, 1, 1);
-
-setAttr ("lSmallToe4_3.t", 0.09958769164, -0.08619968627, 0.3142941552);
-setAttr ("lSmallToe4_3.r", 0, 0, 0);
-setAttr ("lSmallToe4_3.s", 1, 1, 1);
-
-setAttr ("lSmallToe3.t", 0.6800384521, 0.1088090539, -0.1249871254);
-setAttr ("lSmallToe3.r", 0, 0, 0);
-setAttr ("lSmallToe3.s", 1, 1, 1);
-
-setAttr ("lSmallToe3_2.t", 0.1745891571, -0.11555022, 0.4147229195);
-setAttr ("lSmallToe3_2.r", 0, 0, 0);
-setAttr ("lSmallToe3_2.s", 1, 1, 1);
-
-setAttr ("lSmallToe3_3.t", 0.1745890584, -0.115550436, 0.4147228547);
-setAttr ("lSmallToe3_3.r", 0, 0, 0);
-setAttr ("lSmallToe3_3.s", 1, 1, 1);
-
-setAttr ("lSmallToe2.t", 0.2911071777, 0.2072042227, 0.188639164);
-setAttr ("lSmallToe2.r", 0, 0, 0);
-setAttr ("lSmallToe2.s", 1, 1, 1);
-
-setAttr ("lSmallToe2_2.t", 0.178196907, -0.1459020972, 0.5210909843);
-setAttr ("lSmallToe2_2.r", 0, 0, 0);
-setAttr ("lSmallToe2_2.s", 1, 1, 1);
-
-setAttr ("lSmallToe2_3.t", 0.1781967333, -0.1459020351, 0.521090496);
-setAttr ("lSmallToe2_3.r", 0, 0, 0);
-setAttr ("lSmallToe2_3.s", 1, 1, 1);
-
-setAttr ("lSmallToe1.t", -0.2636260986, 0.1678218246, 0.4016156197);
-setAttr ("lSmallToe1.r", 0, 0, 0);
-setAttr ("lSmallToe1.s", 1, 1, 1);
-
-setAttr ("lSmallToe1_2.t", 0.2270116806, -0.1439600587, 0.5766072273);
-setAttr ("lSmallToe1_2.r", 0, 0, 0);
-setAttr ("lSmallToe1_2.s", 1, 1, 1);
-
-setAttr ("lSmallToe1_3.t", 0.2270115026, -0.1439599999, 0.5766063929);
-setAttr ("lSmallToe1_3.r", 0, 0, 0);
-setAttr ("lSmallToe1_3.s", 1, 1, 1);
-
-setAttr ("lBigToe.t", -1.144295216, 0.06035256386, 0.4422569275);
-setAttr ("lBigToe.r", 0, 0, 0);
-setAttr ("lBigToe.s", 1, 1, 1);
-
-setAttr ("lBigToe_2.t", 0.323638916, -0.1689726114, 0.6852369308);
-setAttr ("lBigToe_2.r", 0, 0, 0);
-setAttr ("lBigToe_2.s", 1, 1, 1);
-
-setAttr ("lBigToe_3.t", 0.3236384932, -0.1689725862, 0.6852364185);
-setAttr ("lBigToe_3.r", 0, 0, 0);
-setAttr ("lBigToe_3.s", 1, 1, 1);
-
-setAttr ("rThighBend.t", -3.480287234, -3.549865723, -0.5538402796);
-setAttr ("rThighBend.r", -1.375691328, -0.1913498499, 15.11417537);
-setAttr ("rThighBend.s", 1, 1, 1);
-
-setAttr ("rThighTwist.t", -1.056883183, -3.958114653, -0.1349287428);
-setAttr ("rThighTwist.r", 0, 10, -0);
-setAttr ("rThighTwist.s", 1, 1, 1);
-
-setAttr ("rShin.t", -0.8732271267, -3.336560019, -0.2060045226);
-setAttr ("rShin.r", 5, -0, 7.454425035e-15);
-setAttr ("rShin.s", 1, 1, 1);
-
-setAttr ("rFoot.t", -1.487991195, -5.523211697, -0.08785881917);
-setAttr ("rFoot.r", -4.903286909, 8.920835203, -20.17633366);
-setAttr ("rFoot.s", 1, 1, 1);
-
-setAttr ("rMetatarsals.t", 0.09977016878, -0.1345597998, -0.2082965611);
-setAttr ("rMetatarsals.r", -3.180554681e-15, -0, 7.951386704e-15);
-setAttr ("rMetatarsals.s", 1, 1, 1);
-
-setAttr ("rToe.t", -1.572068516, -1.250765674, 3.295698419);
-setAttr ("rToe.r", 0, -0, -0);
-setAttr ("rToe.s", 1, 1, 1);
-
-setAttr ("rSmallToe4.t", -1.250813484, 0.05882537365, -0.4788851738);
-setAttr ("rSmallToe4.r", 0, -0, -0);
-setAttr ("rSmallToe4.s", 1, 1, 1);
-
-setAttr ("rSmallToe4_2.t", -0.09958744049, -0.08619976044, 0.3142945766);
-setAttr ("rSmallToe4_2.r", 0, -0, -0);
-setAttr ("rSmallToe4_2.s", 1, 1, 1);
-
-setAttr ("rSmallToe4_3.t", -0.09958769164, -0.08619968627, 0.3142941552);
-setAttr ("rSmallToe4_3.r", 0, -0, -0);
-setAttr ("rSmallToe4_3.s", 1, 1, 1);
-
-setAttr ("rSmallToe3.t", -0.6800384521, 0.1088090539, -0.1249871254);
-setAttr ("rSmallToe3.r", 0, -0, -0);
-setAttr ("rSmallToe3.s", 1, 1, 1);
-
-setAttr ("rSmallToe3_2.t", -0.1745891571, -0.11555022, 0.4147229195);
-setAttr ("rSmallToe3_2.r", 0, -0, -0);
-setAttr ("rSmallToe3_2.s", 1, 1, 1);
-
-setAttr ("rSmallToe3_3.t", -0.1745890584, -0.115550436, 0.4147228547);
-setAttr ("rSmallToe3_3.r", 0, -0, -0);
-setAttr ("rSmallToe3_3.s", 1, 1, 1);
-
-setAttr ("rSmallToe2.t", -0.2911071777, 0.2072042227, 0.188639164);
-setAttr ("rSmallToe2.r", 0, -0, -0);
-setAttr ("rSmallToe2.s", 1, 1, 1);
-
-setAttr ("rSmallToe2_2.t", -0.178196907, -0.1459020972, 0.5210909843);
-setAttr ("rSmallToe2_2.r", 0, -0, -0);
-setAttr ("rSmallToe2_2.s", 1, 1, 1);
-
-setAttr ("rSmallToe2_3.t", -0.1781967333, -0.1459020351, 0.521090496);
-setAttr ("rSmallToe2_3.r", 0, -0, -0);
-setAttr ("rSmallToe2_3.s", 1, 1, 1);
-
-setAttr ("rSmallToe1.t", 0.2636260986, 0.1678218246, 0.4016156197);
-setAttr ("rSmallToe1.r", 0, -0, -0);
-setAttr ("rSmallToe1.s", 1, 1, 1);
-
-setAttr ("rSmallToe1_2.t", -0.2270116806, -0.1439600587, 0.5766072273);
-setAttr ("rSmallToe1_2.r", 0, -0, -0);
-setAttr ("rSmallToe1_2.s", 1, 1, 1);
-
-setAttr ("rSmallToe1_3.t", -0.2270115026, -0.1439599999, 0.5766063929);
-setAttr ("rSmallToe1_3.r", 0, -0, -0);
-setAttr ("rSmallToe1_3.s", 1, 1, 1);
-
-setAttr ("rBigToe.t", 1.144295216, 0.06035256386, 0.4422569275);
-setAttr ("rBigToe.r", 0, -0, -0);
-setAttr ("rBigToe.s", 1, 1, 1);
-
-setAttr ("rBigToe_2.t", -0.323638916, -0.1689726114, 0.6852369308);
-setAttr ("rBigToe_2.r", 0, -0, -0);
-setAttr ("rBigToe_2.s", 1, 1, 1);
-
-setAttr ("rBigToe_3.t", -0.3236384932, -0.1689725862, 0.6852364185);
-setAttr ("rBigToe_3.r", 0, -0, -0);
-setAttr ("rBigToe_3.s", 1, 1, 1);
-
-setAttr ("abdomenLower.t", 0.0005595076364, 0.7221431732, -0.7822894454);
-setAttr ("abdomenLower.r", 0, 0, 0);
-setAttr ("abdomenLower.s", 1, 1, 1);
-
-setAttr ("abdomenUpper.t", -0.0004657555255, 2.541467667, 0.2736142278);
-setAttr ("abdomenUpper.r", 0, 0, 0);
-setAttr ("abdomenUpper.s", 1, 1, 1);
-
-setAttr ("chestLower.t", 0.0007109686849, 2.322898865, -0.2372201681);
-setAttr ("chestLower.r", 0, 0, 0);
-setAttr ("chestLower.s", 1, 1, 1);
-
-setAttr ("chestUpper.t", -0.0008854029584, 3.619886398, -1.240051508);
-setAttr ("chestUpper.r", 0, 0, 0);
-setAttr ("chestUpper.s", 1, 1, 1);
-
-setAttr ("lCollar.t", 1.302600517, 3.295757294, -0.5030192137);
-setAttr ("lCollar.r", -0.3667608971, 0.03047285628, 3.131201406);
-setAttr ("lCollar.s", 1, 1, 1);
-
-setAttr ("lShldrBend.t", 3.372105469, -0.184236839, -0.3963507804);
-setAttr ("lShldrBend.r", 5.431598353, -0.1091926179, 46.60375151);
-setAttr ("lShldrBend.s", 1, 1, 1);
-
-setAttr ("lShldrTwist.t", 1.867700266, -2.401625603, -0.2031361231);
-setAttr ("lShldrTwist.r", 0, 0, 0);
-setAttr ("lShldrTwist.s", 1, 1, 1);
-
-setAttr ("lForearmBend.t", 2.302656324, -2.62967954, -0.5899907804);
-setAttr ("lForearmBend.r", 0, 0, 0);
-setAttr ("lForearmBend.s", 1, 1, 1);
-
-setAttr ("lForearmTwist.t", 1.755465508, -1.846828461, 0.8172482252);
-setAttr ("lForearmTwist.r", 0, 0, 0);
-setAttr ("lForearmTwist.s", 1, 1, 1);
-
-setAttr ("lHand.t", 1.657998851, -2.03501554, 0.6883179472);
-setAttr ("lHand.r", -1.987846676e-15, -2.484808345e-15, -7.532075295e-15);
-setAttr ("lHand.s", 1, 1, 1);
-
-setAttr ("lThumb1.t", 0.04907417297, -0.484046936, 0.7308487892);
-setAttr ("lThumb1.r", 0, 0, 0);
-setAttr ("lThumb1.s", 1, 1, 1);
-
-setAttr ("lThumb2.t", 0.2079486847, -0.5850257874, 1.158870459);
-setAttr ("lThumb2.r", 0, 0, 0);
-setAttr ("lThumb2.s", 1, 1, 1);
-
-setAttr ("lThumb3.t", 0.249247551, -0.6446113586, 0.4022532701);
-setAttr ("lThumb3.r", 0, 0, 0);
-setAttr ("lThumb3.s", 1, 1, 1);
-
-setAttr ("lThumb4.t", 0.2492478172, -0.6446110232, 0.4022533191);
-setAttr ("lThumb4.r", 0, 0, 0);
-setAttr ("lThumb4.s", 1, 1, 1);
-
-setAttr ("lCarpal1.t", 0.2612934113, 0.1689720154, 0.5508847237);
-setAttr ("lCarpal1.r", 0, -4.770832022e-15, -2.305902144e-14);
-setAttr ("lCarpal1.s", 1, 1, 1);
-
-setAttr ("lIndex1.t", 1.741241455, -1.764694214, 0.9600218534);
-setAttr ("lIndex1.r", 0, 0, 0);
-setAttr ("lIndex1.s", 1, 1, 1);
-
-setAttr ("lIndex2.t", 0.6639614105, -0.6851882935, 0.1477489471);
-setAttr ("lIndex2.r", 0, 0, 0);
-setAttr ("lIndex2.s", 1, 1, 1);
-
-setAttr ("lIndex3.t", 0.3155546188, -0.5000038147, 0.06924420595);
-setAttr ("lIndex3.r", 0, 0, 0);
-setAttr ("lIndex3.s", 1, 1, 1);
-
-setAttr ("lIndex4.t", 0.3155540984, -0.5000054117, 0.06924430554);
-setAttr ("lIndex4.r", 0, 0, 0);
-setAttr ("lIndex4.s", 1, 1, 1);
-
-setAttr ("lCarpal2.t", 0.3507022858, 0.03659439087, 0.1004074812);
-setAttr ("lCarpal2.r", 0, -1.590277341e-15, -2.88237768e-15);
-setAttr ("lCarpal2.s", 1, 1, 1);
-
-setAttr ("lMid1.t", 1.881948471, -1.775995255, 0.4666826427);
-setAttr ("lMid1.r", 0, 0, 0);
-setAttr ("lMid1.s", 1, 1, 1);
-
-setAttr ("lMid2.t", 0.7169837952, -0.6813373566, 0.1076190993);
-setAttr ("lMid2.r", 0, 0, 0);
-setAttr ("lMid2.s", 1, 1, 1);
-
-setAttr ("lMid3.t", 0.3707294464, -0.618106842, 0.1120509654);
-setAttr ("lMid3.r", 0, 0, 0);
-setAttr ("lMid3.s", 1, 1, 1);
-
-setAttr ("lMid4.t", 0.3707301425, -0.618108058, 0.1120511988);
-setAttr ("lMid4.r", 0, 0, 0);
-setAttr ("lMid4.s", 1, 1, 1);
-
-setAttr ("lCarpal3.t", 0.3823490143, -0.05543518066, -0.4102253914);
-setAttr ("lCarpal3.r", 0, -2.186631344e-15, -9.097504553e-15);
-setAttr ("lCarpal3.s", 1, 1, 1);
-
-setAttr ("lRing1.t", 1.703004837, -1.632652283, 0.1186289787);
-setAttr ("lRing1.r", 0, 0, 0);
-setAttr ("lRing1.s", 1, 1, 1);
-
-setAttr ("lRing2.t", 0.6426868439, -0.6983642578, -0.02487635612);
-setAttr ("lRing2.r", 0, 0, 0);
-setAttr ("lRing2.s", 1, 1, 1);
-
-setAttr ("lRing3.t", 0.3870868683, -0.5487060547, 0.01329243183);
-setAttr ("lRing3.r", 0, 0, 0);
-setAttr ("lRing3.s", 1, 1, 1);
-
-setAttr ("lRing4.t", 0.3870869597, -0.548706213, 0.01329274893);
-setAttr ("lRing4.r", 0, 0, 0);
-setAttr ("lRing4.s", 1, 1, 1);
-
-setAttr ("lCarpal4.t", 0.3749446869, -0.123008728, -0.8685088158);
-setAttr ("lCarpal4.r", 0, 0, -9.442271711e-16);
-setAttr ("lCarpal4.s", 1, 1, 1);
-
-setAttr ("lPinky1.t", 1.358624458, -1.688335419, -0.3329012394);
-setAttr ("lPinky1.r", 0, 0, 0);
-setAttr ("lPinky1.s", 1, 1, 1);
-
-setAttr ("lPinky2.t", 0.5587024689, -0.5342922211, 0.05063652992);
-setAttr ("lPinky2.r", 0, 0, 0);
-setAttr ("lPinky2.s", 1, 1, 1);
-
-setAttr ("lPinky3.t", 0.2875623703, -0.4193840027, -0.04317212105);
-setAttr ("lPinky3.r", 0, 0, 0);
-setAttr ("lPinky3.s", 1, 1, 1);
-
-setAttr ("lPinky4.t", 0.2875632662, -0.419384988, -0.04317207266);
-setAttr ("lPinky4.r", 0, 0, 0);
-setAttr ("lPinky4.s", 1, 1, 1);
-
-setAttr ("rCollar.t", -1.302600517, 3.295757294, -0.5030192137);
-setAttr ("rCollar.r", -0.3667608971, -0.03047285628, -3.131201406);
-setAttr ("rCollar.s", 1, 1, 1);
-
-setAttr ("rShldrBend.t", -3.372105469, -0.184236839, -0.3963507804);
-setAttr ("rShldrBend.r", 5.431598353, 0.1091926179, -46.60375151);
-setAttr ("rShldrBend.s", 1, 1, 1);
-
-setAttr ("rShldrTwist.t", -1.867700266, -2.401625603, -0.2031361231);
-setAttr ("rShldrTwist.r", 0, -0, -0);
-setAttr ("rShldrTwist.s", 1, 1, 1);
-
-setAttr ("rForearmBend.t", -2.302656324, -2.62967954, -0.5899907804);
-setAttr ("rForearmBend.r", 0, -0, -0);
-setAttr ("rForearmBend.s", 1, 1, 1);
-
-setAttr ("rForearmTwist.t", -1.755465508, -1.846828461, 0.8172482252);
-setAttr ("rForearmTwist.r", 0, -0, -0);
-setAttr ("rForearmTwist.s", 1, 1, 1);
-
-setAttr ("rHand.t", -1.657998851, -2.03501554, 0.6883179472);
-setAttr ("rHand.r", -1.987846676e-15, 2.484808345e-15, 7.532075295e-15);
-setAttr ("rHand.s", 1, 1, 1);
-
-setAttr ("rThumb1.t", -0.04907417297, -0.484046936, 0.7308487892);
-setAttr ("rThumb1.r", 0, -0, -0);
-setAttr ("rThumb1.s", 1, 1, 1);
-
-setAttr ("rThumb2.t", -0.2079486847, -0.5850257874, 1.158870459);
-setAttr ("rThumb2.r", 0, -0, -0);
-setAttr ("rThumb2.s", 1, 1, 1);
-
-setAttr ("rThumb3.t", -0.249247551, -0.6446113586, 0.4022532701);
-setAttr ("rThumb3.r", 0, -0, -0);
-setAttr ("rThumb3.s", 1, 1, 1);
-
-setAttr ("rThumb4.t", -0.2492478172, -0.6446110232, 0.4022533191);
-setAttr ("rThumb4.r", 0, -0, -0);
-setAttr ("rThumb4.s", 1, 1, 1);
-
-setAttr ("rCarpal1.t", -0.2612934113, 0.1689720154, 0.5508847237);
-setAttr ("rCarpal1.r", 0, 4.770832022e-15, 2.305902144e-14);
-setAttr ("rCarpal1.s", 1, 1, 1);
-
-setAttr ("rIndex1.t", -1.741241455, -1.764694214, 0.9600218534);
-setAttr ("rIndex1.r", 0, -0, -0);
-setAttr ("rIndex1.s", 1, 1, 1);
-
-setAttr ("rIndex2.t", -0.6639614105, -0.6851882935, 0.1477489471);
-setAttr ("rIndex2.r", 0, -0, -0);
-setAttr ("rIndex2.s", 1, 1, 1);
-
-setAttr ("rIndex3.t", -0.3155546188, -0.5000038147, 0.06924420595);
-setAttr ("rIndex3.r", 0, -0, -0);
-setAttr ("rIndex3.s", 1, 1, 1);
-
-setAttr ("rIndex4.t", -0.3155540984, -0.5000054117, 0.06924430554);
-setAttr ("rIndex4.r", 0, -0, -0);
-setAttr ("rIndex4.s", 1, 1, 1);
-
-setAttr ("rCarpal2.t", -0.3507022858, 0.03659439087, 0.1004074812);
-setAttr ("rCarpal2.r", 0, 1.590277341e-15, 2.88237768e-15);
-setAttr ("rCarpal2.s", 1, 1, 1);
-
-setAttr ("rMid1.t", -1.881948471, -1.775995255, 0.4666826427);
-setAttr ("rMid1.r", 0, -0, -0);
-setAttr ("rMid1.s", 1, 1, 1);
-
-setAttr ("rMid2.t", -0.7169837952, -0.6813373566, 0.1076190993);
-setAttr ("rMid2.r", 0, -0, -0);
-setAttr ("rMid2.s", 1, 1, 1);
-
-setAttr ("rMid3.t", -0.3707294464, -0.618106842, 0.1120509654);
-setAttr ("rMid3.r", 0, -0, -0);
-setAttr ("rMid3.s", 1, 1, 1);
-
-setAttr ("rMid4.t", -0.3707301425, -0.618108058, 0.1120511988);
-setAttr ("rMid4.r", 0, -0, -0);
-setAttr ("rMid4.s", 1, 1, 1);
-
-setAttr ("rCarpal3.t", -0.3823490143, -0.05543518066, -0.4102253914);
-setAttr ("rCarpal3.r", 0, 2.186631344e-15, 9.097504553e-15);
-setAttr ("rCarpal3.s", 1, 1, 1);
-
-setAttr ("rRing1.t", -1.703004837, -1.632652283, 0.1186289787);
-setAttr ("rRing1.r", 0, -0, -0);
-setAttr ("rRing1.s", 1, 1, 1);
-
-setAttr ("rRing2.t", -0.6426868439, -0.6983642578, -0.02487635612);
-setAttr ("rRing2.r", 0, -0, -0);
-setAttr ("rRing2.s", 1, 1, 1);
-
-setAttr ("rRing3.t", -0.3870868683, -0.5487060547, 0.01329243183);
-setAttr ("rRing3.r", 0, -0, -0);
-setAttr ("rRing3.s", 1, 1, 1);
-
-setAttr ("rRing4.t", -0.3870869597, -0.548706213, 0.01329274893);
-setAttr ("rRing4.r", 0, -0, -0);
-setAttr ("rRing4.s", 1, 1, 1);
-
-setAttr ("rCarpal4.t", -0.3749446869, -0.123008728, -0.8685088158);
-setAttr ("rCarpal4.r", 0, -0, 9.442271711e-16);
-setAttr ("rCarpal4.s", 1, 1, 1);
-
-setAttr ("rPinky1.t", -1.358624458, -1.688335419, -0.3329012394);
-setAttr ("rPinky1.r", 0, -0, -0);
-setAttr ("rPinky1.s", 1, 1, 1);
-
-setAttr ("rPinky2.t", -0.5587024689, -0.5342922211, 0.05063652992);
-setAttr ("rPinky2.r", 0, -0, -0);
-setAttr ("rPinky2.s", 1, 1, 1);
-
-setAttr ("rPinky3.t", -0.2875623703, -0.4193840027, -0.04317212105);
-setAttr ("rPinky3.r", 0, -0, -0);
-setAttr ("rPinky3.s", 1, 1, 1);
-
-setAttr ("rPinky4.t", -0.2875632662, -0.419384988, -0.04317207266);
-setAttr ("rPinky4.r", 0, -0, -0);
-setAttr ("rPinky4.s", 1, 1, 1);
-
-setAttr ("neckLower.t", -1.790351234e-06, 5.694850922, -0.6815158129);
-setAttr ("neckLower.r", 0, 0, 0);
-setAttr ("neckLower.s", 1, 1, 1);
-
-setAttr ("neckUpper.t", 0.0008647903451, 1.209220886, 0.9483574033);
-setAttr ("neckUpper.r", 0, 0, 0);
-setAttr ("neckUpper.s", 1, 1, 1);
-
-setAttr ("head.t", 0.0004501403891, 2.990406036, -0.271928668);
-setAttr ("head.r", 0, 0, 0);
-setAttr ("head.s", 1, 1, 1);
-
-setAttr ("lowerJaw.t", -0.001178448438, 1.227924347, 1.667272389);
-setAttr ("lowerJaw.r", 0, 0, 0);
-setAttr ("lowerJaw.s", 1, 1, 1);
-
-setAttr ("lEye.t", 3.394085252, 4.210296631, 5.03264147);
-setAttr ("lEye.r", 0, 0, 0);
-setAttr ("lEye.s", 1, 1, 1);
-
-setAttr ("rEye.t", -3.395569718, 4.210151672, 5.032635272);
-setAttr ("rEye.r", 0, 0, 0);
-setAttr ("rEye.s", 1, 1, 1);
-
-setAttr ("lEar.t", 8.380838954, 2.75063324, 0.4816475213);
-setAttr ("lEar.r", 9.93923338e-17, 0, 1.192708006e-15);
-setAttr ("lEar.s", 1, 1, 1);
-
-setAttr ("rEar.t", -8.380838954, 2.75063324, 0.4816475213);
-setAttr ("rEar.r", 9.93923338e-17, -0, -1.192708006e-15);
-setAttr ("rEar.s", 1, 1, 1);
-
-setAttr ("lPectoral.t", 1.460229256, 2.316339493, -3.416525722);
-setAttr ("lPectoral.r", 1.590277341e-15, 6.361109363e-15, 1.590277341e-15);
-setAttr ("lPectoral.s", 1, 1, 1);
-
-setAttr ("rPectoral.t", -1.460229256, 2.316339493, -3.416525722);
-setAttr ("rPectoral.r", 1.590277341e-15, -6.361109363e-15, -1.590277341e-15);
-setAttr ("rPectoral.s", 1, 1, 1);
+  string $charObj[] = ls("-sl");
+
+  string $OriginLct[] = spaceLocator();
+  string $xdirLct[] = spaceLocator();
+  setAttr($xdirLct[0]+".t",1,0,0);
+  string $ydirLct[] = spaceLocator();
+  setAttr($ydirLct[0]+".t",0,1,0);
+  string $nydirLct[] = spaceLocator();
+  setAttr($nydirLct[0]+".t",0,-1,0);
+  string $zdirLct[] = spaceLocator();
+  setAttr($zdirLct[0]+".t",0,0,1);
+  string $nzdirLct[] = spaceLocator();
+  setAttr($nzdirLct[0]+".t",0,0,-1);
+
+  // spine
+  setAttr("hip.tx", 0);
+  setAttr("pelvis.tx", 0);
+  setAttr("abdomenLower.tx", 0);
+  setAttr("abdomenUpper.tx", 0);
+  setAttr("chestLower.tx", 0);
+  setAttr("chestUpper.tx", 0);
+  setAttr("neckLower.tx", 0);
+  setAttr("neckUpper.tx", 0);
+  setAttr("head.tx", 0);
+
+  string $headFrontLct[] = spaceLocator();
+  float $headPos[] = xform("-q", "-t", "-ws", "head");
+  setAttr($headFrontLct[0]+".t",$headPos[0],$headPos[1],$headPos[2]+1);
+  parent($headFrontLct[0], "head");
+
+  dazas_aimOrientMatch("hip", "abdomenUpper", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "hip", "abdomenLower");
+
+  dazas_aimOrientMatch("abdomenUpper", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "abdomenUpper");
+
+  //dazas_aimOrientMatch("chestLower", "chestUpper", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "chestLower");
+
+  //dazas_aimOrientMatch("chestUpper", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "chestUpper");
+
+  dazas_aimOrientMatch("head", $headFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "neckLower");
+  delete($headFrontLct[0]);
+
+  // arm
+  dazas_aimOrientMatch("lCollar", "lShldrBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lCollar");
+
+  dazas_aimOrientMatch("lShldrBend", "lForearmBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lShldrBend");
+
+  dazas_aimOrientMatch("lForearmBend", "lHand", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lForearmBend");
+
+  rotate("-r", "-ws", "-fo", 0,-2,0, "lForearmBend");
+
+  dazas_aimOrientMatch("lShldrBend", "lHand", "lForearmBend", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $xdirLct[0], $nzdirLct[0], {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lShldrBend");
+
+  dazas_aimOrientMatch("lCarpal2", "lMid4", "lCarpal4", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $xdirLct[0], $nzdirLct[0], {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lHand");
+
+  // leg
+  dazas_aimOrientMatch("lThighBend", "lShin", "", {0.0,-1.0,0.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $nydirLct[0], "", {0.0,-1.0,0.0}, {0.0,0.0,1.0}, 1.0, "", "lThighBend");
+
+  dazas_aimOrientMatch("lShin", "lFoot", "", {0.0,-1.0,0.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $nydirLct[0], "", {0.0,-1.0,0.0}, {0.0,0.0,1.0}, 1.0, "", "lShin");
+
+  // twist leg
+  string $lThighBendFrontLct[] = spaceLocator();
+  float $lThighBendPos[] = xform("-q", "-t", "-ws", "lThighBend");
+  float $lToePos[] = xform("-q", "-t", "-ws", "lToe");
+  setAttr($lThighBendFrontLct[0]+".t",$lToePos[0],$lThighBendPos[1],$lToePos[2]);
+  dazas_aimOrientMatch("lThighBend", $lThighBendFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 0.333, "", "lThighBend");
+  delete($lThighBendFrontLct[0]);
+
+  $lThighBendFrontLct = spaceLocator();
+  $lThighBendPos = xform("-q", "-t", "-ws", "lThighBend");
+  $lToePos = xform("-q", "-t", "-ws", "lToe");
+  setAttr($lThighBendFrontLct[0]+".t",$lToePos[0],$lThighBendPos[1],$lToePos[2]);
+  string $lThighTwistPivotLct[] = spaceLocator();
+  float $lThighTwistPos[] = xform("-q", "-t", "-ws", "lThighTwist");
+  setAttr($lThighTwistPivotLct[0]+".t",$lThighBendPos[0],$lThighTwistPos[1],$lThighBendPos[2]);
+  dazas_aimOrientMatch("lThighBend", $lThighBendFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 0.5, $lThighTwistPivotLct[0], "lThighTwist");
+  delete($lThighTwistPivotLct[0], $lThighBendFrontLct[0]);
+
+  rotate("-r", "-ws", "-fo", 2,0,0, "lShin");
+
+  dazas_aimOrientMatch("lThighBend", "lFoot", "lShin", {0.0,-1.0,0.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $nydirLct[0], $zdirLct[0], {0.0,-1.0,0.0}, {0.0,0.0,1.0}, 1.0, "", "lThighBend");
+
+  // feet
+  dazas_aimOrientMatch("lToe", "lSmallToe4", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lFoot");
+
+  string $lFootFrontLct[] = spaceLocator();
+  float $lFootPos[] = xform("-q", "-t", "-ws", "lFoot");
+  $lToePos = xform("-q", "-t", "-ws", "lToe");
+  setAttr($lFootFrontLct[0]+".t",$lToePos[0],$lFootPos[1],$lToePos[2]);
+  dazas_aimOrientMatch("lFoot", $lFootFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lFoot");
+  delete($lFootFrontLct[0]);
+
+  if (size($charObj))
+  {
+    string $lFootOriginLct[] = spaceLocator();
+    float  $lFootOriginPos[] = pointPosition("-w", $charObj[0]+".vtx[4462]");
+    setAttr($lFootOriginLct[0]+".t",$lFootOriginPos[0],$lFootOriginPos[1],$lFootOriginPos[2]);
+    string $lFootAimLct[] = spaceLocator();
+    float  $lFootAimPos[] = pointPosition("-w", $charObj[0]+".vtx[2079]");
+    setAttr($lFootAimLct[0]+".t",$lFootOriginPos[0],$lFootAimPos[1],$lFootAimPos[2]);
+    dazas_aimOrientMatch($lFootOriginLct[0], $lFootAimLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+    $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lFoot");
+    delete($lFootAimLct[0], $lFootOriginLct[0]);
+
+    float $solesPos[] = pointPosition("-w", $charObj[0]+".vtx[4459]");
+    move("-ws", "-r",0,-$solesPos[1],0, "hip");
+  }
+  else
+  {
+    warning("\nNo mesh of Genesis 8 Character is selected to determine the angle and location of the sole.");
+  }
+
+  dazas_mirrorDazJointsTrans(0);
+
+  delete($OriginLct[0], $xdirLct[0], $ydirLct[0], $nydirLct[0], $zdirLct[0], $nzdirLct[0]);
 }

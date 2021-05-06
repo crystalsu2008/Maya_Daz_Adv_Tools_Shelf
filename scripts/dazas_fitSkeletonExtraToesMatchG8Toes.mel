@@ -31,4 +31,7 @@ global proc dazas_fitSkeletonExtraToesMatchG8Toes()
   delete("LongToe4", "MiddleToe4", "RingToe4", "PinkyToe4");
 
   joint("-e", "-oj","xyz", "-sao","yup", "-zso", $fitJoints);
+
+  select -r FootSideOuter FootSideInner Heel ;
+  move -ws -rpr -y 0;
 }

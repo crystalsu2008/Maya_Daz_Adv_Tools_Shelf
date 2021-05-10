@@ -1,0 +1,105 @@
+// Constraint the AdvancedSkeleton controllers to the Daz Genesis 8 character joints.
+//dazas_constraintASCtrlsToDazJoints("on")
+//dazas_constraintASCtrlsToDazJoints("off")
+global proc dazas_constraintASCtrlsToDazJoints(string $onoff)
+{
+  string $matchDate[] ={
+    "RootX=hip",
+    //"FKRoot_M=hip",
+    "FKSpine1=abdomenUpper",
+    //"IKhybridSpine2=abdomenUpper", //IK
+    "FKChest=chestLower",
+    "IKhybridSpine3=chestLower", //IK
+    "FKScapula=Collar",
+    "FKShoulder=ShldrBend",
+    "=ShldrTwist",
+    "FKElbow=ForearmBend",
+    "=ForearmTwist",
+    "FKWrist=Hand",
+    "IKArm=Hand", //IK
+    //"FKCup=Hand",
+    "FKIndexFinger1=Index1",
+    "FKIndexFinger2=Index2",
+    "FKIndexFinger3=Index3",
+    "=Index4",
+    "FKMiddleFinger1=Mid1",
+    "FKMiddleFinger2=Mid2",
+    "FKMiddleFinger3=Mid3",
+    "=Mid4",
+    "FKRingFinger1=Ring1",
+    "FKRingFinger2=Ring2",
+    "FKRingFinger3=Ring3",
+    "=Ring4",
+    "FKPinkyFinger1=Pinky1",
+    "FKPinkyFinger2=Pinky2",
+    "FKPinkyFinger3=Pinky3",
+    "=Pinky4",
+    "FKThumbFinger1=Thumb1",
+    "FKThumbFinger2=Thumb2",
+    "FKThumbFinger3=Thumb3",
+    "=Thumb4",
+    "FKNeck=neckLower",
+    "=neckUpper",
+    "FKHead=head",
+    "FKHip=ThighBend",
+    "=ThighTwist",
+    "FKKnee=Shin",
+    "FKAnkle=Foot",
+    "IKLeg=Foot", //IK
+    "FKToes=Toe",
+    "IKToes=Toe", //IK
+    "FKBigToe1=BigToe",
+    "FKBigToe2=BigToe_2",
+    "FKLongToe1=SmallToe1",
+    "FKLongToe2=SmallToe1_2",
+    "FKMiddleToe1=SmallToe2",
+    "FKMiddleToe2=SmallToe2_2",
+    "FKRingToe1=SmallToe3",
+    "FKRingToe2=SmallToe3_2",
+    "FKPinkyToe1=SmallToe4",
+    "FKPinkyToe2=SmallToe4_2"};
+
+  string $dazfix[] = {"","l","r"};
+  string $asfix[] = {"_M","_L","_R"};
+
+  if ($onoff == "on")
+  {
+    setAttr "PoleLeg_R.follow" 10;
+    setAttr "PoleArm_L.follow" 10;
+    setAttr "PoleLeg_L.follow" 10;
+    setAttr "PoleArm_R.follow" 10;
+  }
+
+  for ($date in $matchDate)
+  {
+    string $buffer[];
+    int $numTokens = `tokenize $date "=" $buffer`;
+    for ($i=0; $i<3; $i++)
+    {
+      string $target = $buffer[0]+$asfix[$i];
+      string $dazJoint = $dazfix[$i]+$buffer[1];
+      if (objExists($target) && objExists($dazJoint))
+      {
+        if ($onoff == "on")
+        {
+          //some packages makes locked or limited atrributes, so open up these first
+      		transformLimits -erx 0 0 -ery 0 0 -erz 0 0 -etx 0 0 -ety 0 0 -etz 0 0 -esx 0 0 -esy 0 0 -esz 0 0 $target;
+      		asLockAttr $target 0 0 0 0;
+
+      		print ($dazJoint+" -> "+$target+"\n");
+      		select $target;
+      		if (`objExists ($target+"_parentConstraint1")`) delete ($target+"_parentConstraint1");
+      		if (`objExists ($target+"_scaleConstraint1")`) delete ($target+"_scaleConstraint1");
+      		parentConstraint -mo $dazJoint $target;
+      		scaleConstraint $dazJoint $target;
+        }
+        else if ($onoff == "off")
+        {
+          string $scaCon[] = listConnections("-d",off, "-s",on, "-t","scaleConstraint", $target);
+          string $parCon[] = listConnections("-d",off, "-s",on, "-t","parentConstraint", $target);
+          delete($scaCon, $parCon);
+        }
+      }
+    }
+  }
+}

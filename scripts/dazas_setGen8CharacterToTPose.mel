@@ -2,7 +2,20 @@
 //Go to Bind Pose then run this script.
 global proc dazas_setGen8CharacterToTPose()
 {
-  string $charObj[] = ls("-sl");
+  string $charObj[] = ls("-sl", "-tr");
+  if (size(listRelatives("-s", "-typ", "mesh", $charObj)) == 0)
+  {
+    string $message =
+      "In order to determine the position and angle of the foot, "+
+      "the Genesis 8 character mesh needs to be selected.\n"+
+      "Continuing without selecting the mesh will not ensure that "+
+      "the foot is horizontal and that the bottom of the foot is in the Y=0 plane.\n "+
+      "Are you sure?";
+
+    string $yesOrNot = confirmDialog("-t","Warning:", "-m",$message, "-b","Yes", "-b","No", "-db","Yes", "-cb","No", "-ds","No");
+    if ($yesOrNot=="No")
+      return;
+  }
 
   string $OriginLct[] = spaceLocator();
   string $xdirLct[] = spaceLocator();
@@ -32,14 +45,14 @@ global proc dazas_setGen8CharacterToTPose()
   setAttr($headFrontLct[0]+".t",$headPos[0],$headPos[1],$headPos[2]+1);
   parent($headFrontLct[0], "head");
 
-  dazas_aimOrientMatch("hip", "abdomenUpper", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "hip", "abdomenLower");
+  //dazas_aimOrientMatch("hip", "abdomenUpper", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "hip", "abdomenLower");
 
-  dazas_aimOrientMatch("abdomenUpper", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "abdomenUpper");
+  dazas_aimOrientMatch("abdomenUpper", "chestLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "abdomenUpper");
 
-  //dazas_aimOrientMatch("chestLower", "chestUpper", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "chestLower");
+  dazas_aimOrientMatch("chestLower", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "chestLower");
 
   //dazas_aimOrientMatch("chestUpper", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
   //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "chestUpper");

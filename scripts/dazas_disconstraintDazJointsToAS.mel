@@ -1,0 +1,14 @@
+// Disconstraint the Daz Genesis 8 character's joints to AdvancedSkeleton joints.
+global proc dazas_disconstraintDazJointsToAS()
+{
+  string $nameSpaceA = "";
+  //string $parCon[]=listRelatives("-typ","parentConstraint", "-ad", ($nameSpaceA+"hip"));
+  //string $scaCon[]=listRelatives("-typ","scaleConstraint", "-ad", ($nameSpaceA+"hip"));
+
+  string $joints[]=listRelatives("-typ","joint", "-ad", ($nameSpaceA+"hip"));
+  $joints[size($joints)] = "hip";
+  string $parCon[]=listConnections("-d",off, "-s",on, "-t","parentConstraint", $joints);
+  string $scaCon[]=listConnections("-d",off, "-s",on, "-t","scaleConstraint", $joints);
+
+  delete($scaCon, $parCon);
+}

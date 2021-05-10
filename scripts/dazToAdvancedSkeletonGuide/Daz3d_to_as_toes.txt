@@ -5,6 +5,7 @@ sideBeforeName=1
 sideUnderScore=0
 
 Root=hip
+RootPart1=abdomenLower
 Spine1=abdomenUpper
 Chest=chestLower
 Scapula=Collar

@@ -1,0 +1,328 @@
+// Match the AdvancedSkeleton controllers to the Daz Genesis 8 character joints.
+// dazas_constraintASCtrlsToDazJoints("arbitrary")
+// dazas_constraintASCtrlsToDazJoints("limited")
+global proc float dazas_threeObjectsAngle(string $vectorAObj, string $vectorBObj, string $originObj,
+                                          string $refAxisObj, vector $refAxisDir)
+{
+  float $posO[], $posA[], $posB[], $ang;
+  vector $va, $vb;
+
+  $posO = xform("-q", "-t", "-ws", $originObj);
+  $posA = xform("-q", "-t", "-ws", $vectorAObj);
+  $posB = xform("-q", "-t", "-ws", $vectorBObj);
+
+  $va = <<$posA[0],$posA[1],$posA[2]>> - <<$posO[0],$posO[1],$posO[2]>>;
+  $vb = <<$posB[0],$posB[1],$posB[2]>> - <<$posO[0],$posO[1],$posO[2]>>;
+
+  $ang = rad_to_deg(angle($va, $vb));
+
+  if (objExists($refAxisObj))
+  {
+    vector $axis = cross($va, $vb);
+
+    string $refAxisDirLoc[] = spaceLocator();
+    parent($refAxisDirLoc[0], $refAxisObj);
+    setAttr($refAxisDirLoc[0]+".t", ($refAxisDir.x), ($refAxisDir.y), ($refAxisDir.z));
+
+    float $posAxis[] = xform("-q", "-t", "-ws", $refAxisObj);
+    float $posDir[] = xform("-q", "-t", "-ws", $refAxisDirLoc[0]);
+    vector $refAxis = <<$posDir[0],$posDir[1],$posDir[2]>> - <<$posAxis[0],$posAxis[1],$posAxis[2]>>;
+
+    $ang = dot($axis, $refAxis)<0 ? 360-$ang : $ang;
+    delete($refAxisDirLoc[0]);
+  }
+  return $ang;
+}
+
+global proc dazas_matchASCtrlsToDazJoints(string $mode)
+{
+  setAttr "PoleLeg_R.follow" 10;
+  setAttr "PoleArm_L.follow" 10;
+  setAttr "PoleLeg_L.follow" 10;
+  setAttr "PoleArm_R.follow" 10;
+
+  setAttr "FKIKLeg_R.FKIKBlend" 0;
+  setAttr "FKIKArm_L.FKIKBlend" 0;
+  setAttr "FKIKArm_R.FKIKBlend" 0;
+  setAttr "FKIKSpine_M.FKIKBlend" 0;
+  setAttr "FKIKLeg_L.FKIKBlend" 0;
+
+  // spine
+  setAttr "FKIKSpine_M.FKIKBlend" 0;
+
+  float $angTarget, $angCtrl, $ang, $pos[];
+
+  $pos = xform("-q", "-t", "-ws", "hip");
+  xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "RootX_M");
+
+  /*$angTarget = dazas_threeObjectsAngle("hip", "chestLower", "abdomenUpper");
+  $angCtrl = dazas_threeObjectsAngle("FKRoot_M", "FKChest_M", "FKSpine1_M");
+  $ang = $angTarget-$angCtrl;
+  setAttr("FKSpine1_M.r", 0,0,$ang);*/
+
+  $angTarget = dazas_threeObjectsAngle("abdomenUpper", "neckLower", "chestLower", "FKChest_M", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngle("FKSpine1_M", "FKNeck_M", "FKChest_M", "FKChest_M", <<0,0,1>>);
+  $ang = $angTarget-$angCtrl;
+  setAttr("FKChest_M.r", 0,0,$ang);
+  dazas_aimOrientMatch("FKSpine1_M", "FKNeck_M", "FKChest_M", {0,0,1}, {1,0,0},
+  "abdomenUpper", "neckLower", "chestLower", {0,0,1}, {1,0,0}, 1, "", "FKSpine1_M");
+
+  // IK
+  setAttr "FKIKSpine_M.FKIKBlend" 10;
+  $pos = xform("-q", "-t", "-ws", "chestLower");
+  xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "IKhybridSpine3_M");
+  dazas_aimOrientMatch("IKhybridSpine3_M", "FKNeck_M", "", {0,0,1}, {1,0,0},
+  "chestLower", "neckLower", "", {0,0,1}, {1,0,0}, 1, "", "IKhybridSpine3_M");
+  setAttr "FKIKSpine_M.FKIKBlend" 0;
+
+  // Neck
+  for ($i=0; $i<10; $i++)
+  {
+    dazas_aimOrientMatch("FKNeck_M", "FKHead_M", "", {0,0,1}, {1,0,0},
+    "neckLower", "head", "", {0,0,1}, {1,0,0}, 1, "", "FKNeck_M");
+  }
+
+  // Head
+  string $headTopLct[] = spaceLocator();
+  parent($headTopLct[0], "head");
+  setAttr($headTopLct[0]+".t", 0,1,0);
+  dazas_aimOrientMatch("FKHead_M", "HeadEnd_M", "", {0,0,1}, {1,0,0},
+  "head", $headTopLct[0], "", {0,0,1}, {1,0,0}, 1, "", "FKHead_M");
+  delete($headTopLct);
+
+  // Arm
+  dazas_aimOrientMatch("FKScapula_L", "FKShoulder_L", "", {0,1,0}, {0,1,0},
+  "lCollar", "lShldrBend", "", {0,1,0}, {0,1,0}, 1, "", "FKScapula_L");
+  dazas_aimOrientMatch("FKScapula_R", "FKShoulder_R", "", {0,1,0}, {0,1,0},
+  "rCollar", "rShldrBend", "", {0,1,0}, {0,1,0}, 1, "", "FKScapula_R");
+
+  $angTarget = dazas_threeObjectsAngle("lShldrBend", "lHand", "lForearmBend", "FKElbow_L", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngle("FKShoulder_L", "FKWrist_L", "FKElbow_L", "FKElbow_L", <<0,0,1>>);
+  $ang = $angTarget-$angCtrl;
+  setAttr("FKElbow_L.r", 0,0,$ang);
+  dazas_aimOrientMatch("FKShoulder_L", "FKWrist_L", "FKElbow_L", {0,1,0}, {0,1,0},
+  "lShldrBend", "lHand", "lForearmBend", {0,1,0}, {0,1,0}, 1, "", "FKShoulder_L");
+  $angTarget = dazas_threeObjectsAngle("rShldrBend", "rHand", "rForearmBend", "FKElbow_R", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngle("FKShoulder_R", "FKWrist_R", "FKElbow_R", "FKElbow_R", <<0,0,1>>);
+  $ang = $angTarget-$angCtrl;
+  setAttr("FKElbow_R.r", 0,0,$ang);
+  dazas_aimOrientMatch("FKShoulder_R", "FKWrist_R", "FKElbow_R", {0,1,0}, {0,1,0},
+  "rShldrBend", "rHand", "rForearmBend", {0,1,0}, {0,1,0}, 1, "", "FKShoulder_R");
+
+  // Arm IK
+  setAttr "FKIKArm_L.FKIKBlend" 10;
+  setAttr "FKIKArm_R.FKIKBlend" 10;
+
+  $pos = xform("-q", "-t", "-ws", "lHand");
+  xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "IKArm_L");
+  dazas_aimOrientMatch("IKArm_L", "FKMiddleFinger1_L", "FKThumbFinger1_L", {0,0,1}, {0,0,1},
+  "lHand", "lMid1", "lThumb1", {0,0,1}, {0,0,1}, 1, "", "IKArm_L");
+
+  $pos = xform("-q", "-t", "-ws", "rHand");
+  xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "IKArm_R");
+  dazas_aimOrientMatch("IKArm_R", "FKMiddleFinger1_R", "FKThumbFinger1_R", {0,0,1}, {0,0,1},
+  "rHand", "rMid1", "rThumb1", {0,0,1}, {0,0,1}, 1, "", "IKArm_R");
+
+  setAttr "FKIKArm_L.FKIKBlend" 0;
+  setAttr "FKIKArm_R.FKIKBlend" 0;
+
+  // Hand
+  string $joints[] = {"FKCup_L", "FKExtraCup_L", "FKThumbFinger1_L", "FKExtraThumbFinger1_L",
+                      "FKIndexFinger1_L", "FKExtraIndexFinger1_L", "FKMiddleFinger1_L", "FKExtraMiddleFinger1_L",
+                      "FKRingFinger1_L", "FKExtraRingFinger1_L", "FKPinkyFinger1_L", "FKExtraPinkyFinger1_L",
+                      "FKCup_R", "FKExtraCup_R", "FKThumbFinger1_R", "FKExtraThumbFinger1_R",
+                      "FKIndexFinger1_R", "FKExtraIndexFinger1_R", "FKMiddleFinger1_R", "FKExtraMiddleFinger1_R",
+                      "FKRingFinger1_R", "FKExtraRingFinger1_R", "FKPinkyFinger1_R", "FKExtraPinkyFinger1_R"};
+  for ($jot in $joints)
+  {
+    setAttr($jot+".t", 0,0,0);
+    setAttr($jot+".r", 0,0,0);
+  }
+
+  dazas_aimOrientMatch("FKWrist_L", "FKMiddleFinger1_L", "FKThumbFinger1_L", {0,1,0}, {0,1,0},
+  "lHand", "lMid1", "lThumb1", {0,1,0}, {0,1,0}, 1, "", "FKWrist_L");
+  dazas_aimOrientMatch("FKWrist_R", "FKMiddleFinger1_R", "FKThumbFinger1_R", {0,1,0}, {0,1,0},
+  "rHand", "rMid1", "rThumb1", {0,1,0}, {0,1,0}, 1, "", "FKWrist_R");
+
+  string $dazJot[] = {"lThumb1", "lIndex1", "lMid1", "lRing1", "lPinky1",
+                      "rThumb1", "rIndex1", "rMid1", "rRing1", "rPinky1"};
+  string $asCtrl[] = {"FKThumbFinger1_L", "FKIndexFinger1_L", "FKMiddleFinger1_L", "FKRingFinger1_L", "FKPinkyFinger1_L",
+                      "FKThumbFinger1_R", "FKIndexFinger1_R", "FKMiddleFinger1_R", "FKRingFinger1_R", "FKPinkyFinger1_R"};
+  int $s=size($dazJot);
+  for ($i=0; $i<$s; $i++)
+  {
+    $pos = xform("-q", "-t", "-ws", $dazJot[$i]);
+    xform("-ws", "-t", $pos[0], $pos[1], $pos[2], $asCtrl[$i]);
+  }
+
+  string $fingerInfo[]={
+    "FKThumbFinger1_L,FKThumbFinger2_L, lThumb1,lThumb2, FKThumbFinger1_L",
+    //"lThumb1,lThumb3,lThumb2,FKThumbFinger2_L, FKThumbFinger1_L,FKThumbFinger3_L,FKThumbFinger2_L,FKThumbFinger2_L, FKThumbFinger2_L.r",
+    "lThumb2,lThumb4,lThumb3,FKThumbFinger3_L, FKThumbFinger2_L,ThumbFinger4_L,FKThumbFinger3_L,FKThumbFinger3_L, FKThumbFinger3_L.r",
+    "FKThumbFinger2_L,ThumbFinger4_L,FKThumbFinger3_L, lThumb2,lThumb4,lThumb3, FKThumbFinger2_L",
+    "lIndex1,lIndex3,lIndex2,FKIndexFinger2_L, FKIndexFinger1_L,FKIndexFinger3_L,FKIndexFinger2_L,FKIndexFinger2_L, FKIndexFinger2_L.r",
+    "lIndex2,lIndex4,lIndex3,FKIndexFinger3_L, FKIndexFinger2_L,IndexFinger4_L,FKIndexFinger3_L,FKIndexFinger3_L, FKIndexFinger3_L.r",
+    "FKIndexFinger1_L,IndexFinger4_L,FKIndexFinger2_L, lIndex1,lIndex4,lIndex2, FKIndexFinger1_L",
+    "lMid1,lMid3,lMid2,FKMiddleFinger2_L, FKMiddleFinger1_L,FKMiddleFinger3_L,FKMiddleFinger2_L,FKMiddleFinger2_L, FKMiddleFinger2_L.r",
+    "lMid2,lMid4,lMid3,FKMiddleFinger3_L, FKMiddleFinger2_L,MiddleFinger4_L,FKMiddleFinger3_L,FKMiddleFinger3_L, FKMiddleFinger3_L.r",
+    "FKMiddleFinger1_L,MiddleFinger4_L,FKMiddleFinger2_L, lMid1,lMid4,lMid2, FKMiddleFinger1_L",
+    "lRing1,lRing3,lRing2,FKRingFinger2_L, FKRingFinger1_L,FKRingFinger3_L,FKRingFinger2_L,FKRingFinger2_L, FKRingFinger2_L.r",
+    "lRing2,lRing4,lRing3,FKRingFinger3_L, FKRingFinger2_L,RingFinger4_L,FKRingFinger3_L,FKRingFinger3_L, FKRingFinger3_L.r",
+    "FKRingFinger1_L,RingFinger4_L,FKRingFinger2_L, lRing1,lRing4,lRing2, FKRingFinger1_L",
+    "lPinky1,lPinky3,lPinky2,FKPinkyFinger2_L, FKPinkyFinger1_L,FKPinkyFinger3_L,FKPinkyFinger2_L,FKPinkyFinger2_L, FKPinkyFinger2_L.r",
+    "lPinky2,lPinky4,lPinky3,FKPinkyFinger3_L, FKPinkyFinger2_L,PinkyFinger4_L,FKPinkyFinger3_L,FKPinkyFinger3_L, FKPinkyFinger3_L.r",
+    "FKPinkyFinger1_L,PinkyFinger4_L,FKPinkyFinger2_L, lPinky1,lPinky4,lPinky2, FKPinkyFinger1_L",
+
+    "FKThumbFinger1_R,FKThumbFinger2_R, rThumb1,rThumb2, FKThumbFinger1_R",
+    //"rThumb1,rThumb3,rThumb2,FKThumbFinger2_R, FKThumbFinger1_R,FKThumbFinger3_R,FKThumbFinger2_R,FKThumbFinger2_R, FKThumbFinger2_R.r",
+    "rThumb2,rThumb4,rThumb3,FKThumbFinger3_R, FKThumbFinger2_R,ThumbFinger4_R,FKThumbFinger3_R,FKThumbFinger3_R, FKThumbFinger3_R.r",
+    "FKThumbFinger2_R,ThumbFinger4_R,FKThumbFinger3_R, rThumb2,rThumb4,rThumb3, FKThumbFinger2_R",
+    "rIndex1,rIndex3,rIndex2,FKIndexFinger2_R, FKIndexFinger1_R,FKIndexFinger3_R,FKIndexFinger2_R,FKIndexFinger2_R, FKIndexFinger2_R.r",
+    "rIndex2,rIndex4,rIndex3,FKIndexFinger3_R, FKIndexFinger2_R,IndexFinger4_R,FKIndexFinger3_R,FKIndexFinger3_R, FKIndexFinger3_R.r",
+    "FKIndexFinger1_R,IndexFinger4_R,FKIndexFinger2_R, rIndex1,rIndex4,rIndex2, FKIndexFinger1_R",
+    "rMid1,rMid3,rMid2,FKMiddleFinger2_R, FKMiddleFinger1_R,FKMiddleFinger3_R,FKMiddleFinger2_R,FKMiddleFinger2_R, FKMiddleFinger2_R.r",
+    "rMid2,rMid4,rMid3,FKMiddleFinger3_R, FKMiddleFinger2_R,MiddleFinger4_R,FKMiddleFinger3_R,FKMiddleFinger3_R, FKMiddleFinger3_R.r",
+    "FKMiddleFinger1_R,MiddleFinger4_R,FKMiddleFinger2_R, rMid1,rMid4,rMid2, FKMiddleFinger1_R",
+    "rRing1,rRing3,rRing2,FKRingFinger2_R, FKRingFinger1_R,FKRingFinger3_R,FKRingFinger2_R,FKRingFinger2_R, FKRingFinger2_R.r",
+    "rRing2,rRing4,rRing3,FKRingFinger3_R, FKRingFinger2_R,RingFinger4_R,FKRingFinger3_R,FKRingFinger3_R, FKRingFinger3_R.r",
+    "FKRingFinger1_R,RingFinger4_R,FKRingFinger2_R, rRing1,rRing4,rRing2, FKRingFinger1_R",
+    "rPinky1,rPinky3,rPinky2,FKPinkyFinger2_R, FKPinkyFinger1_R,FKPinkyFinger3_R,FKPinkyFinger2_R,FKPinkyFinger2_R, FKPinkyFinger2_R.r",
+    "rPinky2,rPinky4,rPinky3,FKPinkyFinger3_R, FKPinkyFinger2_R,PinkyFinger4_R,FKPinkyFinger3_R,FKPinkyFinger3_R, FKPinkyFinger3_R.r",
+    "FKPinkyFinger1_R,PinkyFinger4_R,FKPinkyFinger2_R, rPinky1,rPinky4,rPinky2, FKPinkyFinger1_R"};
+  for ($info in $fingerInfo)
+  {
+    string $buf[];
+    $numTokens = tokenize($info, ",", $buf);
+    if ($numTokens == 9)
+    {
+      $angTarget = dazas_threeObjectsAngle($buf[0], $buf[1], $buf[2], $buf[3], <<0,1,0>>);
+      $angCtrl = dazas_threeObjectsAngle($buf[4], $buf[5], $buf[6], $buf[7], <<0,1,0>>);
+      $ang = $angTarget-$angCtrl;
+      setAttr($buf[8], 0,$ang,0);
+    }
+    else if ($numTokens == 7)
+    {
+      dazas_aimOrientMatch($buf[0], $buf[1], $buf[2], {0,1,0}, {0,1,0},
+      $buf[3], $buf[4], $buf[5], {0,1,0}, {0,1,0}, 1, "", $buf[6]);
+    }
+    else if ($numTokens == 5)
+    {
+      dazas_aimOrientMatch($buf[0], $buf[1], "", {0,1,0}, {0,1,0},
+      $buf[2], $buf[3], "", {0,1,0}, {0,1,0}, 1, "", $buf[4]);
+    }
+  }
+
+  // Leg
+  $angTarget = dazas_threeObjectsAngle("lThighBend", "lFoot", "lShin", "FKKnee_L", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngle("FKHip_L", "FKAnkle_L", "FKKnee_L", "FKKnee_L", <<0,0,1>>);
+  $ang = $angTarget-$angCtrl;
+  setAttr("FKKnee_L.r", 0,0,$ang);
+  dazas_aimOrientMatch("FKHip_L", "FKAnkle_L", "FKKnee_L", {0,0,-1}, {1,0,0},
+  "lThighBend", "lFoot", "lShin", {0,0,-1}, {1,0,0}, 1, "", "FKHip_L");
+
+  $angTarget = dazas_threeObjectsAngle("rThighBend", "rFoot", "rShin", "FKKnee_R", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngle("FKHip_R", "FKAnkle_R", "FKKnee_R", "FKKnee_R", <<0,0,1>>);
+  $ang = $angTarget-$angCtrl;
+  setAttr("FKKnee_R.r", 0,0,$ang);
+  dazas_aimOrientMatch("FKHip_R", "FKAnkle_R", "FKKnee_R", {0,0,-1}, {1,0,0},
+  "rThighBend", "rFoot", "rShin", {0,0,-1}, {1,0,0}, 1, "", "FKHip_R");
+
+  dazas_aimOrientMatch("FKAnkle_L", "FKToes_L", "FKPinkyToe1_L", {0,0,-1}, {1,0,0},
+  "lFoot", "lToe", "lSmallToe4", {0,0,-1}, {1,0,0}, 1, "", "FKAnkle_L");
+  dazas_aimOrientMatch("FKAnkle_R", "FKToes_R", "FKPinkyToe1_R", {0,0,-1}, {1,0,0},
+  "rFoot", "rToe", "rSmallToe4", {0,0,-1}, {1,0,0}, 1, "", "FKAnkle_R");
+
+
+
+
+  // Foot
+  $joints = {"FKToes_L", "FKExtraToes_L", "FKBigToe1_L", "FKExtraBigToe1_L",
+            "FKLongToe1_L", "FKExtraLongToe1_L", "FKMiddleToe1_L", "FKExtraMiddleToe1_L",
+            "FKRingToe1_L", "FKExtraRingToe1_L", "FKPinkyToe1_L", "FKExtraPinkyToe1_L",
+            "FKToes_R", "FKExtraToes_R", "FKBigToe1_R", "FKExtraBigToe1_R",
+            "FKLongToe1_R", "FKExtraLongToe1_R", "FKMiddleToe1_R", "FKExtraMiddleToe1_R",
+            "FKRingToe1_R", "FKExtraRingToe1_R", "FKPinkyToe1_R", "FKExtraPinkyToe1_R"};
+  for ($jot in $joints)
+  {
+    setAttr($jot+".t", 0,0,0);
+    setAttr($jot+".r", 0,0,0);
+  }
+
+  string $toeInfo[]={
+    "lBigToe,lBigToe_3,lBigToe_2,FKBigToe2_L, FKBigToe1_L,BigToe3_L,FKBigToe2_L,FKBigToe2_L, FKBigToe2_L.r",
+    "FKBigToe1_L,BigToe3_L,FKBigToe2_L, lBigToe,lBigToe_3,lBigToe_2, FKBigToe1_L",
+    "lSmallToe1,lSmallToe1_3,lSmallToe1_2,FKLongToe2_L, FKLongToe1_L,LongToe3_L,FKLongToe2_L,FKLongToe2_L, FKLongToe2_L.r",
+    "FKLongToe1_L,LongToe3_L,FKLongToe2_L, lSmallToe1,lSmallToe1_3,lSmallToe1_2, FKLongToe1_L",
+    "lSmallToe2,lSmallToe2_3,lSmallToe2_2,FKMiddleToe2_L, FKMiddleToe1_L,MiddleToe3_L,FKMiddleToe2_L,FKMiddleToe2_L, FKMiddleToe2_L.r",
+    "FKMiddleToe1_L,MiddleToe3_L,FKMiddleToe2_L, lSmallToe2,lSmallToe2_3,lSmallToe2_2, FKMiddleToe1_L",
+    "lSmallToe3,lSmallToe3_3,lSmallToe3_2,FKRingToe2_L, FKRingToe1_L,RingToe3_L,FKRingToe2_L,FKRingToe2_L, FKRingToe2_L.r",
+    "FKRingToe1_L,RingToe3_L,FKRingToe2_L, lSmallToe3,lSmallToe3_3,lSmallToe3_2, FKRingToe1_L",
+    "lSmallToe4,lSmallToe4_3,lSmallToe4_2,FKPinkyToe2_L, FKPinkyToe1_L,PinkyToe3_L,FKPinkyToe2_L,FKPinkyToe2_L, FKPinkyToe2_L.r",
+    "FKPinkyToe1_L,PinkyToe3_L,FKPinkyToe2_L, lSmallToe4,lSmallToe4_3,lSmallToe4_2, FKPinkyToe1_L",
+
+    "rBigToe,rBigToe_3,rBigToe_2,FKBigToe2_R, FKBigToe1_R,BigToe3_R,FKBigToe2_R,FKBigToe2_R, FKBigToe2_R.r",
+    "FKBigToe1_R,BigToe3_R,FKBigToe2_R, rBigToe,rBigToe_3,rBigToe_2, FKBigToe1_R",
+    "rSmallToe1,rSmallToe1_3,rSmallToe1_2,FKLongToe2_R, FKLongToe1_R,LongToe3_R,FKLongToe2_R,FKLongToe2_R, FKLongToe2_R.r",
+    "FKLongToe1_R,LongToe3_R,FKLongToe2_R, rSmallToe1,rSmallToe1_3,rSmallToe1_2, FKLongToe1_R",
+    "rSmallToe2,rSmallToe2_3,rSmallToe2_2,FKMiddleToe2_R, FKMiddleToe1_R,MiddleToe3_R,FKMiddleToe2_R,FKMiddleToe2_R, FKMiddleToe2_R.r",
+    "FKMiddleToe1_R,MiddleToe3_R,FKMiddleToe2_R, rSmallToe2,rSmallToe2_3,rSmallToe2_2, FKMiddleToe1_R",
+    "rSmallToe3,rSmallToe3_3,rSmallToe3_2,FKRingToe2_R, FKRingToe1_R,RingToe3_R,FKRingToe2_R,FKRingToe2_R, FKRingToe2_R.r",
+    "FKRingToe1_R,RingToe3_R,FKRingToe2_R, rSmallToe3,rSmallToe3_3,rSmallToe3_2, FKRingToe1_R",
+    "rSmallToe4,rSmallToe4_3,rSmallToe4_2,FKPinkyToe2_R, FKPinkyToe1_R,PinkyToe3_R,FKPinkyToe2_R,FKPinkyToe2_R, FKPinkyToe2_R.r",
+    "FKPinkyToe1_R,PinkyToe3_R,FKPinkyToe2_R, rSmallToe4,rSmallToe4_3,rSmallToe4_2, FKPinkyToe1_R"};
+  for ($info in $toeInfo)
+  {
+    string $buf[];
+    $numTokens = tokenize($info, ",", $buf);
+    if ($numTokens == 9)
+    {
+      $angTarget = dazas_threeObjectsAngle($buf[0], $buf[1], $buf[2], $buf[3], <<0,0,1>>);
+      $angCtrl = dazas_threeObjectsAngle($buf[4], $buf[5], $buf[6], $buf[7], <<0,0,1>>);
+      $ang = $angTarget-$angCtrl;
+      setAttr($buf[8], 0,0,$ang);
+    }
+    else if ($numTokens == 7)
+    {
+      dazas_aimOrientMatch($buf[0], $buf[1], $buf[2], {0,0,1}, {-1,0,0},
+      $buf[3], $buf[4], $buf[5], {0,0,1}, {-1,0,0}, 1, "", $buf[6]);
+    }
+    else if ($numTokens == 5)
+    {
+      dazas_aimOrientMatch($buf[0], $buf[1], "", {0,0,1}, {-1,0,0},
+      $buf[2], $buf[3], "", {0,0,1}, {-1,0,0}, 1, "", $buf[4]);
+    }
+  }
+
+  // Leg IK
+  setAttr "FKIKLeg_L.FKIKBlend" 10;
+  setAttr "FKIKLeg_R.FKIKBlend" 10;
+
+  $pos = xform("-q", "-t", "-ws", "lFoot");
+  xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "IKLeg_L");
+  dazas_aimOrientMatch("IKLeg_L", "IKToes_L", "FKPinkyToe1_L", {0,0,1}, {-1,0,0},
+  "lFoot", "lToe", "lSmallToe4", {0,0,1}, {-1,0,0}, 1, "", "IKLeg_L");
+
+  $pos = xform("-q", "-t", "-ws", "rFoot");
+  xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "IKLeg_R");
+  dazas_aimOrientMatch("IKLeg_R", "IKToes_R", "FKPinkyToe1_R", {0,0,1}, {-1,0,0},
+  "rFoot", "rToe", "rSmallToe4", {0,0,1}, {-1,0,0}, 1, "", "IKLeg_R");
+
+  setAttr "FKIKLeg_L.FKIKBlend" 0;
+  setAttr "FKIKLeg_R.FKIKBlend" 0;
+
+  if ($mode=="arbitrary")
+  {
+    // spine
+    dazas_aimOrientMatch("FKRoot_M", "FKSpine1_M", "", {0,1,0}, {0,0,1},
+    "hip", "abdomenUpper", "", {0,1,0}, {0,0,1}, 1, "", "FKRoot_M");
+
+    dazas_aimOrientMatch("FKSpine1_M", "FKChest_M", "", {0,1,0}, {0,0,1},
+    "abdomenUpper", "chestLower", "", {0,1,0}, {0,0,1}, 1, "", "FKSpine1_M");
+
+    dazas_aimOrientMatch("FKChest_M", "FKNeck_M", "", {0,1,0}, {0,0,1},
+    "chestLower", "neckLower", "", {0,1,0}, {0,0,1}, 1, "", "FKChest_M");
+  }
+
+  setAttr "FKIKLeg_L.FKIKBlend" 10;
+  setAttr "FKIKLeg_R.FKIKBlend" 10;
+}

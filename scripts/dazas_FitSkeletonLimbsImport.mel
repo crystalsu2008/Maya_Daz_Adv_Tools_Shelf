@@ -1,0 +1,76 @@
+// Import extra limbs file 'foot.ma' to FitSkeleton.
+// This procedure is modified from the AdvancedSkeleton 'asFitSkeletonLimbsImport' procedure.
+// Automatic select the 'foot.ma' and the 'Merge' option.
+
+global proc dazas_FitSkeletonLimbsImport(string $filename, string $dialog)
+{
+//string $dialog;
+string $tempString[],$tempString2[],$tempString3[];
+string $fitSkeletonsDir=`asGetScriptLocation`+"/AdvancedSkeleton5Files/fitSkeletonsLimbs/";
+string $FitSkeletonFile=$fitSkeletonsDir+$filename;//`optionMenu -q -v asLimbFiles`;
+float $existingScale[3]={1,1,1};
+if (`objExists FitSkeleton`)
+	$existingScale=`getAttr FitSkeleton.s`;
+if (`file -q -ex $FitSkeletonFile`)
+	file -import -rpr "AdvancedSkeleton" -options "v=0" $FitSkeletonFile;
+if (`objExists Main|FitSkeleton` && `objExists |FitSkeleton`)
+	rename |FitSkeleton AdvancedSkeleton_FitSkeleton;
+if (`objExists AdvancedSkeleton_FitSkeleton` && `objExists FitSkeleton`)
+	{
+	setAttr -type float3 AdvancedSkeleton_FitSkeleton.s $existingScale[0] $existingScale[1] $existingScale[2];
+	$tempString=`listRelatives -f -c -type transform AdvancedSkeleton_FitSkeleton`;
+	for ($i=0;$i<size($tempString);$i++)
+		{
+		tokenize $tempString[$i] "|" $tempString2;
+		string $shortName=$tempString2[size($tempString2)-1];
+		$tempString2=`ls -l $shortName`;
+			{
+			/*if (size($tempString2)>1)
+				$dialog=`confirmDialog -t "Confirm"
+				-m ($shortName+" already exist")
+				-b "Replace" -db "Replace"
+				-b "Merge" -ds "Merge"`;*/
+			if ($dialog=="Replace")
+				{
+				for ($y=0;$y<size($tempString2);$y++)
+					if ($tempString2[$y]!=$tempString[$i])
+						{
+						$tempString3=`listRelatives -p $tempString2[$y]`;
+						delete $tempString2[$y];
+						if ($tempString3[0]!="")
+							parent $tempString[$i] $tempString3[0];
+						else
+							parent $tempString[$i] FitSkeleton;
+						}
+				}
+			else if (`objExists Root`)
+				parent $tempString[$i] Root;
+			else
+				parent $tempString[$i] FitSkeleton;
+			}
+		}
+	//Transfer SDK`s to FitSkeleton;
+	if (`attributeExists drivingSystem AdvancedSkeleton_FitSkeleton`)
+		{
+		$tempString=`listConnections AdvancedSkeleton_FitSkeleton.drivingSystem`;
+		if (!`attributeExists drivingSystem FitSkeleton`)
+			addAttr -k 0 -ln drivingSystem -at message -multi -indexMatters 0 FitSkeleton;
+		for ($i=0;$i<size($tempString);$i++)
+			connectAttr -na ($tempString[$i]+".drivingSystemOut") FitSkeleton.drivingSystem;
+		string $uAs[]=`listAttr -ud AdvancedSkeleton_FitSkeleton`;
+		for ($i=0;$i<size($uAs);$i++)
+			{
+			if (!`gmatch $uAs[$i] "drivingSystem_*"`)
+				continue;
+			if (!`attributeExists $uAs[$i] FitSkeleton`)
+				addAttr -k 0 -ln $uAs[$i] -at bool -dv true -multi FitSkeleton;
+			$tempString=`listConnections -p 1 ("AdvancedSkeleton_FitSkeleton."+$uAs[$i])`;
+			for ($y=0;$y<size($tempString);$y++)
+				connectAttr -f ("FitSkeleton."+$uAs[$i]+"["+$y+"]") $tempString[$y];
+			}
+		}
+	delete AdvancedSkeleton_FitSkeleton;
+	}
+asEnsureFitSkeletonAttributes;
+asUpdateButtonEnables;
+}

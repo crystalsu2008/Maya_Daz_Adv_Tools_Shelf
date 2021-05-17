@@ -1,0 +1,18 @@
+// Constrain Daz joints to AdvancedSkeleton joints.
+global proc dazas_constraintDazToASJoints(string $template)
+{
+  if (!`window -q -ex asMappingUI`)
+  {
+    asMappingUI NameMatcher "";
+    optionMenu -e -v $template asMappingUIFiles;
+    asMappingUIFileOptionMenuChanged NameMatcher;
+    asMappingUIFunction AutoRigConstraint;
+    deleteUI asMappingUI;
+  }
+  else
+  {
+    optionMenu -e -v $template asMappingUIFiles;
+    asMappingUIFileOptionMenuChanged NameMatcher;
+    asMappingUIFunction AutoRigConstraint;
+  }
+}

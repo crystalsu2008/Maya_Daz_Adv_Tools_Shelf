@@ -1,0 +1,15 @@
+// Open AdvancedSkeleton NameMatcher.
+global proc dazas_openNameMatcher(string $template)
+{
+  if (!`window -q -ex asMappingUI`)
+  {
+    asMappingUI NameMatcher "";
+    optionMenu -e -v $template asMappingUIFiles;
+    asMappingUIFileOptionMenuChanged NameMatcher;
+  }
+  else
+  {
+    optionMenu -e -v $template asMappingUIFiles;
+    asMappingUIFileOptionMenuChanged NameMatcher;
+  }
+}

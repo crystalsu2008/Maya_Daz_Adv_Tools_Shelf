@@ -55,8 +55,10 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
           button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_GoToT-Pose.png\")");
           setParent ..;
 
-        rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
-          text("-l", "Open NameMatcher");
+        rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+          //text("-l", "Open NameMatcher");
+          button("-l","Open NameMatcher", "-w",160, "-c",dazToAsGuides_cmd("dazas_openNameMatcher","mel","dazas_openNameMatcher Daz3d_to_as_toes"));
+          text("-l", "");
           button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_OpenNameMatcher.jpg\")");
           setParent ..;
 
@@ -71,7 +73,7 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
           setParent ..;
 
         rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
-          button("-l","Delete Eye & Jaw", "-w",160, "-c","delete Eye Jaw1;");
+          button("-l","Delete Eye && Jaw", "-w",160, "-c","delete Eye Jaw1;");
           text("-l", "");
           button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_DeleteEyeAndJaw.jpg\")");
           setParent ..;
@@ -86,6 +88,82 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
           iconTextButton("-st","iconOnly", "-i1","orientJoint.png", "-l","Orient Joint", "-c","OrientJointOptions;");
           button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_orientJoints.png\")");
           setParent ..;
+
+        rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+          button("-l","Import extra foot", "-w",160, "-c",dazToAsGuides_cmd("dazas_FitSkeletonLimbsImport","mel","dazas_FitSkeletonLimbsImport(\"foot.ma\", \"Merge\");"));
+          text("-l", "");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_importFxtraFoot.png\")");
+          setParent ..;
+
+        rowLayout("-adj",2, "-nc",4, "-cl4","left","center","left","left", "-ct4","left","both","right","right", "-co4",15,0,0,15);
+          button("-l","Match G8 Toes", "-w",160, "-c",dazToAsGuides_cmd("dazas_fitSkeletonExtraToesMatchG8Toes","mel",""));
+          text("-l", "");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_MatchG8Toes1.png\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_MatchG8Toes2.png\")");
+          setParent ..;
+
+        rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+          button("-l","Inbetween && Twist Joints", "-w",160, "-c",dazToAsGuides_cmd("dazas_setInbetweenAndTwist","mel",""));
+          text("-l", "");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_InbetweenAndTwist.png\")");
+          setParent ..;
+
+        rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+          text("-l", "Build AdvancedSkeleton");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_buildAdvancedSkeleton.png\")");
+          setParent ..;
+
+        rowLayout("-adj",2, "-nc",5, "-cl5","left","center","left","left","left", "-ct5","left","both","right","right","right", "-co5",15,0,0,0,15);
+          button("-l","Check Pole Vector", "-w",160, "-c","setAttr \"FKIKArm_R.FKIKBlend\" 10;setAttr \"FKIKLeg_L.FKIKBlend\" 10;setAttr \"FKIKLeg_R.FKIKBlend\" 10;setAttr \"FKIKArm_L.FKIKBlend\" 10;");
+          text("-l", "");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_checkPoleVector1.png\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_checkPoleVector2.png\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_checkPoleVector3.png\")");
+          setParent ..;
+
+        rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+          text("-l", "Constraint To Joints");
+          //button("-l","Constraint To Joints", "-w",160, "-c",dazToAsGuides_cmd("dazas_constraintDazToASJoints","mel","dazas_constraintDazToASJoints(\"Daz3d_to_as_toes\");"));
+          text("-l", "");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_constraintToJoints.png\")");
+          setParent ..;
+
+        rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",10,0,10);
+          text("-l", "");
+          frameLayout("-l", "Tools", "-cll", 1, "-cl", 0, "-bv", 1, "-mh",0, "-mw",0);
+            string $dazas_applayAdvSke_Tools_form = `formLayout -numberOfDivisions 100`;
+              string $dazas_applayAdvSke_Tools_columnL = `columnLayout -adj 1 -columnAttach "both" 0`;
+                rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",0,0);
+                  button("-l","MoCapLibrary", "-w",100, "-c","asMoCapLibraryUI \"\"");
+                  button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_MoCapLibrary.png\")");
+                  setParent ..;
+                setParent ..;
+              string $dazas_applayAdvSke_Tools_columnR = `columnLayout -adj 1 -columnAttach "both" 0`;
+                rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",0,0);
+                  button("-l","Disconstraint Joints", "-w",100, "-c","dazas_disconstraintDazJointsToAS();");
+                  button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_DisconstraintToJoints.png\")");
+                  setParent ..;
+                setParent ..;
+              setParent ..;
+            setParent ..;
+          text("-l", "");
+          setParent ..;
+        setParent ..;
+      setParent ..;
+    setParent ..;
+  setParent ..;
+
+formLayout -edit
+    -attachForm     $dazas_applayAdvSke_Tools_columnL     "top"    0
+    -attachForm     $dazas_applayAdvSke_Tools_columnL     "left"   0
+    -attachForm     $dazas_applayAdvSke_Tools_columnL     "bottom" 0
+    -attachPosition $dazas_applayAdvSke_Tools_columnL     "right"  0 50
+
+    -attachForm     $dazas_applayAdvSke_Tools_columnR     "top"    0
+    -attachPosition $dazas_applayAdvSke_Tools_columnR     "left"   0 50
+    -attachForm     $dazas_applayAdvSke_Tools_columnR     "bottom" 0
+    -attachForm     $dazas_applayAdvSke_Tools_columnR     "right"  0
+$dazas_applayAdvSke_Tools_form;
 
 showWindow $dazToAsGuide_Window;
 }

@@ -50,20 +50,49 @@ global proc dazas_setGen8CharacterToTPose()
 
   dazas_aimOrientMatch("abdomenUpper", "chestLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
   $OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "abdomenUpper");
+  dazas_orientAimMatch ("-fromOriginObject abdomenUpper \
+                         -fromAimObject    chestLower \
+                         -fromUpVector     0 0 1 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$ydirLct[0]);
 
-  dazas_aimOrientMatch("chestLower", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "chestLower");
+  //dazas_aimOrientMatch("chestLower", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
+  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "chestLower");
+  dazas_orientAimMatch ("-fromOriginObject chestLower \
+                         -fromAimObject    neckLower \
+                         -fromUpVector     0 0 1 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$ydirLct[0]);
 
   //dazas_aimOrientMatch("chestUpper", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
   //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "chestUpper");
 
-  dazas_aimOrientMatch("head", $headFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "neckLower");
+  //dazas_aimOrientMatch("head", $headFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  //$OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "neckLower");
+  dazas_orientAimMatch ("-fromOriginObject head \
+                         -fromAimObject    "+$headFrontLct[0]+" \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$zdirLct[0]+" \
+                         -matchObject      neckLower");
   delete($headFrontLct[0]);
 
   // arm
-  dazas_aimOrientMatch("lCollar", "lShldrBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lCollar");
+  //dazas_aimOrientMatch("lCollar", "lShldrBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
+  //$OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lCollar");
+  dazas_orientAimMatch ("-fromOriginObject lCollar \
+                         -fromAimObject    lShldrBend \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]);
+
+  dazas_orientAimMatch ("-fromOriginObject lShldrBend \
+                         -fromAimObject    lHand \
+                         -fromUpObject     lForearmBend \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]+" \
+                         -toUpObject       "+$nzdirLct[0]);
 
   dazas_aimOrientMatch("lShldrBend", "lForearmBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
   $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lShldrBend");

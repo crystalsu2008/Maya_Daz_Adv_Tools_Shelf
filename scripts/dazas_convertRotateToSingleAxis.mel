@@ -1,0 +1,41 @@
+global proc dazas_convertRotateToSingleAxis (string $paramline)
+{
+  string $obj;
+  string $orientObj;
+  string $aimObj;
+  string $axis;
+
+  float $axisMult;
+
+  string $toLct[] = spaceLocator();
+  float $poPos[] = xform("-q", "-t", "-ws", $obj);
+  setAttr($toLct[0]+".t", $poPos[0], $poPos[1], $poPos[2]);
+
+  string $toOriginLct[] = spaceLocator();
+  $poPos = xform("-q", "-t", "-ws", $orientObj);
+  setAttr($toOriginLct[0]+".t", $poPos[0], $poPos[1], $poPos[2]);
+
+  string $toAimObj[] = spaceLocator();
+  $poPos = xform("-q", "-t", "-ws", $aimObj);
+  setAttr($toAimObj[0]+".t", $poPos[0], $poPos[1], $poPos[2]);
+
+  float $angle = dazas_threeObjectsAngle "-originObject FKElbow_L\
+                                          -vectorObjectA FKShoulder_L\
+                                          -vectorObjectB FKWrist_L";
+
+
+int $poIsValid = objExists($pivotObj);
+if($poIsValid)
+  $poPos = xform("-q", "-t", "-ws", $pivotObj);
+
+
+
+//
+dazas_orientAimMatch "-fromOriginObject FKShoulder_L \
+                      -fromAimObject FKWrist_L \
+                      -fromUpObject FKElbow_L \
+                      -toOriginObject lShldrBend \
+                      -toAimObject lHand \
+                      -toUpObject lForearmBend";
+
+}

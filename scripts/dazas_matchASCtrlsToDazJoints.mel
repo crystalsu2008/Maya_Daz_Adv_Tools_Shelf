@@ -1,7 +1,7 @@
 // Match the AdvancedSkeleton controllers to the Daz Genesis 8 character joints.
 // dazas_constraintASCtrlsToDazJoints("arbitrary")
 // dazas_constraintASCtrlsToDazJoints("limited")
-global proc float dazas_threeObjectsAngle(string $vectorAObj, string $vectorBObj, string $originObj,
+global proc float dazas_threeObjectsAngleOld(string $vectorAObj, string $vectorBObj, string $originObj,
                                           string $refAxisObj, vector $refAxisDir)
 {
   float $posO[], $posA[], $posB[], $ang;
@@ -55,13 +55,13 @@ global proc dazas_matchASCtrlsToDazJoints(string $mode)
   $pos = xform("-q", "-t", "-ws", "hip");
   xform("-ws", "-t", $pos[0], $pos[1], $pos[2], "RootX_M");
 
-  /*$angTarget = dazas_threeObjectsAngle("hip", "chestLower", "abdomenUpper");
-  $angCtrl = dazas_threeObjectsAngle("FKRoot_M", "FKChest_M", "FKSpine1_M");
+  /*$angTarget = dazas_threeObjectsAngleOld("hip", "chestLower", "abdomenUpper");
+  $angCtrl = dazas_threeObjectsAngleOld("FKRoot_M", "FKChest_M", "FKSpine1_M");
   $ang = $angTarget-$angCtrl;
   setAttr("FKSpine1_M.r", 0,0,$ang);*/
 
-  $angTarget = dazas_threeObjectsAngle("abdomenUpper", "neckLower", "chestLower", "FKChest_M", <<0,0,1>>);
-  $angCtrl = dazas_threeObjectsAngle("FKSpine1_M", "FKNeck_M", "FKChest_M", "FKChest_M", <<0,0,1>>);
+  $angTarget = dazas_threeObjectsAngleOld("abdomenUpper", "neckLower", "chestLower", "FKChest_M", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngleOld("FKSpine1_M", "FKNeck_M", "FKChest_M", "FKChest_M", <<0,0,1>>);
   $ang = $angTarget-$angCtrl;
   setAttr("FKChest_M.r", 0,0,$ang);
   dazas_aimOrientMatch("FKSpine1_M", "FKNeck_M", "FKChest_M", {0,0,1}, {1,0,0},
@@ -96,14 +96,14 @@ global proc dazas_matchASCtrlsToDazJoints(string $mode)
   dazas_aimOrientMatch("FKScapula_R", "FKShoulder_R", "", {0,1,0}, {0,1,0},
   "rCollar", "rShldrBend", "", {0,1,0}, {0,1,0}, 1, "", "FKScapula_R");
 
-  $angTarget = dazas_threeObjectsAngle("lShldrBend", "lHand", "lForearmBend", "FKElbow_L", <<0,0,1>>);
-  $angCtrl = dazas_threeObjectsAngle("FKShoulder_L", "FKWrist_L", "FKElbow_L", "FKElbow_L", <<0,0,1>>);
+  $angTarget = dazas_threeObjectsAngleOld("lShldrBend", "lHand", "lForearmBend", "FKElbow_L", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngleOld("FKShoulder_L", "FKWrist_L", "FKElbow_L", "FKElbow_L", <<0,0,1>>);
   $ang = $angTarget-$angCtrl;
   setAttr("FKElbow_L.r", 0,0,$ang);
   dazas_aimOrientMatch("FKShoulder_L", "FKWrist_L", "FKElbow_L", {0,1,0}, {0,1,0},
   "lShldrBend", "lHand", "lForearmBend", {0,1,0}, {0,1,0}, 1, "", "FKShoulder_L");
-  $angTarget = dazas_threeObjectsAngle("rShldrBend", "rHand", "rForearmBend", "FKElbow_R", <<0,0,1>>);
-  $angCtrl = dazas_threeObjectsAngle("FKShoulder_R", "FKWrist_R", "FKElbow_R", "FKElbow_R", <<0,0,1>>);
+  $angTarget = dazas_threeObjectsAngleOld("rShldrBend", "rHand", "rForearmBend", "FKElbow_R", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngleOld("FKShoulder_R", "FKWrist_R", "FKElbow_R", "FKElbow_R", <<0,0,1>>);
   $ang = $angTarget-$angCtrl;
   setAttr("FKElbow_R.r", 0,0,$ang);
   dazas_aimOrientMatch("FKShoulder_R", "FKWrist_R", "FKElbow_R", {0,1,0}, {0,1,0},
@@ -195,8 +195,8 @@ global proc dazas_matchASCtrlsToDazJoints(string $mode)
     $numTokens = tokenize($info, ",", $buf);
     if ($numTokens == 9)
     {
-      $angTarget = dazas_threeObjectsAngle($buf[0], $buf[1], $buf[2], $buf[3], <<0,1,0>>);
-      $angCtrl = dazas_threeObjectsAngle($buf[4], $buf[5], $buf[6], $buf[7], <<0,1,0>>);
+      $angTarget = dazas_threeObjectsAngleOld($buf[0], $buf[1], $buf[2], $buf[3], <<0,1,0>>);
+      $angCtrl = dazas_threeObjectsAngleOld($buf[4], $buf[5], $buf[6], $buf[7], <<0,1,0>>);
       $ang = $angTarget-$angCtrl;
       setAttr($buf[8], 0,$ang,0);
     }
@@ -213,15 +213,15 @@ global proc dazas_matchASCtrlsToDazJoints(string $mode)
   }
 
   // Leg
-  $angTarget = dazas_threeObjectsAngle("lThighBend", "lFoot", "lShin", "FKKnee_L", <<0,0,1>>);
-  $angCtrl = dazas_threeObjectsAngle("FKHip_L", "FKAnkle_L", "FKKnee_L", "FKKnee_L", <<0,0,1>>);
+  $angTarget = dazas_threeObjectsAngleOld("lThighBend", "lFoot", "lShin", "FKKnee_L", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngleOld("FKHip_L", "FKAnkle_L", "FKKnee_L", "FKKnee_L", <<0,0,1>>);
   $ang = $angTarget-$angCtrl;
   setAttr("FKKnee_L.r", 0,0,$ang);
   dazas_aimOrientMatch("FKHip_L", "FKAnkle_L", "FKKnee_L", {0,0,-1}, {1,0,0},
   "lThighBend", "lFoot", "lShin", {0,0,-1}, {1,0,0}, 1, "", "FKHip_L");
 
-  $angTarget = dazas_threeObjectsAngle("rThighBend", "rFoot", "rShin", "FKKnee_R", <<0,0,1>>);
-  $angCtrl = dazas_threeObjectsAngle("FKHip_R", "FKAnkle_R", "FKKnee_R", "FKKnee_R", <<0,0,1>>);
+  $angTarget = dazas_threeObjectsAngleOld("rThighBend", "rFoot", "rShin", "FKKnee_R", <<0,0,1>>);
+  $angCtrl = dazas_threeObjectsAngleOld("FKHip_R", "FKAnkle_R", "FKKnee_R", "FKKnee_R", <<0,0,1>>);
   $ang = $angTarget-$angCtrl;
   setAttr("FKKnee_R.r", 0,0,$ang);
   dazas_aimOrientMatch("FKHip_R", "FKAnkle_R", "FKKnee_R", {0,0,-1}, {1,0,0},
@@ -276,8 +276,8 @@ global proc dazas_matchASCtrlsToDazJoints(string $mode)
     $numTokens = tokenize($info, ",", $buf);
     if ($numTokens == 9)
     {
-      $angTarget = dazas_threeObjectsAngle($buf[0], $buf[1], $buf[2], $buf[3], <<0,0,1>>);
-      $angCtrl = dazas_threeObjectsAngle($buf[4], $buf[5], $buf[6], $buf[7], <<0,0,1>>);
+      $angTarget = dazas_threeObjectsAngleOld($buf[0], $buf[1], $buf[2], $buf[3], <<0,0,1>>);
+      $angCtrl = dazas_threeObjectsAngleOld($buf[4], $buf[5], $buf[6], $buf[7], <<0,0,1>>);
       $ang = $angTarget-$angCtrl;
       setAttr($buf[8], 0,0,$ang);
     }

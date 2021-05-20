@@ -1,0 +1,16 @@
+global proc vector dazas_vectorParameterAnalysis (string $paramline, string $param, vector $default)
+{
+  string $paramGrp, $paramGrps[], $params[];
+  tokenize $paramline "-" $paramGrps;
+
+  for ($paramGrp in $paramGrps)
+  {
+    tokenize $paramGrp " ,<>()[]{}" $params;
+    if ($param == ("-"+$params[0]))
+    {
+      return (<<float($params[0]), float($params[1]), float($params[2])>>);
+    }
+  }
+  //warning("The '"+$param+"' parameter could not be found, returns the default value.");
+  return $default;
+}

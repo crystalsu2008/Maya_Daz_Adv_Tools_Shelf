@@ -1,0 +1,16 @@
+global proc string dazas_stringParameterAnalysis (string $paramline, string $param, string $default)
+{
+  string $paramGrp, $paramGrps[], $params[];
+  tokenize $paramline "-" $paramGrps;
+
+  for ($paramGrp in $paramGrps)
+  {
+    tokenize $paramGrp " ,<>()[]{}" $params;
+    if ($param == ("-"+$params[0]))
+    {
+      return $params[1];
+    }
+  }
+  //warning("The '"+$param+"' parameter could not be found, returns the default value.");
+  return $default;
+}

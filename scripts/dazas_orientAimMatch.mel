@@ -1,0 +1,129 @@
+// Rotate the object the angle that from the angle of coordinates of the from object to the to object.
+// Example:
+/*
+   dazas_orientAimMatch "-fromOriginObject FKShoulder_L \
+                         -fromAimObject FKWrist_L \
+                         -fromUpObject FKElbow_L \
+                         -toOriginObject lShldrBend \
+                         -toAimObject lHand \
+                         -toUpObject lForearmBend";
+*/
+global proc dazas_orientAimMatch (string $paramline)
+{
+  string $fromOriginObj = dazas_stringParameterAnalysis($paramline, "-fromOriginObject", "");
+  string $fromAimObj = dazas_stringParameterAnalysis($paramline, "-fromAimObject", "");
+  string $fromUpObj = dazas_stringParameterAnalysis($paramline, "-fromUpObject", "");
+  float $fromUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-fromUpVector", {0,1,0});
+  float $fromWorldUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-fromWorldUpVector", $fromUpVector);
+
+  string $toOriginObj = dazas_stringParameterAnalysis($paramline, "-toOriginObject", "");
+  string $toAimObj = dazas_stringParameterAnalysis($paramline, "-toAimObject", "");
+  string $toUpObj = dazas_stringParameterAnalysis($paramline, "-toUpObject", "");
+  float $toUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-toUpVector", $fromUpVector);
+  float $toWorldUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-toWorldUpVector", $fromWorldUpVector);
+
+  string $matchObj = dazas_stringParameterAnalysis($paramline, "-matchObject", $fromOriginObj);
+  string $pivotObj = dazas_stringParameterAnalysis($paramline, "-pivotObject", $matchObj);
+  float $percentage = dazas_floatParameterAnalysis($paramline, "-percentage", 1);
+
+
+  float $fooPos[] = xform("-q", "-t", "-ws", $fromOriginObj);
+  float $faoPos[] = xform("-q", "-t", "-ws", $fromAimObj);
+  float $fuoPos[];
+  int $fuoIsValid = objExists($fromUpObj);
+
+  float $tooPos[] = xform("-q", "-t", "-ws", $toOriginObj);
+  float $taoPos[] = xform("-q", "-t", "-ws", $toAimObj);
+  float $tuoPos[];
+  int $tuoIsValid = objExists($toUpObj);
+
+  string $foolct[] = spaceLocator();
+  setAttr($foolct[0]+".t", $fooPos[0], $fooPos[1], $fooPos[2]);
+  string $faolct[] = spaceLocator();
+  setAttr($faolct[0]+".t", $faoPos[0], $faoPos[1], $faoPos[2]);
+  string $fuolct[];
+
+  string $toolct[] = spaceLocator();
+  setAttr($toolct[0]+".t", $tooPos[0], $tooPos[1], $tooPos[2]);
+  string $taolct[] = spaceLocator();
+  setAttr($taolct[0]+".t", $taoPos[0], $taoPos[1], $taoPos[2]);
+  string $tuolct[];
+
+  string $medialct[] = spaceLocator();
+  float $poPos[] = xform("-q", "-t", "-ws", $matchObj);
+  int $poIsValid = objExists($pivotObj);
+  if($poIsValid)
+    $poPos = xform("-q", "-t", "-ws", $pivotObj);
+  setAttr($medialct[0]+".t", $poPos[0], $poPos[1], $poPos[2]);
+
+  string $aimNode[], $parentNode[], $mediaOrientNode[];
+  if ($fuoIsValid && $tuoIsValid)
+  {
+    $fuoPos = xform("-q", "-t", "-ws", $fromUpObj);
+    $tuoPos = xform("-q", "-t", "-ws", $toUpObj);
+    $fuolct = spaceLocator();
+    setAttr($fuolct[0]+".t", $fuoPos[0], $fuoPos[1], $fuoPos[2]);
+    $tuolct = spaceLocator();
+    setAttr($tuolct[0]+".t", $tuoPos[0], $tuoPos[1], $tuoPos[2]);
+
+    $aimNode = aimConstraint(
+    "-o",0,0,0, "-w",1, "-aim",1,0,0, "-u",$fromUpVector[0],$fromUpVector[1],$fromUpVector[2],
+    "-wut","object", "-wuo",$fuolct,
+    $faolct[0], $foolct[0]);
+    delete $aimNode;
+
+    $aimNode = aimConstraint(
+    "-o",0,0,0, "-w",1, "-aim",1,0,0, "-u",$toUpVector[0],$toUpVector[1],$toUpVector[2],
+    "-wut","object", "-wuo",$tuolct,
+    $taolct[0], $toolct[0]);
+    delete $aimNode;
+
+    $mediaOrientNode = orientConstraint("-o",0,0,0, "-w",1, $foolct[0], $toolct[0], $medialct[0]);
+    string $wattrs[] = orientConstraint("-q", "-wal", $mediaOrientNode[0]);
+
+    setAttr($mediaOrientNode[0]+"."+$wattrs[0], 1);
+    setAttr($mediaOrientNode[0]+"."+$wattrs[1], 0);
+    $parentNode = parentConstraint("-mo", "-w",1, $medialct[0], $matchObj);
+    float $a=0, $b=1;
+    if ($percentage<1)
+    {
+      $a = 1;
+      $b = $percentage/(1-$percentage);
+    }
+    setAttr($mediaOrientNode[0]+"."+$wattrs[0], $a);
+    setAttr($mediaOrientNode[0]+"."+$wattrs[1], $b);
+
+    delete($parentNode, $mediaOrientNode, $medialct[0], $tuolct[0], $taolct[0], $toolct[0],$fuolct[0], $faolct[0], $foolct[0]);
+  }
+  else
+  {
+    $aimNode = aimConstraint(
+      "-o",0,0,0, "-w",1, "-aim",1,0,0, "-u",$fromUpVector[0],$fromUpVector[1],$fromUpVector[2],
+      "-wut","vector", "-wu",$fromWorldUpVector[0],$fromWorldUpVector[1],$fromWorldUpVector[2],
+      $faolct[0], $foolct[0]);
+    delete $aimNode;
+
+    $aimNode = aimConstraint(
+      "-o",0,0,0, "-w",1, "-aim",1,0,0, "-u",$toUpVector[0],$toUpVector[1],$toUpVector[2],
+      "-wut","vector", "-wu",$toWorldUpVector[0],$toWorldUpVector[1],$toWorldUpVector[2],
+      $taolct[0], $toolct[0]);
+    delete $aimNode;
+
+    $mediaOrientNode = orientConstraint("-o",0,0,0, "-w",1, $foolct[0], $toolct[0], $medialct[0]);
+    string $wattrs[] = orientConstraint("-q", "-wal", $mediaOrientNode[0]);
+
+    setAttr($mediaOrientNode[0]+"."+$wattrs[0], 1);
+    setAttr($mediaOrientNode[0]+"."+$wattrs[1], 0);
+    $parentNode = parentConstraint("-mo", "-w",1, $medialct[0], $matchObj);
+    float $a=0, $b=1;
+    if ($percentage<1)
+    {
+      $a = 1;
+      $b = $percentage/(1-$percentage);
+    }
+    setAttr($mediaOrientNode[0]+"."+$wattrs[0], $a);
+    setAttr($mediaOrientNode[0]+"."+$wattrs[1], $b);
+
+    delete($parentNode, $mediaOrientNode, $medialct[0], $taolct[0], $toolct[0], $faolct[0], $foolct[0]);
+  }
+}

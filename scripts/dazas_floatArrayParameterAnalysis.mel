@@ -1,0 +1,22 @@
+global proc float[] dazas_floatArrayParameterAnalysis (string $paramline, string $param, float $default[])
+{
+  string $paramGrp, $paramGrps[], $params[];
+  tokenize $paramline "-" $paramGrps;
+
+  for ($paramGrp in $paramGrps)
+  {
+    tokenize $paramGrp " ,<>()[]{}" $params;
+    if ($param == ("-"+$params[0]))
+    {
+      int $s = size($params);
+      float $result[];
+      for ($i=1; $i<$s; $i++)
+      {
+        $result[size($result)] = float($params[$i]);
+      }
+      return $result;
+    }
+  }
+  //warning("The '"+$param+"' parameter could not be found, returns the default value.");
+  return $default;
+}

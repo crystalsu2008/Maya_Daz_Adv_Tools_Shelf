@@ -1,19 +1,19 @@
 // Mirror Daz character's joints transform on the left and right sides.
-global proc string[] dazas_mirrorDazJointsTrans_getTwoJoints(string $jName, string $dir)
+global proc string[] dazas_dazJointsSymmetrical_getTwoJoints(string $jName, string $dir, string $NS)
 {
-  string $dazJoints[] = {("l"+$jName), ("r"+$jName)};
-  string $advJoints[] = {($jName+"_L"), ($jName+"_R")};
+  string $dazJoints[] = {($NS+"l"+$jName), ($NS+"r"+$jName)};
+  string $advJoints[] = {($NS+$jName+"_L"), ($NS+$jName+"_R")};
 
   if(objExists($dazJoints[0]))
   {
-    if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right to left")
+    if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right_to_left")
       return {$dazJoints[1], $dazJoints[0]};
     else
       return {$dazJoints[0], $dazJoints[1]};
   }
   else if(objExists($advJoints[0]))
   {
-    if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right to left")
+    if($dir == "1" || $dir == "rl" || $dir == "rtol" || $dir == "right_to_left")
       return {$advJoints[1], $advJoints[0]};
     else
       return {$advJoints[0], $advJoints[1]};
@@ -21,8 +21,11 @@ global proc string[] dazas_mirrorDazJointsTrans_getTwoJoints(string $jName, stri
   return {};
 }
 
-global proc dazas_mirrorDazJointsTrans(string $dir)
+global proc dazas_dazJointsSymmetrical (string $paramline)
 {
+  string $dir = dazas_stringParameterAnalysis($paramline, {"-dir", "-direction"}, "");
+  string $NS = dazas_stringParameterAnalysis($paramline, {"-ns", "-nameSpace"}, "");
+
   float $tm[] = {-1.0, 1.0, 1.0};
   float $rm[] = {1.0, -1.0, -1.0};
 
@@ -43,7 +46,7 @@ global proc dazas_mirrorDazJointsTrans(string $dir)
 
   for($joint in $allJoints)
   {
-    string $twoJoint[] = dazas_mirrorDazJointsTrans_getTwoJoints($joint ,$dir);
+    string $twoJoint[] = dazas_dazJointsSymmetrical_getTwoJoints($joint, $dir, $NS);
     if(size($twoJoint))
     {
       $t = getAttr($twoJoint[0]+".t");

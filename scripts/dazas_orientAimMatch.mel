@@ -10,21 +10,21 @@
 */
 global proc dazas_orientAimMatch (string $paramline)
 {
-  string $fromOriginObj = dazas_stringParameterAnalysis($paramline, "-fromOriginObject", "");
-  string $fromAimObj = dazas_stringParameterAnalysis($paramline, "-fromAimObject", "");
-  string $fromUpObj = dazas_stringParameterAnalysis($paramline, "-fromUpObject", "");
-  float $fromUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-fromUpVector", {0,1,0});
-  float $fromWorldUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-fromWorldUpVector", $fromUpVector);
+  string $fromOriginObj = dazas_stringParameterAnalysis($paramline, {"-fromOriginObject"}, "");
+  string $fromAimObj = dazas_stringParameterAnalysis($paramline, {"-fromAimObject"}, "");
+  string $fromUpObj = dazas_stringParameterAnalysis($paramline, {"-fromUpObject"}, "");
+  float $fromUpVector[] = dazas_floatArrayParameterAnalysis($paramline, {"-fromUpVector"}, {0.0,1,0});
+  float $fromWorldUpVector[] = dazas_floatArrayParameterAnalysis($paramline, {"-fromWorldUpVector"}, $fromUpVector);
 
-  string $toOriginObj = dazas_stringParameterAnalysis($paramline, "-toOriginObject", "");
-  string $toAimObj = dazas_stringParameterAnalysis($paramline, "-toAimObject", "");
-  string $toUpObj = dazas_stringParameterAnalysis($paramline, "-toUpObject", "");
-  float $toUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-toUpVector", $fromUpVector);
-  float $toWorldUpVector[] = dazas_floatArrayParameterAnalysis($paramline, "-toWorldUpVector", $fromWorldUpVector);
+  string $toOriginObj = dazas_stringParameterAnalysis($paramline, {"-toOriginObject"}, "");
+  string $toAimObj = dazas_stringParameterAnalysis($paramline, {"-toAimObject"}, "");
+  string $toUpObj = dazas_stringParameterAnalysis($paramline, {"-toUpObject"}, "");
+  float $toUpVector[] = dazas_floatArrayParameterAnalysis($paramline, {"-toUpVector"}, $fromUpVector);
+  float $toWorldUpVector[] = dazas_floatArrayParameterAnalysis($paramline, {"-toWorldUpVector"}, $fromWorldUpVector);
 
-  string $matchObj = dazas_stringParameterAnalysis($paramline, "-matchObject", $fromOriginObj);
-  string $pivotObj = dazas_stringParameterAnalysis($paramline, "-pivotObject", $matchObj);
-  float $percentage = dazas_floatParameterAnalysis($paramline, "-percentage", 1);
+  string $matchObj = dazas_stringParameterAnalysis($paramline, {"-matchObject"}, $fromOriginObj);
+  string $pivotObj = dazas_stringParameterAnalysis($paramline, {"-pivotObject"}, $matchObj);
+  float $percentage = dazas_floatParameterAnalysis($paramline, {"-percentage"}, 1);
 
 
   float $fooPos[] = xform("-q", "-t", "-ws", $fromOriginObj);

@@ -2,6 +2,18 @@
 //Go to Bind Pose then run this script.
 global proc dazas_setGen8CharacterToTPose()
 {
+  global string $gDazasNameSpace;
+  GoToBindPose;
+  string $NS;
+  if ($gDazasNameSpace=="")
+  {
+    $NS = dazas_nameSpaceDetect(1);
+  }
+  else
+  {
+    $NS = $gDazasNameSpace+":";
+  }
+
   string $charObj[] = ls("-sl", "-tr");
   if (size(listRelatives("-s", "-typ", "mesh", $charObj)) == 0)
   {
@@ -30,126 +42,166 @@ global proc dazas_setGen8CharacterToTPose()
   setAttr($nzdirLct[0]+".t",0,0,-1);
 
   // spine
-  setAttr("hip.tx", 0);
-  setAttr("pelvis.tx", 0);
-  setAttr("abdomenLower.tx", 0);
-  setAttr("abdomenUpper.tx", 0);
-  setAttr("chestLower.tx", 0);
-  setAttr("chestUpper.tx", 0);
-  setAttr("neckLower.tx", 0);
-  setAttr("neckUpper.tx", 0);
-  setAttr("head.tx", 0);
+  string $spineObjs[] = {"hip", "pelvis", "abdomenLower", "abdomenUpper",
+            "chestLower", "chestUpper", "neckLower", "neckUpper", "head"};
+  for ($obj in $spineObjs)
+  {
+    setAttr($NS+$obj+".tx", 0);
+  }
 
   string $headFrontLct[] = spaceLocator();
-  float $headPos[] = xform("-q", "-t", "-ws", "head");
+  float $headPos[] = xform("-q", "-t", "-ws", $NS+"head");
   setAttr($headFrontLct[0]+".t",$headPos[0],$headPos[1],$headPos[2]+1);
-  parent($headFrontLct[0], "head");
+  parent($headFrontLct[0], $NS+"head");
 
-  //dazas_aimOrientMatch("hip", "abdomenUpper", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "hip", "abdomenLower");
-
-  dazas_aimOrientMatch("abdomenUpper", "chestLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "abdomenUpper");
-  dazas_orientAimMatch ("-fromOriginObject abdomenUpper \
-                         -fromAimObject    chestLower \
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"abdomenUpper \
+                         -fromAimObject    "+$NS+"chestLower \
                          -fromUpVector     0 0 1 \
                          -toOriginObject   "+$OriginLct[0]+" \
                          -toAimObject      "+$ydirLct[0]);
 
-  //dazas_aimOrientMatch("chestLower", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,1.0}, {0.0,0.0,1.0}, 1.0, "", "chestLower");
-  dazas_orientAimMatch ("-fromOriginObject chestLower \
-                         -fromAimObject    neckLower \
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"chestLower \
+                         -fromAimObject    "+$NS+"neckLower \
                          -fromUpVector     0 0 1 \
                          -toOriginObject   "+$OriginLct[0]+" \
                          -toAimObject      "+$ydirLct[0]);
 
-  //dazas_aimOrientMatch("chestUpper", "neckLower", "", {0.0,0.0,1.0}, {0.0,0.0,1.0},
-  //$OriginLct[0], $ydirLct[0], "", {0.0,0.0,0.1}, {0.0,0.0,0.1}, 1.0, "", "chestUpper");
-
-  //dazas_aimOrientMatch("head", $headFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  //$OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "neckLower");
-  dazas_orientAimMatch ("-fromOriginObject head \
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"head \
                          -fromAimObject    "+$headFrontLct[0]+" \
                          -fromUpVector     0 1 0 \
                          -toOriginObject   "+$OriginLct[0]+" \
                          -toAimObject      "+$zdirLct[0]+" \
-                         -matchObject      neckLower");
+                         -matchObject      "+$NS+"neckLower");
   delete($headFrontLct[0]);
 
   // arm
-  //dazas_aimOrientMatch("lCollar", "lShldrBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  //$OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lCollar");
-  dazas_orientAimMatch ("-fromOriginObject lCollar \
-                         -fromAimObject    lShldrBend \
+  dazas_straighten3HierarchicalJoints ("-originObject "+$NS+"lForearmTwist \
+                                        -upperLevelObject "+$NS+"lForearmBend \
+                                        -lowerLevelObject "+$NS+"lHand");
+
+  dazas_straighten3HierarchicalJoints ("-originObject "+$NS+"lShldrTwist \
+                                        -upperLevelObject "+$NS+"lShldrBend \
+                                        -lowerLevelObject "+$NS+"lForearmBend");
+
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lCollar \
+                         -fromAimObject    "+$NS+"lShldrBend \
                          -fromUpVector     0 1 0 \
                          -toOriginObject   "+$OriginLct[0]+" \
                          -toAimObject      "+$xdirLct[0]);
 
-  dazas_orientAimMatch ("-fromOriginObject lShldrBend \
-                         -fromAimObject    lHand \
-                         -fromUpObject     lForearmBend \
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lShldrBend \
+                         -fromAimObject    "+$NS+"lHand \
+                         -fromUpObject     "+$NS+"lForearmBend \
                          -fromUpVector     0 1 0 \
                          -toOriginObject   "+$OriginLct[0]+" \
                          -toAimObject      "+$xdirLct[0]+" \
                          -toUpObject       "+$nzdirLct[0]);
 
-  dazas_aimOrientMatch("lShldrBend", "lForearmBend", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lShldrBend");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lShldrBend \
+                         -fromAimObject    "+$NS+"lForearmBend \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]);
 
-  dazas_aimOrientMatch("lForearmBend", "lHand", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lForearmBend");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lForearmBend \
+                         -fromAimObject    "+$NS+"lHand \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]);
 
-  rotate("-r", "-ws", "-fo", 0,-2,0, "lForearmBend");
+  rotate("-r", "-ws", "-fo", 0,-2,0, $NS+"lForearmBend");
 
-  dazas_aimOrientMatch("lShldrBend", "lHand", "lForearmBend", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $xdirLct[0], $nzdirLct[0], {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lShldrBend");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lShldrBend \
+                         -fromAimObject    "+$NS+"lHand \
+                         -fromUpObject     "+$NS+"lForearmBend \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]+" \
+                         -toUpObject       "+$nzdirLct[0]);
 
-  dazas_aimOrientMatch("lCarpal2", "lMid4", "lCarpal4", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $xdirLct[0], $nzdirLct[0], {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lHand");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lCarpal2 \
+                         -fromAimObject    "+$NS+"lMid4 \
+                         -fromUpObject     "+$NS+"lCarpal4 \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]+" \
+                         -toUpObject       "+$nzdirLct[0]+" \
+                         -matchObject      "+$NS+"lHand");
 
   // leg
-  dazas_aimOrientMatch("lThighBend", "lShin", "", {0.0,-1.0,0.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $nydirLct[0], "", {0.0,-1.0,0.0}, {0.0,0.0,1.0}, 1.0, "", "lThighBend");
+  dazas_straighten3HierarchicalJoints ("-originObject "+$NS+"lThighTwist \
+                                        -upperLevelObject "+$NS+"lThighBend \
+                                        -lowerLevelObject "+$NS+"lShin");
 
-  dazas_aimOrientMatch("lShin", "lFoot", "", {0.0,-1.0,0.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $nydirLct[0], "", {0.0,-1.0,0.0}, {0.0,0.0,1.0}, 1.0, "", "lShin");
+  dazas_straighten3HierarchicalJoints ("-originObject "+$NS+"lShin \
+                                        -upperLevelObject "+$NS+"lThighTwist \
+                                        -lowerLevelObject "+$NS+"lFoot");
 
-  // twist leg
-  string $lThighBendFrontLct[] = spaceLocator();
-  float $lThighBendPos[] = xform("-q", "-t", "-ws", "lThighBend");
-  float $lToePos[] = xform("-q", "-t", "-ws", "lToe");
-  setAttr($lThighBendFrontLct[0]+".t",$lToePos[0],$lThighBendPos[1],$lToePos[2]);
-  dazas_aimOrientMatch("lThighBend", $lThighBendFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 0.333, "", "lThighBend");
-  delete($lThighBendFrontLct[0]);
+  rotate -r -os -fo 2 0 0 ($NS+"lShin");
 
-  $lThighBendFrontLct = spaceLocator();
-  $lThighBendPos = xform("-q", "-t", "-ws", "lThighBend");
-  $lToePos = xform("-q", "-t", "-ws", "lToe");
-  setAttr($lThighBendFrontLct[0]+".t",$lToePos[0],$lThighBendPos[1],$lToePos[2]);
-  string $lThighTwistPivotLct[] = spaceLocator();
-  float $lThighTwistPos[] = xform("-q", "-t", "-ws", "lThighTwist");
-  setAttr($lThighTwistPivotLct[0]+".t",$lThighBendPos[0],$lThighTwistPos[1],$lThighBendPos[2]);
-  dazas_aimOrientMatch("lThighBend", $lThighBendFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 0.5, $lThighTwistPivotLct[0], "lThighTwist");
-  delete($lThighTwistPivotLct[0], $lThighBendFrontLct[0]);
+  string $lThighBendFrontLctA[] = spaceLocator();
+  float $lThighBendPos[] = xform("-q", "-t", "-ws", $NS+"lThighBend");
+  xform("-ws", "-t",$lThighBendPos[0],$lThighBendPos[1],$lThighBendPos[2]+10, $lThighBendFrontLctA[0]);
+  parent($lThighBendFrontLctA[0], $NS+"lThighBend");
 
-  rotate("-r", "-ws", "-fo", 2,0,0, "lShin");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lThighBend \
+                         -fromAimObject    "+$NS+"lFoot \
+                         -fromUpObject     "+$NS+"lShin \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$nydirLct[0]+" \
+                         -toUpObject       "+$zdirLct[0]);
 
-  dazas_aimOrientMatch("lThighBend", "lFoot", "lShin", {0.0,-1.0,0.0}, {0.0,0.0,1.0},
-  $OriginLct[0], $nydirLct[0], $zdirLct[0], {0.0,-1.0,0.0}, {0.0,0.0,1.0}, 1.0, "", "lThighBend");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lThighBend \
+                         -fromAimObject    "+$NS+"lShin \
+                         -fromUpVector     0 0 1 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$nydirLct[0]);
+
+  parent -w $lThighBendFrontLctA[0];
+
+  string $lThighBendFrontLctB[] = spaceLocator();
+  $lThighBendPos = xform("-q", "-t", "-ws", $NS+"lThighBend");
+  xform("-ws", "-t",$lThighBendPos[0],$lThighBendPos[1],$lThighBendPos[2]+10, $lThighBendFrontLctB[0]);
+  setAttr($lThighBendFrontLctA[0]+".ty", getAttr($lThighBendFrontLctB[0]+".ty"));
+
+  float $angle = dazas_threeObjectsAngle ("-originObject          "+$NS+"lThighBend \
+                                          -vectorObjectA          "+$lThighBendFrontLctA[0]+" \
+                                          -vectorObjectB          "+$lThighBendFrontLctB[0]+" \
+                                          -referenceAxisObj       "+$OriginLct[0]+" \
+                                          -referenceAxisDirection 0 1 0");
+
+  rotate -r -ws -fo 0 (0.5*$angle) 0 ($NS+"lThighBend");
+  rotate -r -ws -fo 0 (-0.5*$angle) 0 ($NS+"lThighTwist");
+
+  delete($lThighBendFrontLctB, $lThighBendFrontLctA);
+
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lThighBend \
+                         -fromAimObject    "+$NS+"lFoot \
+                         -fromUpObject     "+$NS+"lShin \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$nydirLct[0]+" \
+                         -toUpObject       "+$zdirLct[0]);
 
   // feet
-  dazas_aimOrientMatch("lToe", "lSmallToe4", "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $xdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lFoot");
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lToe \
+                         -fromAimObject    "+$NS+"lSmallToe4 \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$xdirLct[0]+" \
+                         -matchObject      "+$NS+"lFoot");
 
   string $lFootFrontLct[] = spaceLocator();
-  float $lFootPos[] = xform("-q", "-t", "-ws", "lFoot");
-  $lToePos = xform("-q", "-t", "-ws", "lToe");
+  float $lFootPos[] = xform("-q", "-t", "-ws", $NS+"lFoot");
+  float $lToePos[] = xform("-q", "-t", "-ws", $NS+"lToe");
   setAttr($lFootFrontLct[0]+".t",$lToePos[0],$lFootPos[1],$lToePos[2]);
-  dazas_aimOrientMatch("lFoot", $lFootFrontLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-  $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lFoot");
+
+  dazas_orientAimMatch ("-fromOriginObject "+$NS+"lFoot \
+                         -fromAimObject    "+$lFootFrontLct[0]+" \
+                         -fromUpVector     0 1 0 \
+                         -toOriginObject   "+$OriginLct[0]+" \
+                         -toAimObject      "+$zdirLct[0]);
   delete($lFootFrontLct[0]);
 
   if (size($charObj))
@@ -160,19 +212,24 @@ global proc dazas_setGen8CharacterToTPose()
     string $lFootAimLct[] = spaceLocator();
     float  $lFootAimPos[] = pointPosition("-w", $charObj[0]+".vtx[2079]");
     setAttr($lFootAimLct[0]+".t",$lFootOriginPos[0],$lFootAimPos[1],$lFootAimPos[2]);
-    dazas_aimOrientMatch($lFootOriginLct[0], $lFootAimLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0},
-    $OriginLct[0], $zdirLct[0], "", {0.0,1.0,0.0}, {0.0,1.0,0.0}, 1.0, "", "lFoot");
-    delete($lFootAimLct[0], $lFootOriginLct[0]);
+
+    dazas_orientAimMatch ("-fromOriginObject "+$lFootOriginLct[0]+" \
+                           -fromAimObject    "+$lFootAimLct[0]+" \
+                           -fromUpVector     0 1 0 \
+                           -toOriginObject   "+$OriginLct[0]+" \
+                           -toAimObject      "+$zdirLct[0]+" \
+                           -matchObject      "+$NS+"lFoot");
+    delete($lFootAimLct, $lFootOriginLct);
 
     float $solesPos[] = pointPosition("-w", $charObj[0]+".vtx[4459]");
-    move("-ws", "-r",0,-$solesPos[1],0, "hip");
+    move("-ws", "-r",0,-$solesPos[1],0, $NS+"hip");
   }
   else
   {
     warning("\nNo mesh of Genesis 8 Character is selected to determine the angle and location of the sole.");
   }
 
-  dazas_mirrorDazJointsTrans(0);
+  dazas_dazJointsSymmetrical("-dir left_to_right -nameSpace "+$NS);
 
   delete($OriginLct[0], $xdirLct[0], $ydirLct[0], $nydirLct[0], $zdirLct[0], $nzdirLct[0]);
 }

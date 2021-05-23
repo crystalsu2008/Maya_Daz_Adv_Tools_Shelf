@@ -1,4 +1,6 @@
 // Daz To AdvancedSkeleton Guide.
+global string $gDazasNameSpace;
+
 global proc dazToAsGuidePathProbe(){}
 
 proc string dazToAsGuidePath()
@@ -31,10 +33,46 @@ global proc dazToAsGuide_help(string $image)
   showWindow;
 }
 
+global proc dazas_guideUINameSpaceDetect ()
+{
+  global string $gDazasNameSpace;
+  $gDazasNameSpace = dazas_nameSpaceDetect(0);
+	print ("// nameSpace \""+$gDazasNameSpace+"\" detected, and updated in the  \"NameSpaces\" section.\n");
+	textField -e -tx $gDazasNameSpace dazasNameSpaceTextField;
+}
+
 global proc dazToAdvancedSkeletonGuide()
 {
-string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
+global string $gDazasNameSpace;
+if (window("-ex", "dazToAsGuideWindow"))
+{
+  deleteUI -window "dazToAsGuideWindow";
+}
+
+string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600, "dazToAsGuideWindow");
   columnLayout("-adj", 1, "-cat", "both", 0);
+
+    frameLayout("-l", "Name Space", "-cll", 1, "-cl", 0);
+      columnLayout("-adj",1, "-cat","both",0);
+
+        rowLayout("-adj",2, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
+          if (textField("-ex", "dazasNameSpaceTextField"))
+          {
+            deleteUI -control "dazasNameSpaceTextField";
+          }
+          string $dazas_namespace_textField = textField("-w",160, "-ed",0, "-tx",$gDazasNameSpace, "dazasNameSpaceTextField");
+          text("-l", "");
+          setParent ..;
+
+        rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);
+          button("-l","Detect From Selected", "-w",160, "-c","dazas_guideUINameSpaceDetect()");
+          text("-l", "");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"nameSpace_detectFromSelected.png\")");
+          setParent ..;
+
+        setParent ..;
+      setParent ..;
+
     frameLayout("-l", "Applay Advanced Skeleton", "-cll", 1, "-cl", 0);
       columnLayout("-adj",1, "-cat","both",0);
 
@@ -69,7 +107,7 @@ string $dazToAsGuide_Window = window("-t", "Daz To Adv", "-w", 300, "-h", 600);
 
         rowLayout("-adj",1, "-nc",2, "-cl2","left","left", "-ct2","left","right", "-co2",15,15);
           text("-l", "Place FitSkeleton");
-          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_PlaceFitSkeleton.jpg\")");
+          button("-l","?", "-w",12, "-c","dazToAsGuide_help(\"applayAdvSke_PlaceFitSkeleton.png\")");
           setParent ..;
 
         rowLayout("-adj",2, "-nc",3, "-cl3","left","center","left", "-ct3","left","both","right", "-co3",15,0,15);

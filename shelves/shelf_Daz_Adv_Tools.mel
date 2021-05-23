@@ -7,7 +7,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -672,19 +672,19 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 64
+        -flexibleWidthValue 32
         -enable 1
         -width 35
         -height 34
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Mirror Daz character's joints transform on the left and right sides." 
+        -annotation "Symmetrical Daz character's joints transform on the left and right sides." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Mirror Daz character's joints X to -X" 
+        -label "Symmetrical Daz character's joints X to -X" 
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -699,7 +699,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_mirrorDazJointsTrans(0);" 
+        -command "{\nglobal string $gDazasNameSpace;\nstring $NS;\nif($gDazasNameSpace!=\"\") \n\t$NS = $gDazasNameSpace+\":\";\ndazas_dazJointsSymmetrical(\"-dir left_to_right -nameSpace \"+$NS);\n}" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -707,19 +707,19 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 64
+        -flexibleWidthValue 32
         -enable 1
         -width 35
         -height 34
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Mirror Daz character's joints transform on the left and right sides." 
+        -annotation "Symmetrical Daz character's joints transform on the left and right sides." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Mirror Daz character's joints -X to X" 
+        -label "Symmetrical Daz character's joints -X to X" 
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -734,7 +734,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_mirrorDazJointsTrans(1);" 
+        -command "{\nglobal string $gDazasNameSpace;\nstring $NS;\nif($gDazasNameSpace!=\"\") \n\t$NS = $gDazasNameSpace+\":\";\ndazas_dazJointsSymmetrical(\"-dir right_to_left -nameSpace \"+$NS);\n}" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -917,7 +917,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -952,7 +952,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -1022,7 +1022,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -1057,7 +1057,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34

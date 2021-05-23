@@ -1,0 +1,34 @@
+// Locate the three objects in a straight line.
+// -originObject -- origin object. An object located between the upstream and downstream joint levels.
+//                  This object will be rotated so that the upstream and downstream joints are in a straight line with this joint.
+// -upperLevelObject -- The object located upstream of the joint hierarchy.
+// -lowerLevelObject -- The object located downstream of the joint hierarchy.
+/*
+Example:
+dazas_straighten3HierarchicalJoints "-originObject lShldrTwist \
+                                     -upperLevelObject lShldrBend \
+                                     -lowerLevelObject lForearmBend";
+*/
+global proc dazas_straighten3HierarchicalJoints (string $paramline)
+{
+  string $originObj = dazas_stringParameterAnalysis($paramline, {"-originObject"}, "");
+  string $lowerObj = dazas_stringParameterAnalysis($paramline, {"-lowerLevelObject"}, "");
+  string $upperObj = dazas_stringParameterAnalysis($paramline, {"-upperLevelObject"}, "");
+
+  float $posO[], $posL[], $posU[];
+  vector $vl, $vu;
+
+  $posO = xform("-q", "-t", "-ws", $originObj);
+  $posL = xform("-q", "-t", "-ws", $lowerObj);
+  $posU = xform("-q", "-t", "-ws", $upperObj);
+
+  $vl = <<$posL[0],$posL[1],$posL[2]>> - <<$posO[0],$posO[1],$posO[2]>>;
+  $vu = (<<$posU[0],$posU[1],$posU[2]>> - <<$posO[0],$posO[1],$posO[2]>>)*-1;
+
+  float $euler[] = `angleBetween -ch 0 -euler -v1 ($vl.x) ($vl.y) ($vl.z) -v2 ($vu.x) ($vu.y) ($vu.z)`;
+
+  string $medialct[] = spaceLocator();
+  $mediaOrientNode = orientConstraint("-mo", "-w",1, $medialct[0], $originObj);
+  xform -a -ws -ro $euler[0] $euler[1] $euler[2] $medialct[0];
+  delete($mediaOrientNode, $medialct);
+}

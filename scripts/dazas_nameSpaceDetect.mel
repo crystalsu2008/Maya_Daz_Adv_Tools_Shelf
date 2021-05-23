@@ -1,0 +1,35 @@
+// This script is adapted from the AdvancedSkeleton 'asMoCapMatcherNameSpaceDetect' script.
+global proc string dazas_nameSpaceDetect (int $keepSeparator)
+{
+	string $sel[]=`ls -sl`;
+	string $tempString[];
+	string $nameSpace="";
+	for ($i=0;$i<size($sel);$i++)
+	{
+		tokenize $sel[$i] ":" $tempString;
+		int $s = size($tempString);
+		if ($s>1)
+		{
+			int $i;
+			for ($i=0;$i<$s-1;$i++)
+			{
+				if ($i!=0)
+				{
+					$nameSpace=$nameSpace+":"+$tempString[$i];
+				}
+				else
+				{
+					$nameSpace=$tempString[$i];
+				}
+			}
+			if ($keepSeparator)
+			{
+				$nameSpace=$nameSpace+":";
+			}
+			break;
+		}
+	}
+	//print ("// nameSpace \""+$nameSpace+"\" detected, and updated in the  \"NameSpaces\" section.\n");
+	//textField -e -tx $nameSpace asMappingUINameSpacesTextFieldB1;
+	return $nameSpace;
+}

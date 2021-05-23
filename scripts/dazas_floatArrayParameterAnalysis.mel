@@ -1,22 +1,31 @@
-global proc float[] dazas_floatArrayParameterAnalysis (string $paramline, string $param, float $default[])
+global proc float[] dazas_floatArrayParameterAnalysis (string $paramline, string $allParams[], float $default[])
 {
-  string $paramGrp, $paramGrps[], $params[];
-  tokenize $paramline "-" $paramGrps;
+  string $eachParamGrp, $allParamGrps[], $grpParams[], $param;
+  tokenize $paramline "-" $allParamGrps;
 
-  for ($paramGrp in $paramGrps)
+  float $result[];
+  int $s;
+  for ($eachParamGrp in $allParamGrps)
   {
-    tokenize $paramGrp " ,<>()[]{}" $params;
-    if ($param == ("-"+$params[0]))
+    tokenize $eachParamGrp " ,<>()[]{}" $grpParams;
+    for ($param in $allParams)
     {
-      int $s = size($params);
-      float $result[];
-      for ($i=1; $i<$s; $i++)
+      if ($param == ("-"+$grpParams[0]))
       {
-        $result[size($result)] = float($params[$i]);
+        $s = size($grpParams);
+        for ($i=1; $i<$s; $i++)
+        {
+          $result[$i-1] = float($grpParams[$i]);
+        }
+        return $result;
       }
-      return $result;
     }
   }
   //warning("The '"+$param+"' parameter could not be found, returns the default value.");
-  return $default;
+  $s = size($default);
+  for ($i=0; $i<$s; $i++)
+  {
+    $result[$i] = float($default[$i]);
+  }
+  return $result;
 }

@@ -13,14 +13,14 @@
 */
 global proc float dazas_threeObjectsAngle (string $paramline)
 {
-  string $originObj = dazas_stringParameterAnalysis($paramline, "-originObject", "");
-  string $vectorAObj = dazas_stringParameterAnalysis($paramline, "-vectorObjectA", "");
-  string $vectorBObj = dazas_stringParameterAnalysis($paramline, "-vectorObjectB", "");
-  string $refAxisObj = dazas_stringParameterAnalysis($paramline, "-referenceAxisObj", $originObj);
-  vector $refAxisDir = dazas_vectorParameterAnalysis($paramline, "-referenceAxisDirection", <<0,0,1>>);
+  string $originObj = dazas_stringParameterAnalysis($paramline, {"-originObject"}, "");
+  string $vectorAObj = dazas_stringParameterAnalysis($paramline, {"-vectorObjectA"}, "");
+  string $vectorBObj = dazas_stringParameterAnalysis($paramline, {"-vectorObjectB"}, "");
+  string $refAxisObj = dazas_stringParameterAnalysis($paramline, {"-referenceAxisObj"}, $originObj);
+  vector $refAxisDir = dazas_vectorParameterAnalysis($paramline, {"-referenceAxisDirection"}, <<0,0,0>>);
 
   float $posO[], $posA[], $posB[], $ang;
-  vector $va, $vb;
+  vector $va, $vb, $axis, $refAxis;
 
   $posO = xform("-q", "-t", "-ws", $originObj);
   $posA = xform("-q", "-t", "-ws", $vectorAObj);
@@ -30,21 +30,26 @@ global proc float dazas_threeObjectsAngle (string $paramline)
   $vb = <<$posB[0],$posB[1],$posB[2]>> - <<$posO[0],$posO[1],$posO[2]>>;
 
   $ang = rad_to_deg(angle($va, $vb));
+  $axis = cross($va, $vb);
 
-  if (objExists($refAxisObj))
+  if ($refAxisDir != <<0,0,0>>)
   {
-    vector $axis = cross($va, $vb);
+    if (objExists($refAxisObj))
+    {
+      string $refAxisDirLoc[] = spaceLocator();
+      parent($refAxisDirLoc[0], $refAxisObj);
+      setAttr($refAxisDirLoc[0]+".t", ($refAxisDir.x), ($refAxisDir.y), ($refAxisDir.z));
 
-    string $refAxisDirLoc[] = spaceLocator();
-    parent($refAxisDirLoc[0], $refAxisObj);
-    setAttr($refAxisDirLoc[0]+".t", ($refAxisDir.x), ($refAxisDir.y), ($refAxisDir.z));
-
-    float $posAxis[] = xform("-q", "-t", "-ws", $refAxisObj);
-    float $posDir[] = xform("-q", "-t", "-ws", $refAxisDirLoc[0]);
-    vector $refAxis = <<$posDir[0],$posDir[1],$posDir[2]>> - <<$posAxis[0],$posAxis[1],$posAxis[2]>>;
-
+      float $posAxis[] = xform("-q", "-t", "-ws", $refAxisObj);
+      float $posDir[] = xform("-q", "-t", "-ws", $refAxisDirLoc[0]);
+      delete($refAxisDirLoc[0]);
+      $refAxis = <<$posDir[0],$posDir[1],$posDir[2]>> - <<$posAxis[0],$posAxis[1],$posAxis[2]>>;
+    }
+    else
+    {
+      $refAxis = $refAxisDir;
+    }
     $ang = dot($axis, $refAxis)<0 ? 360-$ang : $ang;
-    delete($refAxisDirLoc[0]);
   }
   return $ang;
 }

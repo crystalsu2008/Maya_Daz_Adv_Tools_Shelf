@@ -1,6 +1,8 @@
 // Open AdvancedSkeleton NameMatcher.
 global proc dazas_openNameMatcher(string $template)
 {
+  global string $gDazasNameSpace;
+
   if (!`window -q -ex asMappingUI`)
   {
     asMappingUI NameMatcher "";
@@ -12,4 +14,6 @@ global proc dazas_openNameMatcher(string $template)
     optionMenu -e -v $template asMappingUIFiles;
     asMappingUIFileOptionMenuChanged NameMatcher;
   }
+
+  textField -e -tx $gDazasNameSpace asMappingUINameSpacesTextFieldB1;
 }

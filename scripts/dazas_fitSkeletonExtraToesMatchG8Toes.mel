@@ -1,6 +1,21 @@
 // Match the extra toe joints of the advanced skeleton FitSkeleton with the toe joints of the daz character.
-global proc dazas_fitSkeletonExtraToesMatchG8Toes()
+global proc dazas_fitSkeletonExtraToesMatchG8Toes (string $paramline)
 {
+  global string $gDazasNameSpace;
+  string $NS;
+  if (size(ls("-sl"))==0)
+  {
+    $NS = dazas_stringParameterAnalysis($paramline, {"-nameSpace"}, $gDazasNameSpace);
+    if ($NS!="")
+    {
+      $NS=$NS+":";
+    }
+  }
+  else
+  {
+    $NS = dazas_nameSpaceDetect(1);
+  }
+
   string $g8Joints[] = {
     "rBigToe", "rBigToe_2", "rBigToe_3",
     "rSmallToe1", "rSmallToe1_2", "rSmallToe1_3",
@@ -24,7 +39,7 @@ global proc dazas_fitSkeletonExtraToesMatchG8Toes()
   int $i, $s = size($fitJoints);
   for ($i=0; $i<$s; $i++)
   {
-    float $p[] = xform("-q", "-t", "-ws", $g8Joints[$i]);
+    float $p[] = xform("-q", "-t", "-ws", $NS+$g8Joints[$i]);
     xform("-ws", "-t", $p[0], $p[1], $p[2], $fitJoints[$i]);
   }
 

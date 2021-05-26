@@ -1,0 +1,37 @@
+global proc dazas_fixMoCapConstraintArmTwist (string $paramline)
+{
+  global string $gDazasNameSpace;
+  string $NS;
+  if (size(ls("-sl"))==0)
+  {
+    $NS = dazas_stringParameterAnalysis($paramline, {"-nameSpace"}, $gDazasNameSpace);
+    if ($NS!="")
+    {
+      $NS=$NS+":";
+    }
+  }
+  else
+  {
+    $NS = dazas_nameSpaceDetect(1);
+  }
+
+  string $joints[] = {"FKShoulder_R", "FKShoulder_L"};
+  if ($NS!="")
+  {
+    int $i, $s=size($joints);
+    for ($i=0;$i<$s;$i++)
+    {
+      $joints[$i] = $NS + $joints[$i];
+    }
+  }
+
+  string $oriCon[]=listConnections("-d",off, "-s",on, "-t","orientConstraint", $joints);
+  $oriCon = stringArrayRemoveDuplicates($oriCon);
+
+  int $i, $s=size($oriCon);
+  for ($i=0;$i<$s;$i++)
+  {
+    setAttr ($oriCon[$i]+".offsetX") 0;
+    print("setAttr "+$oriCon[$i]+".offsetX 0\n");
+  }
+}

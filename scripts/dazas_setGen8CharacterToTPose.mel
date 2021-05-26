@@ -2,17 +2,9 @@
 //Go to Bind Pose then run this script.
 global proc dazas_setGen8CharacterToTPose()
 {
-  global string $gDazasNameSpace;
+  string $NS = dazas_nameSpaceDetect(1);
+
   GoToBindPose;
-  string $NS;
-  if ($gDazasNameSpace=="")
-  {
-    $NS = dazas_nameSpaceDetect(1);
-  }
-  else
-  {
-    $NS = $gDazasNameSpace+":";
-  }
 
   string $charObj[] = ls("-sl", "-tr");
   if (size(listRelatives("-s", "-typ", "mesh", $charObj)) == 0)

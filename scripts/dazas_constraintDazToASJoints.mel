@@ -1,11 +1,30 @@
 // Constrain Daz joints to AdvancedSkeleton joints.
-global proc dazas_constraintDazToASJoints(string $template)
+global proc dazas_constraintDazToASJoints(string $paramline)
 {
+  global string $gDazasNameSpace;
+  string $NS;
+  if (size(ls("-sl"))==0)
+  {
+    $NS = dazas_stringParameterAnalysis($paramline, {"-nameSpace"}, $gDazasNameSpace);
+    if ($NS!="")
+    {
+      $NS=$NS+":";
+    }
+  }
+  else
+  {
+    $NS = dazas_nameSpaceDetect(1);
+  }
+  
+  string $template = dazas_stringParameterAnalysis($paramline, {"-template"}, "Daz3d_to_as_toes");
+
   if (!`window -q -ex asMappingUI`)
   {
     asMappingUI NameMatcher "";
     optionMenu -e -v $template asMappingUIFiles;
     asMappingUIFileOptionMenuChanged NameMatcher;
+
+    textField -e -tx $NS asMappingUINameSpacesTextFieldB1;
     asMappingUIFunction AutoRigConstraint;
     deleteUI asMappingUI;
   }
@@ -13,6 +32,10 @@ global proc dazas_constraintDazToASJoints(string $template)
   {
     optionMenu -e -v $template asMappingUIFiles;
     asMappingUIFileOptionMenuChanged NameMatcher;
+
+    textField -e -tx $NS asMappingUINameSpacesTextFieldB1;
     asMappingUIFunction AutoRigConstraint;
   }
+
+
 }

@@ -1,8 +1,25 @@
 // Constraint the AdvancedSkeleton controllers to the Daz Genesis 8 character joints.
-//dazas_constraintASCtrlsToDazJoints("on")
-//dazas_constraintASCtrlsToDazJoints("off")
-global proc dazas_constraintASCtrlsToDazJoints(string $onoff)
+//dazas_constraintASCtrlsToDazJoints("-mode on")
+//dazas_constraintASCtrlsToDazJoints("-mode off")
+global proc dazas_constraintASCtrlsToDazJoints(string $paramline)
 {
+  global string $gDazasNameSpace;
+  string $NS;
+  if (size(ls("-sl"))==0)
+  {
+    $NS = dazas_stringParameterAnalysis($paramline, {"-nameSpace"}, $gDazasNameSpace);
+    if ($NS!="")
+    {
+      $NS=$NS+":";
+    }
+  }
+  else
+  {
+    $NS = dazas_nameSpaceDetect(1);
+  }
+
+  string $onoff = dazas_stringParameterAnalysis($paramline, {"-mode"}, "on");
+
   string $matchDate[] ={
     "RootX=hip",
     //"FKRoot_M=hip",
@@ -64,10 +81,10 @@ global proc dazas_constraintASCtrlsToDazJoints(string $onoff)
 
   if ($onoff == "on")
   {
-    setAttr "PoleLeg_R.follow" 10;
-    setAttr "PoleArm_L.follow" 10;
-    setAttr "PoleLeg_L.follow" 10;
-    setAttr "PoleArm_R.follow" 10;
+    setAttr ($NS+"PoleLeg_R.follow") 10;
+    setAttr ($NS+"PoleArm_L.follow") 10;
+    setAttr ($NS+"PoleLeg_L.follow") 10;
+    setAttr ($NS+"PoleArm_R.follow") 10;
   }
 
   for ($date in $matchDate)
@@ -76,8 +93,8 @@ global proc dazas_constraintASCtrlsToDazJoints(string $onoff)
     int $numTokens = `tokenize $date "=" $buffer`;
     for ($i=0; $i<3; $i++)
     {
-      string $target = $buffer[0]+$asfix[$i];
-      string $dazJoint = $dazfix[$i]+$buffer[1];
+      string $target = $NS+$buffer[0]+$asfix[$i];
+      string $dazJoint = $NS+$dazfix[$i]+$buffer[1];
       if (objExists($target) && objExists($dazJoint))
       {
         if ($onoff == "on")

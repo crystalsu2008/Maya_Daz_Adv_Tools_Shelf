@@ -1,9 +1,20 @@
 global proc dazas_setInbetweenAndTwist()
 {
   setAttr "Root.inbetweenJoints" 2;
+  print("setAttr Root.inbetweenJoints 2\n");
+
   setAttr "Spine1.inbetweenJoints" 0;
+  print("setAttr Spine1.inbetweenJoints 0\n");
+
   setAttr "Neck.inbetweenJoints" 2;
+  print("setAttr Neck.inbetweenJoints 2\n");
+
   setAttr "Hip.twistJoints" 1;
+  print("setAttr Hip.inbetweenJoints 1\n");
+
   setAttr "Shoulder.twistJoints" 1;
+  print("setAttr Shoulder.inbetweenJoints 1\n");
+
   setAttr "Elbow.twistJoints" 1;
+  print("setAttr Elbow.inbetweenJoints 1\n");
 }

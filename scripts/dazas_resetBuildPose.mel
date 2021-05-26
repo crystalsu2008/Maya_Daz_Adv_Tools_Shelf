@@ -1,0 +1,20 @@
+// This command is used to restore the AdvancedSkeleton Build Pose to the pose they was originally created in.
+//
+global proc dazas_resetBuildPose (string $uiName)
+{
+  //string $controlsSet="ControlSet";
+  string $fitSkeleton="FitSkeleton";
+  //string $buildPose="buildPose";
+  if ($uiName=="faceSetup")
+  {
+  	//$controlsSet="FaceControlSet";
+  	$fitSkeleton="FaceFitSkeleton";
+  	//$buildPose="faceBuildPose";
+  }
+  if (`objExists $fitSkeleton`)
+    if (`attributeExists run $fitSkeleton`)
+    {
+      setAttr -type "string" ($fitSkeleton+".run") "";
+      print("The custom body Build Pose is cleared. Returns the Build Pose to the pose where the controller was originally created.\n");
+    }
+}

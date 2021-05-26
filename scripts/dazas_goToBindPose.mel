@@ -1,0 +1,15 @@
+global proc dazas_goToBindPose ()
+{
+  string $obj[] = `ls -sl`;
+  if(size($obj)==0)
+      error("Select the skin object to run this script.");
+
+  string $NS = dazas_nameSpaceDetect(1);
+
+  dazas_disconstraintDazJointsToAS("-nameSpace "+$NS);
+  dazas_constraintASCtrlsToDazJoints("-mode on -nameSpace "+$NS);
+  select $obj;
+  GoToBindPose;
+  dazas_constraintASCtrlsToDazJoints("-mode off -nameSpace "+$NS);
+  dazas_constraintDazToASJoints("-template Daz3d_to_as_toes -nameSpace "+$NS);
+}

@@ -1,0 +1,114 @@
+// This script is adapted from the AdvancedSkeleton 'asSetBuildPose' script.
+// This script does not pop up a confirmDialog window.
+global proc dazas_asSetBuildPose (string $uiName)
+{
+string $controlsSet="ControlSet";
+string $fitSkeleton="FitSkeleton";
+string $buildPose="buildPose";
+if ($uiName=="faceSetup")
+	{
+	$controlsSet="FaceControlSet";
+	$fitSkeleton="FaceFitSkeleton";
+	$buildPose="faceBuildPose";
+	}
+string $controlSetMembers[]=`sets -q $controlsSet`;
+string $objAttr,$runCmd,$buildPoseCmd,$newRunCmds;
+int $foundRunValue,$modifiedOldRunCmd;
+float $poseValue,$currentValue,$runValue,$poseRunValue;
+float $runValues[];
+string $runCmds[],$tempString[],$tempString2[],$runObjAttrs[],$checkObjAttr[];
+if (`objExists $fitSkeleton`)
+	if (`attributeExists run $fitSkeleton`)
+		{
+		$runCmd=`getAttr ($fitSkeleton+".run")`;
+		$runCmd=`substituteAllString $runCmd "\"" ""`;
+		}
+if ($runCmd!="")
+	tokenize $runCmd ";" $tempString;
+for ($i=0;$i<size($tempString);$i++)
+	{
+	if ($tempString[$i]=="")
+		continue;
+	tokenize $tempString[$i] $tempString2;
+	$runCmds[size($runCmds)]=$tempString[$i];
+	$runObjAttrs[size($runObjAttrs)]=$tempString2[1];
+	$runValues[size($runValues)]=$tempString2[2];
+	}
+
+$buildPoseCmd=`getAttr ($buildPose+".udAttr")`;
+if (`attributeExists udExtraAttr $buildPose`)
+	$buildPoseCmd+=`getAttr ($buildPose+".udExtraAttr")`;
+
+tokenize $buildPoseCmd ";" $tempString;
+for ($i=0;$i<size($tempString);$i++)
+	{
+	if ($tempString[$i]=="")
+		continue;
+	tokenize $tempString[$i] $tempString2;
+	int $loopTimes=0;
+	if ($tempString2[0]=="setAttr")
+		{
+		$objAttr=$tempString2[1];
+		$poseValue=$tempString2[2];
+		$loopTimes=1;
+		$checkObjAttr[0]=$objAttr;
+		}
+	else if ($tempString2[0]=="xform")
+		{
+		$loopTimes=9;
+		$obj=$tempString2[size($tempString2)-1];
+		$checkObjAttr[0]=$obj+".translateX";$checkObjAttr[1]=$obj+".translateY";$checkObjAttr[2]=$obj+".translateZ";
+		$checkObjAttr[3]=$obj+".rotateX";$checkObjAttr[4]=$obj+".rotateY";$checkObjAttr[5]=$obj+".rotateZ";
+		$checkObjAttr[6]=$obj+".scaleX";$checkObjAttr[7]=$obj+".scaleY";$checkObjAttr[8]=$obj+".scaleZ";
+		$poseValue=0;
+		}
+	for ($z=0;$z<$loopTimes;$z++)
+		{
+		$currentValue=`getAttr $checkObjAttr[$z]`;
+		if($z>5) $poseValue=1;//scale
+		//actual poseValue might come from the run attribute//
+		$foundRunValue=0;
+		for ($y=0;$y<size($runObjAttrs);$y++)
+			if ($checkObjAttr[$z]==$runObjAttrs[$y])
+				{
+				$runValue=$runValues[$y];
+				$foundRunValue=1;
+				}
+		if ($foundRunValue)
+			$poseRunValue=$runValue;
+		else
+			$poseRunValue=$poseValue;
+
+		if ($poseRunValue>($currentValue+0.001) || $poseRunValue<($currentValue-0.001))
+			{
+			if ($poseValue>($currentValue+0.001) || $poseValue<($currentValue-0.001))
+				$newRunCmds+="setAttr "+$checkObjAttr[$z]+" "+$currentValue+";";
+			else
+				;//Arrived here, if there was a previous value set, but now replaced by 0, thereby removing entry
+			//Also remove this from old run cmd, to avoid double up
+			for ($y=0;$y<size($runObjAttrs);$y++)
+				if ($checkObjAttr[$z]==$runObjAttrs[$y])
+					{
+					$runCmd=`substitute ($runCmds[$y]+";") $runCmd ""`;
+					$modifiedOldRunCmd=1;
+					}
+			}
+		}
+	}
+
+if ($newRunCmds=="" && !$modifiedOldRunCmd)
+	{
+	print "// No changes to the build pose detected\n";
+	return;
+	}
+
+string $m="Set the following as default values ?\n\n"+`substituteAllString $newRunCmds ";" "\n"`;
+//string $confirmResult=`confirmDialog -t Confirm -m $m -b "Ok" -b "Cancel" -db "Ok"`;
+//if ($confirmResult!="Ok")
+//	return;
+print $m;
+if (!`attributeExists run $fitSkeleton`)
+	addAttr -ln run -dt "string" $fitSkeleton;
+
+setAttr -type "string" ($fitSkeleton+".run") ($runCmd+$newRunCmds);
+}

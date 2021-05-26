@@ -672,7 +672,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -707,7 +707,7 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
@@ -847,9 +847,9 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 64
+        -flexibleWidthValue 32
         -enable 1
-        -width 35
+        -width 39
         -height 34
         -manage 1
         -visible 1
@@ -874,7 +874,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_fitSkeletonExtraToesMatchG8Toes();" 
+        -command "dazas_fitSkeletonExtraToesMatchG8Toes(\"\");" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -944,7 +944,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_constraintASCtrlsToDazJoints(\"on\")" 
+        -command "dazas_constraintASCtrlsToDazJoints(\"-mode on\")" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -979,7 +979,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_constraintASCtrlsToDazJoints(\"off\")" 
+        -command "dazas_constraintASCtrlsToDazJoints(\"-mode off\")" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -989,7 +989,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 35
+        -width 39
         -height 34
         -manage 1
         -visible 1
@@ -1049,7 +1049,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_constraintDazToASJoints(\"Daz3d_to_as_toes\");" 
+        -command "dazas_constraintDazToASJoints(\"-template Daz3d_to_as_toes\");" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -1084,7 +1084,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "dazas_disconstraintDazJointsToAS();\n\n" 
+        -command "dazas_disconstraintDazJointsToAS(\"\");\n\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -1092,19 +1092,19 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 64
         -enable 1
         -width 35
         -height 34
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Go To Bind Pose." 
+        -annotation "Advanced Skeleton Go To Bind Pose." 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Go To Bind Pose" 
+        -label "AS Go To Bind Pose" 
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -1119,7 +1119,77 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "{\nstring $obj[] = `ls -sl`;\nif(size($obj)==0)\n    error(\"Select the skin object to run this script.\");\ndazas_disconstraintDazJointsToAS();\ndazas_constraintASCtrlsToDazJoints(\"on\");\nselect $obj;\nGoToBindPose;\ndazas_constraintASCtrlsToDazJoints(\"off\");\ndazas_constraintDazToASJoints(\"Daz3d_to_as_toes\");\n}" 
+        -command "dazas_goToBindPose();" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Set current pose as AdvancedSkeleton body Build Pose." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Set Body Build Pose" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "SBuild" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "createPose.png" 
+        -image1 "createPose.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "dazas_asSetBuildPose bodySetup" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Restore the AdvancedSkeleton body controllers to the pose they was originally created in." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Reset Body Build Pose" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "RBuild" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "createPose.png" 
+        -image1 "createPose.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "dazas_resetBuildPose bodySetup" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

@@ -1,0 +1,11 @@
+// Merge vertices that are very close to almost overlapping on the selected polygon.
+// Select the polygon and run this script.
+{
+    polyOptions("-db", true);
+    string $vtxs[] = polyListComponentConversion("-tv");
+    print $vtxs;
+    select("-r", $vtxs[0]);
+    ConvertSelectionToShellBorder;
+    polyMergeVertex("-d", 0.01, "-am", 1, "-ch", 1);
+    select -cl;
+}

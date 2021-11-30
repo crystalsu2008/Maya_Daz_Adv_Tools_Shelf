@@ -84,6 +84,155 @@ for ($b=1;$b>-2;$b=$b-2)
 	xform -ws -ro $rotA[0] $rotA[1] $rotA[2] ($moCapNs+":"+$rightLeft+"Hand");
 
 	if (`objExists ("FKShoulder"+$side)`)
+		asSetMoCapWSOrient $rotB[0] $rotB[1] $rotB[2] ("FKShoulder"+$side) $nameSpace;
+	if (`objExists ("FKWrist"+$side)`)
+		asSetMoCapWSOrient $rotB[0] $rotB[1] $rotB[2] ("FKWrist"+$side) $nameSpace;
+	}
+
+$constraintObjs={"RootX_M","FKRoot_M","FKSpine1_M","FKChest_M","FKNeck_M","FKHead_M"};
+$constraintToObjs={"Hips","Spine","Spine1","Spine3","Neck","Head"};
+
+for ($b=1;$b>-2;$b=$b-2)
+	{
+	if ($b==1)  {$side="_R";$rightLeft="Right";}
+	if ($b==-1) {$side="_L";$rightLeft="Left";}
+
+    string $IKLegObj=("IKLeg"+$side);
+    if(!`objExists ($nameSpace+$IKLegObj)` && `objExists ($nameSpace+"IKLegBack"+$side)`)
+        $IKLegObj=("IKLegBack"+$side);
+
+    string $IKToesObj=("IKToes"+$side);
+    if(!`objExists ($nameSpace+$IKToesObj)` && `objExists ($nameSpace+"IKToes3"+$side)`)
+        $IKToesObj=("IKToes3"+$side);
+
+    $tempString={$IKLegObj,$IKToesObj,("FKScapula"+$side),("FKShoulder"+$side),("FKElbow"+$side),("FKWrist"+$side)};
+    $constraintObjs=`stringArrayCatenate $tempString $constraintObjs`;
+    $tempString={($rightLeft+"Foot"),($rightLeft+"ToeBase"),($rightLeft+"Shoulder"),($rightLeft+"Arm"),($rightLeft+"ForeArm"),($rightLeft+"Hand")};
+    $constraintToObjs=`stringArrayCatenate $tempString $constraintToObjs`;
+	}
+
+for ($i=0;$i<size($constraintObjs);$i++)
+	{
+	if (!`objExists ($moCapNs+":"+$constraintToObjs[$i])` || !`objExists ($nameSpace+$constraintObjs[$i])`)
+		continue;
+	if (`gmatch $constraintObjs[$i] "FK*"` || `gmatch $constraintObjs[$i] "IKToes_*"`)
+		orientConstraint -mo ($moCapNs+":"+$constraintToObjs[$i]) ($nameSpace+$constraintObjs[$i]);
+	else
+		parentConstraint -mo ($moCapNs+":"+$constraintToObjs[$i]) ($nameSpace+$constraintObjs[$i]);
+	}
+
+for ($b=1;$b>-2;$b=$b-2)
+	{
+	if ($b==1)  {$side="_R";$rightLeft="Right";}
+	if ($b==-1) {$side="_L";$rightLeft="Left";}
+
+
+	for ($y=0;$y<size($fingers);$y++)
+		for ($i=1;$i<4;$i++)
+			{
+			$mpd="MotionCaptureLibrary"+$fingers[$y]+"FingerMPD"+$i+$side;
+			if (`objExists $mpd`)
+				delete $mpd;
+			if (!`objExists ($moCapNs+":"+$rightLeft+"Hand"+$fingers[$y]+$i)` || !`objExists ($nameSpace+"FK"+$fingers[$y]+"Finger"+$i+$side)`)
+				continue;
+			createNode -n $mpd multiplyDivide;
+			connectAttr ($moCapNs+":"+$rightLeft+"Hand"+$fingers[$y]+$i+".ry") ($mpd+".input1Y");
+			connectAttr ($moCapNs+":"+$rightLeft+"Hand"+$fingers[$y]+$i+".rz") ($mpd+".input1Z");
+			setAttr ($mpd+".input2Y") -1;
+			if ($side=="_L")
+				setAttr ($mpd+".input2Z") -1;
+			connectAttr ($mpd+".outputZ") ($nameSpace+"FK"+$fingers[$y]+"Finger"+$i+$side+".ry");
+			connectAttr ($mpd+".outputY") ($nameSpace+"FK"+$fingers[$y]+"Finger"+$i+$side+".rz");
+			}
+	}
+
+setAttr MotionCaptureLibraryScale.v 0;
+select -cl;
+currentTime 0;
+}
+
+global proc dazas_MCLCustomMayaApply_5_845()
+{
+string $uiName="asSelectorbiped";
+string $mclpath=`textField -q -tx asMCLMoCapCustomPathTextField`;
+string $mclfile=$mclpath+"/"+`optionMenu -q -v asMCLMoCapCustomOptionMenu`;
+
+int $lastKeyFrameNr;
+float $posA[],$posB[],$keyTimes[],$rotA[],$rotB[];
+string $mayaLocation=`getenv MAYA_LOCATION`;
+string $mocapFbxLocation=$mayaLocation+"/Examples/Animation/Motion_Capture/FBX";
+string $fileName=`optionMenu -q -v asMCLMoCapsOptionMenu`;
+string $file=$mocapFbxLocation+"/"+$fileName;
+$file = $mclfile;
+
+string $basename=`basenameEx $file`;
+string $ref="MotionCaptureLibrary:"+$basename+":Reference";
+string $nameSpace=`asNameSpaceFromUIName $uiName`;
+string $upAxisDirection=`optionVar -q "upAxisDirection"`;
+string $hipsJoint,$side,$rightLeft,$mpd,$moCapNs;
+string $constraintObjs[],$constraintToObjs[],$tempString[];
+string $fingers[]={"Thumb","Index","Middle","Ring","Pinky"};
+
+if ($fileName=="")
+	error "No MotionCapture Example choosen";
+
+asMCLRemoveBody $uiName;
+
+file -r -type "FBX" -ignoreVersion -gl -mergeNamespacesOnClash false -namespace "MotionCaptureLibrary" -options "v=0;" $file;
+$tempString=`ls -r 1 Reference`;
+if (!`size($tempString)`)
+	error "Top node named Reference, not found in this file";
+$moCapNs=`substitute ":Reference" $tempString[0] ""`;
+
+$ref=$moCapNs+":Reference";
+
+currentTime 0;
+$tempString=`listRelatives -type joint -c $ref`;
+$hipsJoint=$tempString[0];
+
+createNode -n MotionCaptureLibraryScale transform;
+parent $ref MotionCaptureLibraryScale;
+
+$posA=`xform -q -ws -t ($nameSpace+"Root_M")`;
+$posB=`xform -q -ws -t $hipsJoint`;
+if ($upAxisDirection=="z")
+	setAttr MotionCaptureLibraryScale.s -type float3 ($posA[2]/$posB[2]) ($posA[2]/$posB[2]) ($posA[2]/$posB[2]);
+else
+	setAttr MotionCaptureLibraryScale.s -type float3 ($posA[1]/$posB[1]) ($posA[1]/$posB[1]) ($posA[1]/$posB[1]);
+
+
+$keyTimes=`keyframe -q -tc ($hipsJoint+".tx")`;
+$lastKeyFrameNr=$keyTimes[size($keyTimes)-1];
+
+playbackOptions -min 0 -ast 0 -max $lastKeyFrameNr -aet $lastKeyFrameNr;
+//asSetAllFK "";
+if (`objExists ($nameSpace+"FKIKLeg_R")`) setAttr ($nameSpace+"FKIKLeg_R.FKIKBlend") 10;
+if (`objExists ($nameSpace+"FKIKLeg_L")`) setAttr ($nameSpace+"FKIKLeg_L.FKIKBlend") 10;
+if (`objExists ($nameSpace+"FKIKSpine_M")`) setAttr ($nameSpace+"FKIKSpine_M.FKIKBlend") 0;
+if (`objExists ($nameSpace+"FKIKArm_R")`) setAttr ($nameSpace+"FKIKArm_R.FKIKBlend") 0;
+if (`objExists ($nameSpace+"FKIKArm_L")`) setAttr ($nameSpace+"FKIKArm_L.FKIKBlend") 0;
+
+$tempString=`listRelatives -type joint -ad $ref`;
+for ($i=0;$i<size($tempString);$i++)
+	setAttr ($tempString[$i]+".r") -type float3 0 0 0;
+setAttr ($hipsJoint+".tx") 0;
+setAttr ($hipsJoint+".tz") 0;
+
+xform -ws -ro -180 0 180 ($moCapNs+":RightShoulder");
+xform -ws -ro 0 0 0 ($moCapNs+":LeftShoulder");
+xform -ws -ro 90 0 -180 ($moCapNs+":RightArm");
+xform -ws -ro 90 0 0 ($moCapNs+":LeftArm");
+
+
+for ($b=1;$b>-2;$b=$b-2)
+	{
+	if ($b==1)  {$side="_R";$rightLeft="Right";$rotA[0]=0;$rotA[1]=0;$rotA[2]=180;$rotB[0]=90;$rotB[1]=0;$rotB[2]=180;}
+	if ($b==-1) {$side="_L";$rightLeft="Left";$rotA[0]=0;$rotA[1]=0;$rotA[2]=0;$rotB[0]=-90;$rotB[1]=0;$rotB[2]=180;}
+
+	xform -ws -ro $rotA[0] $rotA[1] $rotA[2] ($moCapNs+":"+$rightLeft+"Arm");
+	xform -ws -ro $rotA[0] $rotA[1] $rotA[2] ($moCapNs+":"+$rightLeft+"Hand");
+
+	if (`objExists ("FKShoulder"+$side)`)
 		asSetWSOrient $rotB[0] $rotB[1] $rotB[2] ("FKShoulder"+$side);
 	if (`objExists ("FKWrist"+$side)`)
 		asSetWSOrient $rotB[0] $rotB[1] $rotB[2] ("FKWrist"+$side);

@@ -518,7 +518,7 @@ global proc int dazas_bleSkiWei_recordVertices (string $vtxs[])
     string $mesh;
     for($mesh in $meshShapes)
     {
-      $upstreamNodes = stringArrayCatenate($upstreamNodes, dazas_listUpstream($mesh, {$mesh}, 0, 20));
+      $upstreamNodes = stringArrayCatenate($upstreamNodes, dazas_listUpstream($mesh, {$mesh}, 0, 100));
     }
     $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
     if (size($skinCluster)==0)

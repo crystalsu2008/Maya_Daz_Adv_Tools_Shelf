@@ -1,0 +1,8 @@
+// Select Vertexs those influences by selected influences.
+// Select Influences & Skin Object run this script.
+global proc dazas_selVtxsByInfluences ()
+{
+    string $selObjs[] = ls("-sl");
+    string $infVtxs[] = dazas_listVtxsByInfluences ($selObjs, 0);
+    select("-r", $infVtxs);
+}

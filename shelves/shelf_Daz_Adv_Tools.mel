@@ -384,7 +384,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "// Select Vertexs those influences by selected influences.\n// Select Influences & Skin Object run this script.\n{\n  // List Mesh Upstream Geometry Nodes.\n  proc string[] listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)\n  {\n      string $plugs[];\n      if(nodeType($startNode) == \"mesh\")\n      {\n          $plugs[0] = $startNode+\".inMesh\";\n      }\n      else\n      {\n          string $plugName[] = listAttr(\"-a\", \"-m\", \"-st\", \"*inputGeometry*\", $startNode);\n          int $s = size($plugName);\n          for($i=0; $i<$s; $i++)\n          {\n              $plugs[$i] = $startNode+\".\"+$plugName[$i];\n          }\n      }\n\n      $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections(\"-s\", 1, \"-d\", 0, \"-scn\", 1, \"-sh\", 1, $plugs)));\n      if( size($sour) > 0 )\n      {\n          $passedNodes = stringArrayCatenate($passedNodes, $sour);\n          if( $depth < $maxDepth )\n          {\n              for( $each in $sour )\n              {\n                  $passedNodes = listUpstream($each,$passedNodes,($depth+1),$maxDepth);\n              }\n          }\n      }\n      return $passedNodes;\n  }\n\n  string $selObjs[] = ls(\"-sl\");\n  string $mesh[] = listRelatives(\"-s\", \"-typ\", \"mesh\", $selObjs);\n\n  string $immesh[];\n  for( $each in $mesh )\n    if( getAttr($each+\".intermediateObject\") )\n      $immesh[size($immesh)] = $each;\n  $mesh = stringArrayRemove($immesh, $mesh);\n\n  string $upstreamNodes[] = listUpstream($mesh[0], {$mesh[0]}, 0, 20);\n  string $skinCluster[] = ls(\"-typ\", \"skinCluster\", $upstreamNodes);\n\n  string $allInfs[]= skinCluster(\"-q\", \"-inf\", $skinCluster[0]);\n  string $infs[];\n\n  for( $each in $selObjs )\n    if( stringArrayContains($each, $allInfs) )\n      $infs[size($infs)] = $each;\n\n  ConvertSelectionToVertices();\n  string $allVtx[] = ls(\"-sl\", \"-fl\");\n  select(\"-cl\");\n  string $infVtxs[];\n  for( $inf in $infs )\n  {\n    for( $vtx in $allVtx)\n    {\n      if( skinPercent( \"-t\", $inf, \"-q\", $skinCluster[0], $vtx) > 0 )\n        $infVtxs[size($infVtxs)] = $vtx;\n    }\n    $allVtx = stringArrayRemove($infVtxs, $allVtx);\n  }\n  $infVtxs = stringArrayRemoveDuplicates($infVtxs);\n  select($infVtxs);\n}\n" 
+        -command "// Select Vertexs those influences by selected influences.\n// Select Influences & Skin Object run this script.\ndazas_selVtxsByInfluences;" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -419,7 +419,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "// Select influences those influences selected Vertexs.\n// Select Skin Vertexs run this script.\n{\n  string $selVtxs[] = ls(\"-sl\", \"-fl\");\n  string $buffer[];\n  tokenize($selVtxs[0], \".\", $buffer);\n  string $mesh[] = listRelatives(\"-s\", \"-typ\", \"mesh\", $buffer[0]);\n\n  string $upstreamNodes[] = dazas_listUpstream($mesh[0], {$mesh[0]}, 0, 20);\n  string $skinCluster[] = ls(\"-typ\", \"skinCluster\", $upstreamNodes);\n\n  string $allInfs[]= skinCluster(\"-q\", \"-inf\", $skinCluster[0]);\n\n  select(\"-cl\");\n  string $infs[];\n  for($vtx in $selVtxs)\n  {\n    for($inf in $allInfs)\n    {\n      if( skinPercent( \"-t\", $inf, \"-q\", $skinCluster[0], $vtx) > 0 )\n        $infs[size($infs)] = $inf;\n    }\n  }\n  $infs = stringArrayRemoveDuplicates($infs);\n  print $infs;\n  select($infs);\n}\n" 
+        -command "// Select influences those influences selected Vertexs.\n// Select Skin Vertexs run this script.\n{\n  string $selVtxs[] = ls(\"-sl\", \"-fl\");\n  string $buffer[];\n  tokenize($selVtxs[0], \".\", $buffer);\n  string $mesh[] = listRelatives(\"-s\", \"-typ\", \"mesh\", $buffer[0]);\n  int $id = size($mesh)-1;\n\n  string $upstreamNodes[] = dazas_listUpstream($mesh[$id], {$mesh[$id]}, 0, 20);\n  string $skinCluster[] = ls(\"-typ\", \"skinCluster\", $upstreamNodes);\n\n  string $allInfs[]= skinCluster(\"-q\", \"-inf\", $skinCluster[0]);\n\n  select(\"-cl\");\n  string $infs[];\n  for($vtx in $selVtxs)\n  {\n    for($inf in $allInfs)\n    {\n      if( skinPercent( \"-t\", $inf, \"-q\", $skinCluster[0], $vtx) > 0 )\n        $infs[size($infs)] = $inf;\n    }\n  }\n  $infs = stringArrayRemoveDuplicates($infs);\n  print $infs;\n  select($infs);\n}\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -1260,6 +1260,111 @@ global proc shelf_Daz_Adv_Tools () {
         -marginWidth 1
         -marginHeight 1
         -command "dazas_MCLCustomMayaApply();" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select the controller that needs to be reversed and execute this script." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Reversing direction of the constraint" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "RevCon" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "reverseOrder.png" 
+        -image1 "reverseOrder.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Reversing the axial direction of the constraint.\n// After using Advancedskeleton's MoCapLibrary function to apply iPi's exported FBX format motion capture data to the character,\n// it may cause the character's right arm direction to be reversed.\n// This script reverses the orientation of these controllers by increasing the Y-axis direction of the constraint by 180 degrees.\n// Select the controller that needs to be reversed and execute this script.\n{\n    string $selObjs[] = `ls -sl`;\n    for ($obj in $selObjs)\n    {\n        string $conObjs[] = listConnections(\"-s\", true, \"-t\", \"orientConstraint\", $obj+\".rx\");\n        if(!size($conObjs)) continue;\n        setAttr ($conObjs[0]+\".offsetY\", getAttr($conObjs[0]+\".offsetY\")+180);\n    }\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select all right-eye skin objects with wrong weights to execute this script." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Fix AS right eye skin  wrong weights" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "FixREye" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "visible.png" 
+        -image1 "visible.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Fix Advancedskeleton's right eye skin object's Wrong Weights.\n// Select all right-eye skin objects with wrong weights to execute this script.\n{\n    string $r_eyes[] = `ls -sl`;\n    for($r_eye in $r_eyes)\n    {\n        setAttr EyeJoint_R.liw 1;\n        setAttr Pupil_R.liw 1;\n        setAttr Iris_R.liw 1;\n        \n        select -r $r_eye IrisJoint_R PupilJoint_R;\n        skinClusterInfluence 1 \" -dr 0.1\";\n        \n        setAttr Iris_R.liw 0;\n        setAttr Pupil_R.liw 0;\n        setAttr EyeJoint_R.liw 0;\n        \n        string $selObjs[] = {$r_eye, \"Pupil_R\"};\n        string $infVtxs[] = dazas_listVtxsByInfluences($selObjs, 1);\n        int $scid = size($infVtxs)-1;\n        string $skinCluster = $infVtxs[$scid];\n        stringArrayRemoveAtIndex($scid, $infVtxs);\n        select(\"-r\", $infVtxs);\n\n        if(size(ls(\"-sl\")))\n            skinPercent -tmw Pupil_R -tmw PupilJoint_R $skinCluster;\n\n        $selObjs = {$r_eye, \"Iris_R\"};\n        $infVtxs = dazas_listVtxsByInfluences($selObjs, 0);\n        select(\"-r\", $infVtxs);\n\n        if(size(ls(\"-sl\")))\n            skinPercent -tmw Iris_R -tmw IrisJoint_R $skinCluster;\n        \n        select -r $r_eye;\n        RemoveUnusedInfluences;\n    }\n}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select all left-eye skin objects with wrong weights to execute this script." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Fix AS left eye skin  wrong weights" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "FixLEye" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "visible.png" 
+        -image1 "visible.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "// Fix Advancedskeleton's left eye skin object's Wrong Weights.\n// Select all left-eye skin objects with wrong weights to execute this script.\n{\n    string $l_eyes[] = `ls -sl`;\n    for($l_eye in $l_eyes)\n    {\n        setAttr EyeJoint_L.liw 1;\n        setAttr Pupil_L.liw 1;\n        setAttr Iris_L.liw 1;\n        \n        select -r $l_eye IrisJoint_L PupilJoint_L;\n        skinClusterInfluence 1 \" -dr 0.1\";\n        \n        setAttr Iris_L.liw 0;\n        setAttr Pupil_L.liw 0;\n        setAttr EyeJoint_L.liw 0;\n        \n        string $selObjs[] = {$l_eye, \"Pupil_L\"};\n        string $infVtxs[] = dazas_listVtxsByInfluences($selObjs, 1);\n        int $scid = size($infVtxs)-1;\n        string $skinCluster = $infVtxs[$scid];\n        stringArrayRemoveAtIndex($scid, $infVtxs);\n        select(\"-r\", $infVtxs);\n\n        if(size(ls(\"-sl\")))\n            skinPercent -tmw Pupil_L -tmw PupilJoint_L $skinCluster;\n\n        $selObjs = {$l_eye, \"Iris_L\"};\n        $infVtxs = dazas_listVtxsByInfluences($selObjs, 0);\n        select(\"-r\", $infVtxs);\n\n        if(size(ls(\"-sl\")))\n            skinPercent -tmw Iris_L -tmw IrisJoint_L $skinCluster;\n        \n        select -r $l_eye;\n        RemoveUnusedInfluences;\n    }\n}\n" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

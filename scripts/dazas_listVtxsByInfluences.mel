@@ -1,0 +1,81 @@
+// List Vertexs those influences by selected influences.
+// The parameter $selObjs[]  is the selected Influences & Skin Object.
+
+global proc string[] dazas_listVtxsByInfluences (string $selObjs[], int $needSkinCluster)
+{
+  // List Mesh Upstream Geometry Nodes.
+  /*
+  proc string[] listUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)
+  {
+      string $plugs[];
+      if(nodeType($startNode) == "mesh")
+      {
+          $plugs[0] = $startNode+".inMesh";
+      }
+      else
+      {
+          string $plugName[] = listAttr("-a", "-m", "-st", "*inputGeometry*", $startNode);
+          int $s = size($plugName);
+          for($i=0; $i<$s; $i++)
+          {
+              $plugs[$i] = $startNode+"."+$plugName[$i];
+          }
+      }
+
+      $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections("-s", 1, "-d", 0, "-scn", 1, "-sh", 1, $plugs)));
+      if( size($sour) > 0 )
+      {
+          $passedNodes = stringArrayCatenate($passedNodes, $sour);
+          if( $depth < $maxDepth )
+          {
+              for( $each in $sour )
+              {
+                  $passedNodes = listUpstream($each,$passedNodes,($depth+1),$maxDepth);
+              }
+          }
+      }
+      return $passedNodes;
+  }
+  */
+
+  //string $selObjs[] = ls("-sl");
+  string $mesh[] = listRelatives("-s", "-typ", "mesh", $selObjs);
+
+  string $immesh[];
+  for( $each in $mesh )
+    if( getAttr($each+".intermediateObject") )
+      $immesh[size($immesh)] = $each;
+  $mesh = stringArrayRemove($immesh, $mesh);
+
+  //string $upstreamNodes[] = listUpstream($mesh[0], {$mesh[0]}, 0, 20);
+  string $upstreamNodes[] = dazas_listUpstream($mesh[0], {$mesh[0]}, 0, 20);
+  string $skinCluster[] = ls("-typ", "skinCluster", $upstreamNodes);
+
+  string $allInfs[]= skinCluster("-q", "-inf", $skinCluster[0]);
+  string $infs[];
+
+  for( $each in $selObjs )
+    if( stringArrayContains($each, $allInfs) )
+      $infs[size($infs)] = $each;
+
+  select -r $mesh;
+  ConvertSelectionToVertices();
+  string $allVtx[] = ls("-sl", "-fl");
+  select("-cl");
+  string $infVtxs[];
+  for( $inf in $infs )
+  {
+    for( $vtx in $allVtx)
+    {
+      if( skinPercent( "-t", $inf, "-q", $skinCluster[0], $vtx) > 0 )
+        $infVtxs[size($infVtxs)] = $vtx;
+    }
+    $allVtx = stringArrayRemove($infVtxs, $allVtx);
+  }
+  $infVtxs = stringArrayRemoveDuplicates($infVtxs);
+
+  if ($needSkinCluster)
+    $infVtxs[size($infVtxs)] = $skinCluster[0];
+
+  return $infVtxs;
+}

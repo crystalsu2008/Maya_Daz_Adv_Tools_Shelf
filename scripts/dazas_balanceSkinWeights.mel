@@ -737,7 +737,8 @@ global proc dazas_balanceSkinWeights (string $vtxs[], string $infs[], string $mo
         $vtxs = sort($vtxs);
         string $mesh = $buffer[0];
         string $meshShape[] = listRelatives("-s", "-typ", "mesh", $buffer[0]);
-        string $upstreamNodes[] = dazas_listUpstream($meshShape[0], {$meshShape[0]}, 0, 20);
+        int $meshshapeid = size($meshShape)-1;
+        string $upstreamNodes[] = dazas_listUpstream($meshShape[$meshshapeid], {$meshShape[$meshshapeid]}, 0, 20);
         $skinCluster = ls("-typ", "skinCluster", $upstreamNodes);
         if (size($skinCluster)==0)
           error ("\nThe selected or entered vertices are not the skinned object.\n");

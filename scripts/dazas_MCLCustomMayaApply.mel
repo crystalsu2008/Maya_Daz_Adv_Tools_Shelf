@@ -69,15 +69,16 @@ for ($i=0;$i<size($tempString);$i++)
 setAttr ($hipsJoint+".tx") 0;
 setAttr ($hipsJoint+".tz") 0;
 
-xform -ws -ro -180 0 180 ($moCapNs+":RightShoulder");
-xform -ws -ro 0 0 0 ($moCapNs+":LeftShoulder");
-xform -ws -ro 90 0 -180 ($moCapNs+":RightArm");
-xform -ws -ro 90 0 0 ($moCapNs+":LeftArm");
+//xform -ws -ro -180 0 180 ($moCapNs+":RightShoulder");
+//xform -ws -ro 0 0 0 ($moCapNs+":LeftShoulder");
+//xform -ws -ro 90 0 -180 ($moCapNs+":RightArm");
+//xform -ws -ro 90 0 0 ($moCapNs+":LeftArm");
 
 
 for ($b=1;$b>-2;$b=$b-2)
 	{
-	if ($b==1)  {$side="_R";$rightLeft="Right";$rotA[0]=0;$rotA[1]=0;$rotA[2]=180;$rotB[0]=90;$rotB[1]=0;$rotB[2]=180;}
+	//if ($b==1)  {$side="_R";$rightLeft="Right";$rotA[0]=0;$rotA[1]=0;$rotA[2]=180;$rotB[0]=90;$rotB[1]=0;$rotB[2]=180;}
+    if ($b==1)  {$side="_R";$rightLeft="Right";$rotA[0]=0;$rotA[1]=0;$rotA[2]=0;$rotB[0]=90;$rotB[1]=0;$rotB[2]=180;}
 	if ($b==-1) {$side="_L";$rightLeft="Left";$rotA[0]=0;$rotA[1]=0;$rotA[2]=0;$rotB[0]=-90;$rotB[1]=0;$rotB[2]=180;}
 
 	xform -ws -ro $rotA[0] $rotA[1] $rotA[2] ($moCapNs+":"+$rightLeft+"Arm");

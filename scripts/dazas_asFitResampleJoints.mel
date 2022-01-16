@@ -1,0 +1,149 @@
+// This script is adapted from the AdvancedSkeleton 'asFitResampleJoints' script.
+// This tool was designed with the intention of batch resample joints.
+// This tool depends on the AdvancedSkeleton to work.
+
+global proc dazas_asFitResampleJoints (string $startJoint, string $endJoint, int $numJoints)
+{
+global string $gSelect;
+setToolTo $gSelect;
+int $reachedStart,$labelNum;
+string $sel[]=`ls -sl`;
+string $tempString[],$joints[],$parentJoints[],$labels[];
+string $newJoint,$nearestJoint;
+//string $startJoint=`textFieldGrp -q -tx asFitResampleStartJointtextFieldGrp`;
+//string $endJoint=`textFieldGrp -q -tx asFitResampleEndJointtextFieldGrp`;
+//int $numJoints=`intFieldGrp -q -v1 asFitResampleNumJoints`;
+float $dist,$minDist;
+float $pos[],$posA[],$posB[],$labelPosX[],$labelPosY[],$labelPosZ[];
+$tempString=`ls -l $endJoint`;
+tokenize $tempString[0] "|" $parentJoints;
+for ($i=0;$i<size($parentJoints);$i++)
+	{
+	if ($parentJoints[$i]==$startJoint)
+		$reachedStart=1;
+	if ($reachedStart)
+		$joints[size($joints)]=$parentJoints[$i];
+	if ($reachedStart && $parentJoints[$i]!=$startJoint && $parentJoints[$i]!=$endJoint)
+		{
+		$tempString[0]=`asLabel $parentJoints[$i]`;
+		if ($tempString[0]!="")
+			{
+			$labels[$labelNum]=$tempString[0];
+			$pos=`xform -q -ws -t $parentJoints[$i]`;
+			$labelPosX[$labelNum]=$pos[0];
+			$labelPosY[$labelNum]=$pos[1];
+			$labelPosZ[$labelNum]=$pos[2];
+			$labelNum++;
+			}
+		}
+	}
+if (!`objExists $startJoint`)
+	error ("startJoint :\""+$startJoint+"\" does not exists");
+if (!`objExists $endJoint`)
+	error ("endJoint :\""+$endJoint+"\" does not exists");
+if ($numJoints<2)
+	error "Can not ReSample to less than 2";
+if (!`stringArrayCount $startJoint $joints`)
+	error ("endJoint:\""+$endJoint+"\" is not a child of startJoint:\""+$startJoint+"\"");
+if ($startJoint==$endJoint)
+	error "StartJoint and EndJoint can not be the same";
+
+select $startJoint $endJoint;
+$tempString=`ikHandle -sol ikSplineSolver -scv false -pcv false`;
+duplicate -n tempIKCurve $tempString[2];
+delete $tempString[0] $tempString[2];
+createNode -n tempPointOnCurveInfo pointOnCurveInfo;
+setAttr tempPointOnCurveInfo.turnOnPercentage 1;
+connectAttr -f tempIKCurveShape.worldSpace[0] tempPointOnCurveInfo.inputCurve;
+select tempIKCurve;refresh;
+
+int $startJointLocks[]=`asUnLockAttrs $startJoint`;
+int $endJointLocks[]=`asUnLockAttrs $endJoint`;
+
+float $startJointFat=1;
+float $startJointFatFront=1;
+float $startJointFatWidth=1;
+float $endJointFat=1;
+float $endJointFatFront=1;
+float $endJointFatWidth=1;
+if (`attributeExists fat $startJoint`) $startJointFat=`getAttr ($startJoint+".fat")`;
+if (`attributeExists fatFront $startJoint`) $startJointFatFront=`getAttr ($startJoint+".fatFront")`;
+if (`attributeExists fatWidth $startJoint`) $startJointFatWidth=`getAttr ($startJoint+".fatWidth")`;
+if (`attributeExists fat $endJoint`) $endJointFat=`getAttr ($endJoint+".fat")`;
+if (`attributeExists fatFront $endJoint`) $endJointFatFront=`getAttr ($endJoint+".fatFront")`;
+if (`attributeExists fatWidth $endJoint`) $endJointFatWidth=`getAttr ($endJoint+".fatWidth")`;
+
+$tempString=`listRelatives -p $startJoint`;
+string $startJointParent=$tempString[0];
+if ($startJointParent!="")
+	parent -w $startJoint;
+parent -w $endJoint;
+float $radius=`getAttr ($startJoint+".radius")`;
+rename $endJoint tempRename;
+if (`objExists $joints[1]`) delete $joints[1];
+string $parent=$startJoint;
+string $newJointName=$joints[0];
+if ($joints[0]=="Root")
+	{
+	createNode -n Spine transform;
+	$newJointName="Spine";
+	}
+for ($i=1;$i<$numJoints-1;$i++)
+	{
+	select -cl;
+	$newJoint=`joint -n $newJointName -rad $radius`;
+	setAttr tempPointOnCurveInfo.parameter ((1.0/($numJoints-1))*$i);
+	$pos=`getAttr tempPointOnCurveInfo.position`;
+	xform -ws -t $pos[0] $pos[1] $pos[2] $newJoint;
+	parent $newJoint $parent;
+	$parent=$newJoint;
+	asEnsureFitJointAttrs $newJoint;
+	setAttr ($newJoint+".fat") ($startJointFat+(($i/($numJoints-1.0))*($endJointFat-$startJointFat)));
+	setAttr ($newJoint+".fatFront") ($startJointFatFront+(($i/($numJoints-1.0))*($endJointFatFront-$startJointFatFront)));
+	setAttr ($newJoint+".fatWidth") ($startJointFatWidth+(($i/($numJoints-1.0))*($endJointFatWidth-$startJointFatWidth)));
+	asFitModeUpdateJoints $newJoint 0;
+	refresh;
+	}
+if ($joints[0]=="Root" && `objExists |Spine`) delete |Spine;
+if (`objExists $endJoint`)
+	rename $endJoint ($endJoint+"_2");
+rename tempRename $endJoint;
+parent $endJoint $parent;
+if ($startJointParent!="")
+	parent $startJoint $startJointParent;
+
+//labels
+for ($i=0;$i<size($labels);$i++)
+	{
+	$posA[0]=$labelPosX[$i];
+	$posA[1]=$labelPosY[$i];
+	$posA[2]=$labelPosZ[$i];
+	$tempString=`listRelatives -f -ad -type joint $startJoint`;
+	$minDist=999;
+	for ($y=0;$y<size($tempString);$y++)
+		{
+		$posB=`xform -q -ws -t $tempString[$y]`;
+		$dist=`mag<<$posA[0]-$posB[0],$posA[1]-$posB[1],$posA[2]-$posB[2]>>`;
+		if ($dist<$minDist)
+			{
+			$nearestJoint=$tempString[$y];
+			$minDist=$dist;
+			}
+		}
+	setAttr ($nearestJoint+".drawLabel") 1;
+	setAttr ($nearestJoint+".type") 18;
+	setAttr -type "string" ($nearestJoint+".otherType") $labels[$i];
+	}
+
+asReLockAttrs $startJoint $startJointLocks;
+asReLockAttrs $endJoint $endJointLocks;
+
+asFitModeUpdateJoints $endJoint 0;
+delete tempIKCurve;
+if (`checkBox -q -ex asLockCenterJoints`)
+	if (`checkBox -q -v asLockCenterJoints`)
+		asFitModeLockCenterJoints;
+
+print ("// Joints Resampled\n");
+catchQuiet (`select $sel`);
+}

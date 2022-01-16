@@ -22,3 +22,252 @@
             print("\n");
     }
 }
+
+//
+{
+    select -r
+        feathersShoulderUpA_mesh
+        feathersShoulderUpB_mesh
+        feathersShoulderDownA_mesh
+        feathersShoulderDownB_mesh
+        feathersShoulderDownC_mesh
+        feathersElbowUpA_mesh
+        feathersElbowUpB_mesh
+        feathersElbowDownA_mesh
+        feathersElbowDownB_mesh
+        feathersElbowDownC_mesh
+        feathersElbowDownD_mesh
+        feathersWristUpA_mesh
+        feathersWristUpB_mesh
+        feathersWristDownA_mesh
+        feathersWristDownB_mesh
+        feathersWristDownC_mesh
+        feathersWristDownD_mesh
+        feathersWristDownE_mesh
+        feathersIndexFinger1UpA_mesh
+        feathersIndexFinger1UpB_mesh
+        feathersIndexFinger1UpC_mesh
+        feathersIndexFinger1DownA_mesh
+        feathersIndexFinger1DownB_mesh
+        feathersIndexFinger1DownC_mesh
+        feathersIndexFinger1DownD_mesh
+        feathersTail_mesh;
+    select -add Wing_Geo ;
+    parent;
+
+    select -r
+        feathersIndexFinger1UpA1
+        feathersIndexFinger1UpA2
+        feathersIndexFinger1UpA3
+        feathersIndexFinger1UpA4
+        feathersIndexFinger1UpA5
+        feathersIndexFinger1UpA6
+        feathersIndexFinger1UpA7
+        feathersIndexFinger1UpA8
+        feathersIndexFinger1UpC1
+        feathersIndexFinger1UpC2
+        feathersIndexFinger1UpB1
+        feathersIndexFinger1UpB2
+        feathersIndexFinger1UpB3
+        feathersIndexFinger1DownD1
+        feathersIndexFinger1DownD2
+        feathersIndexFinger1DownC1
+        feathersIndexFinger1DownC2
+        feathersIndexFinger1DownC3
+        feathersIndexFinger1DownB1
+        feathersIndexFinger1DownB2
+        feathersIndexFinger1DownA1
+        feathersIndexFinger1DownA2
+        feathersIndexFinger1DownA3
+        feathersIndexFinger1DownA4;
+    select -add IndexFinger1 ;
+    parent;
+    delete
+        feathersIndexFinger1UpA_grp
+        feathersIndexFinger1UpB_grp
+        feathersIndexFinger1UpC_grp
+        feathersIndexFinger1DownA_grp
+        feathersIndexFinger1DownB_grp
+        feathersIndexFinger1DownC_grp
+        feathersIndexFinger1DownD_grp;
+
+    select -r
+        feathersWristUpA1
+        feathersWristUpA2
+        feathersWristUpA3
+        feathersWristUpA4
+        feathersWristUpA5
+        feathersWristUpA6
+        feathersWristUpA7
+        feathersWristUpA8
+        feathersWristUpA9
+        feathersWristUpA10
+        feathersWristUpB1
+        feathersWristUpB2
+        feathersWristUpB3
+        feathersWristUpB4
+        feathersWristUpB5
+        feathersWristUpB6
+        feathersWristUpB7
+        feathersWristUpB8
+        feathersWristDownA1
+        feathersWristDownA2
+        feathersWristDownA3
+        feathersWristDownA4
+        feathersWristDownA5
+        feathersWristDownA6
+        feathersWristDownA7
+        feathersWristDownA8
+        feathersWristDownB1
+        feathersWristDownB2
+        feathersWristDownB3
+        feathersWristDownB4
+        feathersWristDownB5
+        feathersWristDownB6
+        feathersWristDownB7
+        feathersWristDownC1
+        feathersWristDownC2
+        feathersWristDownC3
+        feathersWristDownC4
+        feathersWristDownC5
+        feathersWristDownC6
+        feathersWristDownD1
+        feathersWristDownD2
+        feathersWristDownD3
+        feathersWristDownD4
+        feathersWristDownD5
+        feathersWristDownD6
+        feathersWristDownD7
+        feathersWristDownD8
+        feathersWristDownE1
+        feathersWristDownE2;
+    select -add Wrist ;
+    parent;
+    delete
+        feathersWristDownA_grp
+        feathersWristDownB_grp
+        feathersWristDownC_grp
+        feathersWristDownD_grp
+        feathersWristDownE_grp
+        feathersWristUpA_grp
+        feathersWristUpB_grp;
+
+    select -r
+        feathersElbowUpA1
+        feathersElbowUpA2
+        feathersElbowUpA3
+        feathersElbowUpA4
+        feathersElbowUpA5
+        feathersElbowUpA6
+        feathersElbowUpA7
+        feathersElbowUpB1
+        feathersElbowUpB2
+        feathersElbowUpB3
+        feathersElbowUpB4
+        feathersElbowUpB5
+        feathersElbowUpB6
+        feathersElbowUpB7
+        feathersElbowUpB8
+        feathersElbowDownA1
+        feathersElbowDownA2
+        feathersElbowDownA3
+        feathersElbowDownA4
+        feathersElbowDownA5
+        feathersElbowDownB1
+        feathersElbowDownB2
+        feathersElbowDownB3
+        feathersElbowDownB4
+        feathersElbowDownB5
+        feathersElbowDownB6
+        feathersElbowDownB7
+        feathersElbowDownC1
+        feathersElbowDownC2
+        feathersElbowDownC3
+        feathersElbowDownC4
+        feathersElbowDownC5
+        feathersElbowDownC6
+        feathersElbowDownC7
+        feathersElbowDownC8
+        feathersElbowDownC9
+        feathersElbowDownD1
+        feathersElbowDownD2
+        feathersElbowDownD3;
+    select -add Elbow ;
+    parent;
+    delete
+        feathersElbowDownA_grp
+        feathersElbowDownB_grp
+        feathersElbowDownC_grp
+        feathersElbowDownD_grp
+        feathersElbowUpA_grp
+        feathersElbowUpB_grp;
+
+    select -r
+        feathersShoulderUpA1
+        feathersShoulderUpA2
+        feathersShoulderUpA3
+        feathersShoulderUpA4
+        feathersShoulderUpA5
+        feathersShoulderUpB1
+        feathersShoulderUpB2
+        feathersShoulderUpB3
+        feathersShoulderUpB4
+        feathersShoulderUpB5
+        feathersShoulderDownA1
+        feathersShoulderDownA2
+        feathersShoulderDownA3
+        feathersShoulderDownA4
+        feathersShoulderDownA5
+        feathersShoulderDownA6
+        feathersShoulderDownA7
+        feathersShoulderDownA8
+        feathersShoulderDownA9
+        feathersShoulderDownA10
+        feathersShoulderDownA11
+        feathersShoulderDownA12
+        feathersShoulderDownB1
+        feathersShoulderDownB2
+        feathersShoulderDownB3
+        feathersShoulderDownB4
+        feathersShoulderDownB5
+        feathersShoulderDownC1
+        feathersShoulderDownC2
+        feathersShoulderDownC3
+        feathersShoulderDownC4
+        feathersShoulderDownC5
+        feathersShoulderDownC6
+        feathersShoulderDownC7
+        feathersTail1
+        feathersTail2
+        feathersTail3
+        feathersTail4
+        feathersTail5
+        feathersTail6
+        feathersTail7;
+    select -add Shoulder ;
+    parent;
+    delete
+        feathersTail_grp
+        feathersShoulderDownA_grp
+        feathersShoulderDownB_grp
+        feathersShoulderDownC_grp
+        feathersShoulderUpA_grp
+        feathersShoulderUpB_grp;
+}
+
+{
+    string $selectjoints[] = `ls -sl`;
+    string $parentjoint;
+    string $endjoint[];
+
+    for($parentjoint in $selectjoints)
+    {
+        $endjoint = `listRelatives -c $parentjoint`;
+        float $length = `getAttr ($endjoint[0]+".tx")`;
+        int $numJoints = floor($length/20.0)+2;
+        //setAttr ($parentjoint+".twistJoints") $numJoints;
+        //setAttr ($parentjoint+".inbetweenJoints") $numJoints;
+        if($numJoints>2)
+            dazas_asFitResampleJoints($parentjoint, $endjoint[0], $numJoints);
+    }
+}

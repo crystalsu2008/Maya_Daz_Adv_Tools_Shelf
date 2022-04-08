@@ -1,0 +1,32 @@
+// List All Upstream Nodes.
+global proc string[] dazas_listAllUpstream(string $startNode, string $passedNodes[], int $depth, int $maxDepth)
+{
+    /*string $plugs[];
+    if(nodeType($startNode) == "mesh")
+    {
+        $plugs[0] = $startNode+".inMesh";
+    }
+    else
+    {
+        string $plugName[] = listAttr("-a", "-m", "-st", "*inputGeometry*", $startNode);
+        int $s = size($plugName);
+        for($i=0; $i<$s; $i++)
+        {
+            $plugs[$i] = $startNode+"."+$plugName[$i];
+        }
+    }*/
+
+    $sour = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates(listConnections("-s", 1, "-d", 0, "-scn", 1, "-sh", 1, $startNode)));
+    if( size($sour) > 0 )
+    {
+        $passedNodes = stringArrayCatenate($passedNodes, $sour);
+        if( $depth < $maxDepth )
+        {
+            for( $each in $sour )
+            {
+                $passedNodes = dazas_listAllUpstream($each,$passedNodes,($depth+1),$maxDepth);
+            }
+        }
+    }
+    return $passedNodes;
+}

@@ -1,0 +1,20 @@
+// List the complete hierarchy objects under the Parent Node.
+// Examples:
+//    dazas_listHierarchy("Root",{"Root"},0,100)
+
+global proc string[] dazas_listHierarchy(string $parentNode, string $passedNodes[], int $depth, int $maxDepth)
+{
+    $child = stringArrayRemove($passedNodes, stringArrayRemoveDuplicates( listRelatives("-c", $parentNode) ));
+    if( size($child) > 0 )
+    {
+        $passedNodes = stringArrayCatenate($passedNodes, $child);
+        if( $depth < $maxDepth )
+        {
+            for( $each in $child )
+            {
+                $passedNodes = dazas_listHierarchy($each,$passedNodes,($depth+1),$maxDepth);
+            }
+        }
+    }
+    return $passedNodes;
+}

@@ -33,7 +33,7 @@ global proc shelf_Daz_Adv_Tools () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";\ndazToAdvancedSkeletonGuide();" 
+        -command "//source \"/Users/chrissu/Documents/GitHub/Maya_Daz_Adv_Tools_Shelf/scripts/dazToAdvancedSkeletonGuide.mel\";\ndazToAdvancedSkeletonGuide();" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

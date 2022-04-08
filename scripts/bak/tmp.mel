@@ -255,6 +255,8 @@
         feathersShoulderUpB_grp;
 }
 
+// 改写了一个 dazas_asFitResampleJoints 脚本用来重新采样骨骼。
+// 下面这段是应用这个脚本批处理所有羽毛骨骼进行重新采样。
 {
     string $selectjoints[] = `ls -sl`;
     string $parentjoint;
@@ -271,3 +273,417 @@
             dazas_asFitResampleJoints($parentjoint, $endjoint[0], $numJoints);
     }
 }
+
+
+{
+    string $selectjoints[] = ls("-type", "joint", "-sl");
+    string $parentjoint;
+    string $childrenObjs[];
+    string $childObj;
+
+    for($parentjoint in $selectjoints)
+    {
+        $childrenObjs = listRelatives("-c", $parentjoint);
+        for($childObj in $childrenObjs)
+        {
+            if (objectType("-isType", "transform", $childObj))
+            {
+                rename $childObj ($parentjoint+"m");
+            }
+        }
+    }
+}
+
+
+// 在创建 AdvanceSkeleton 的 fitSkeleton 的时候，每根羽毛的骨骼有可能分成几段。
+// 这个脚本用来吸附每个分段的关节到相应的羽毛 mesh 上。
+{
+    if(!`pluginInfo -q -l nearestPointOnMesh`)
+        loadPlugin nearestPointOnMesh;
+
+    string $selectjoints[] = ls("-type", "joint", "-sl");
+    string $parentjoint;
+    string $children[];
+    string $child;
+
+    for($parentjoint in $selectjoints)
+    {
+        string $mesh = $parentjoint+"mesh";
+        $children = dazas_listHierarchy($parentjoint, {$parentjoint}, 0, 100);
+
+        for($child in $children)
+        {
+            float $inPos[] = xform ("-q", "-ws", "-t", $child);
+            float $pos[] = nearestPointOnMesh ("-ip", $inPos[0], $inPos[1], $inPos[2], "-q", "-p", $mesh);
+            //xform ("-ws", "-t", $pos[0],$pos[1],$pos[2], ($child+".scalePivot"));
+            move ("-a", "-ws", $pos[0], $pos[1], $pos[2], ($child+".scalePivot"), ($child+".rotatePivot"));
+        }
+    }
+}
+
+
+// Create joints based on every two selected vertex positions.
+{
+    if (selectPref("-q", "-tso"))
+    {
+        string $selVtxs[] = ls("-os");
+        int $i, $s=size($selVtxs);
+        select -cl;
+        for($i=0; $i<$s; $i+=2)
+        {
+
+            string $buffer[];
+            tokenize($selVtxs[$i], ".", $buffer);
+            string $name = $buffer[0]+"_Joint";
+
+            float $pos0[] = pointPosition("-w", $selVtxs[$i]);
+            float $pos1[] = pointPosition("-w", $selVtxs[$i+1]);
+            select -cl;
+            joint("-n", $name, "-p", $pos0[0], $pos0[1], $pos0[2]);
+            joint("-n", $name+"_End", "-p", $pos1[0], $pos1[1], $pos1[2]);
+        }
+    }
+    else
+    {
+        select -cl;
+        selectPref("-tso", true);
+        string $warningText = "\n    The value of the -tso/trackSelectionOrder flag of the selectPref command was NOT enable until you select vertexs.\n" +
+        "    List objects and components that are currently selected in their order of selection " +
+        "depends on the value of the -tso/trackSelectionOrder flag of the selectPref command.\n" +
+        "    I have just enabled the -tso/trackSelectionOrder flag of the selectPref command.\n" +
+        "    Please select the vertices in order again and run this command again.\n";
+        warning($warningText);
+    }
+}
+
+
+
+// 绑定选择的 mesh 与名称对应的 joint
+// 用来给许多羽毛和对应的骨骼蒙皮
+{
+    string $modelNS = "mod:";
+    string $selobjs[] = ls("-sl");
+    select -cl;
+    for($obj in $selobjs)
+    {
+        string $suffix = endString($obj, 1);
+        string $parentjoint = stringRemovePrefix($obj, $modelNS);
+        $parentjoint = "SKIN"+startString($parentjoint, size($parentjoint)-size("mesh_L"))+$suffix;
+
+        string $skinjoints[] = dazas_listHierarchy($parentjoint, {$parentjoint}, 0, 100);
+        select("-r", $obj);
+        select("-add", $skinjoints);
+
+        skinCluster("-toSelectedBones", "-bindMethod", 1, "-skinMethod", 1,
+                    "-normalizeWeights", 1, "-weightDistribution", 0,
+                    "-maximumInfluences", 3, "-dropoffRate", 1.5);
+        /*for($joint in $skinjoints)
+        {
+            setAttr($joint+".liw", 1);
+        }*/
+    }
+}
+
+// 这个没成功，想根据创建的 Sets 来绑定。
+// 绑定选择的每个 Sets 的顶点与名称对应的 joint
+// 用来给许多羽毛和对应的骨骼蒙皮
+{
+    string $modelNS = "model:";
+    string $selsets[] = ls("-sl");
+    select -cl;
+    for($set in $selsets)
+    {
+        string $suffix = endString($set, 1);
+        string $parentjoint = stringRemovePrefix($set, $modelNS);
+        $parentjoint = startString($parentjoint, size($parentjoint)-size("set_L"))+$suffix;
+
+        string $skinjoints[] = dazas_listHierarchy($parentjoint, {$parentjoint}, 0, 100);
+        select("-r", $set);
+        select("-add", $skinjoints);
+
+        skinCluster("-toSelectedBones", "-bindMethod", 1, "-skinMethod", 0,
+                    "-normalizeWeights", 1, "-weightDistribution", 0,
+                    "-maximumInfluences", 3, "-dropoffRate", 4.0);
+        for($joint in $skinjoints)
+        {
+            setAttr($joint+".liw", 1);
+        }
+    }
+}
+
+SmoothBindSkin
+
+
+/////////
+// 为每一个选择的物体创建包含其所有顶点的 Set
+{
+    string $selobjs[] = ls("-sl");
+    select -cl;
+    for($obj in $selobjs)
+    {
+        string $suffix = endString($obj, 1);
+        string $set = startString($obj, size($obj)-6) + "set_" + $suffix;
+        select("-r", $obj+".vtx[0:99999999]");
+        sets("-n",$set);
+    }
+}
+
+
+
+
+// 根据骨骼层级创建和与其完全一致的 NURBS 控制环层级。
+// 此功能为了使用 Overlapper 脚本制作跟随动画。
+//
+// 在制作翅膀绑定的时候，创建了过多的羽毛物体，
+// 而 AdvancedSkeleton 的控制器又过于复杂，造成使用 Overlapper 脚本时速度非常缓慢。
+// 由于 Overlapper 脚本只识别 NURBS 曲线类型的控制器，
+// 所以需要创建一套非常简介的具有和骨骼相同层级关系的曲线物体层级，来应用 Overlapper 脚本。
+// 然后在后续步骤中再将这个曲线层级上的 Overlap 动画应用到翅膀 AdvancedSkeleton 控制器上。
+//
+// Examples:
+//    dazas_jointsOverlapHandle("","","Root_M",{"Root_M"},0,100)
+global proc string[] dazas_jointsOverlapHandle(string $NS, string $grand_ol, string $parent, string $passed[], int $depth, int $maxDepth)
+{
+    string $target = $parent;
+
+    string $parentjoint = stringRemovePrefix($parent, $NS);
+    string $parent_fk = $NS+"FK"+$parentjoint;
+    if( `objExists $parent_fk` )
+        $target = $parent_fk;
+
+    string $parent_ol[] = circle("-n", $NS+"OL"+$parentjoint);
+    float $pos[] = xform ("-q", "-ws", "-t", $target);
+    //float $rot[] = xform ("-q", "-ws", "-ro", $target);
+    setAttr ($parent_ol[0]+".t", "-type", "float3", $pos[0],$pos[1],$pos[2]);
+    //setAttr ($parent_ol[0]+".r", "-type", "float3", $rot[0],$rot[1],$rot[2]);
+    if($grand_ol != "")
+        parent($parent_ol[0], $grand_ol);
+
+    string $children[] = listRelatives("-c", $parent);
+    if( size($children) > 0 )
+    {
+        $passed = stringArrayCatenate($passed, $children);
+        if( $depth < $maxDepth )
+        {
+            for( $child in $children )
+            {
+                $passed = dazas_jointsOverlapHandle($NS, $parent_ol[0], $child, $passed, ($depth+1), $maxDepth);
+            }
+        }
+    }
+    return $passed;
+}
+// 旧的版本，只根据骨骼创建，不考虑骨骼是否有对应的 FK 控制器,不支持名字空间。
+//
+// Examples:
+//    dazas_joints2Handle("","Root_M",{"Root_M"},0,100)
+global proc string[] dazas_joints2Handle(string $grand_handle, string $parent, string $passed[], int $depth, int $maxDepth)
+{
+    string $parent_handle[] = circle("-n", $parent+"_H");
+
+    float $pos[] = xform ("-q", "-ws", "-t", $parent);
+    //float $rot[] = xform ("-q", "-ws", "-rt", $parent);
+
+    setAttr ($parent_handle[0]+".t", "-type", "float3", $pos[0],$pos[1],$pos[2]);
+    //setAttr ($parent_handle[0]+".r", "-type", "float3", $rot[0],$rot[1],$rot[2]);
+
+    if($grand_handle != "")
+        parent($parent_handle[0], $grand_handle);
+
+    $child = listRelatives("-c", $parent);
+    if( size($child) > 0 )
+    {
+        $passed = stringArrayCatenate($passed, $child);
+        if( $depth < $maxDepth )
+        {
+            for( $each in $child )
+            {
+                $passed = dazas_joints2Handle($parent_handle[0], $each, $passed, ($depth+1), $maxDepth);
+            }
+        }
+    }
+    return $passed;
+}
+
+
+
+// 选择 FK 控制器对应的 OL 控制器
+// Examples:
+//  dazas_FK2OL("rig:", 0)
+global proc string[] dazas_FK2OL(string $NS, int $mode)
+{
+    string $overlapCtrls[];
+    string $selFKCtrls[] = ls("-sl");
+    select -cl;
+    for($fk_ctrl in $selFKCtrls)
+    {
+        string $ctrlname = stringRemovePrefix($fk_ctrl, $NS+"FK");
+        string $ol_ctrl = $NS+"OL"+$ctrlname;
+        if( `objExists $ol_ctrl` )
+        {
+            $overlapCtrls[size($overlapCtrls)] = $ol_ctrl;
+            if( $mode==1 )
+                parentConstraint -mo -weight 1 $fk_ctrl $ol_ctrl;
+            else if( $mode==-1 )
+                parentConstraint -mo -weight 1 $ol_ctrl $fk_ctrl;
+            else
+                select("-add", $ol_ctrl);
+        }
+    }
+    return $overlapCtrls;
+}
+// 选择 OL 控制器对应的 FK 控制器
+// Examples:
+//  dazas_OL2FK("rig:", 0)
+global proc string[] dazas_OL2FK(string $NS, int $mode)
+{
+    string $fkCtrls[];
+    string $selOLCtrls[] = ls("-sl");
+    select -cl;
+    for($ol_ctrl in $selOLCtrls)
+    {
+        string $ctrlname = stringRemovePrefix($ol_ctrl, $NS+"OL");
+        string $fk_ctrl = $NS+"FK"+$ctrlname;
+        if( `objExists $fk_ctrl` )
+        {
+            $fkCtrls[size($fkCtrls)] = $fk_ctrl;
+            if( $mode==1 )
+                parentConstraint -mo -weight 1 $ol_ctrl $fk_ctrl;
+            else if( $mode==-1 )
+                parentConstraint -mo -weight 1 $fk_ctrl $ol_ctrl;
+            else
+                select("-add", $fk_ctrl);
+        }
+    }
+    return $fkCtrls;
+}
+
+
+
+// 选择引导曲线约束 FK上层 Offset 组的 aimConstraint 物体
+// 用来取消引导曲线对羽毛骨骼的控制，加快绑定的反应速度
+select `ls "rig:FKCurveGuide*aimConstraint1"`;
+
+
+
+// 根据骨骼创建 Spline IK 所需要的曲线。
+{
+    string $skinJointGrps[] = ls("-sl");
+    select -cl;
+    for($jointGroup in $skinJointGrps)
+    {
+        string $splineName = stringRemovePrefix($jointGroup, "SKIN");
+        $splineName = "SPLINE"+startString($splineName, (size($splineName)-4));
+
+        string $joints[] = `listRelatives -ad $jointGroup`;
+        int $s = size($joints);
+        int $i;
+        float $pos[], $allpos[];
+        string $cmd = "curve";
+        for($i=$s-1;$i>=0;$i--)
+        {
+            $pos = xform ("-q", "-ws", "-t", $joints[$i]);
+            $cmd += " -ep "+$pos[0]+" "+$pos[1]+" "+$pos[2];
+        }
+        $cmd += ";";
+        string $curve = `eval $cmd`;
+        parent $curve $jointGroup;
+        rename $curve $splineName;
+    }
+}
+
+
+// 重命名 Make SelectCurvesDynamicHairs 创建的曲线。
+{
+    string $selobjs[] = `ls -sl`;
+    for($obj in $selobjs)
+    {
+        string $follicleShape[] = listConnections("-s", 1, "-d", 0, "-scn", 1, "-sh", 1, ($obj+".create"));
+        string $follicle[] = `listRelatives -p $follicleShape[0]`;
+
+        string $splineShape[] = listConnections("-s", 1, "-d", 0, "-scn", 1, "-sh", 1, ($follicleShape[0]+".startPosition"));
+        string $spline[] = `listRelatives -p $splineShape[0]`;
+
+        string $curveName = $spline[0];
+        string $target = `rename $spline[0] ($spline[0]+"_Target")`;
+        rename $obj $curveName;
+
+        string $follicleName = "FOLLICLE"+stringRemovePrefix($curveName, "SPLINE");
+        rename $follicle[0] $follicleName;
+    }
+}
+
+
+// 约束羽毛的毛囊到 Adv 的骨骼上。
+{
+    string $NS = "feather:";
+    string $selfollices[] = ls("-sl");
+    select -cl;
+    for($follice in $selfollices)
+    {
+        string $jointName = stringRemovePrefix($follice, ($NS+"FOLLICLE"));
+        parentConstraint -weight 1 $jointName $follice;
+    }
+}
+{
+string $NS = "feather:";
+parentConstraint -weight 1 Shoulder_R ($NS+"SKINShoulder_R_Grp");
+parentConstraint -weight 1 Elbow_R ($NS+"SKINElbow_R_Grp");
+parentConstraint -weight 1 Wrist_R ($NS+"SKINWrist_R_Grp");
+parentConstraint -weight 1 IndexFinger1_R ($NS+"SKINIndexFinger1_R_Grp");
+parentConstraint -weight 1 Shoulder_L ($NS+"SKINShoulder_L_Grp");
+parentConstraint -weight 1 Elbow_L ($NS+"SKINElbow_L_Grp");
+parentConstraint -weight 1 Wrist_L ($NS+"SKINWrist_L_Grp");
+parentConstraint -weight 1 IndexFinger1_L ($NS+"SKINIndexFinger1_L_Grp");
+}
+// 约束羽毛的蒙皮骨骼到 Adv 的骨骼上。
+{
+    string $NS = "feather:";
+    string $skinJointGrps[] = ls("-sl");
+    select -cl;
+    for($jointGroup in $skinJointGrps)
+    {
+        string $jointName = stringRemovePrefix($jointGroup, ($NS+"SKIN"));
+        int $s = size($jointName);
+        $jointName = startString($jointName, ($s-4));
+        parentConstraint -weight 1 $jointName $jointGroup;
+    }
+}
+
+
+// 创建羽毛的曲线IK
+{
+    string $skinJointGrps[] = ls("-sl");
+    select -cl;
+    for($jointGroup in $skinJointGrps)
+    {
+        string $advJointName = stringRemovePrefix($jointGroup, "SKIN");
+        $advJointName = startString($advJointName, (size($advJointName)-4));
+
+        string $splineName = "SPLINE"+$advJointName;
+
+        string $skinJoints[] = `listRelatives -ad $jointGroup`;
+
+        ikHandle -sol ikSplineSolver -ccv false -pcv false -roc true
+            -curve $splineName
+            -startJoint $skinJoints[size($skinJoints)-1]
+            -endEffector $skinJoints[0]
+            -name ("IK"+$advJointName);
+    }
+}
+
+
+// 删除节数小于某个值的羽毛骨骼组
+{
+    string $skinJointGrps[] = ls("-sl");
+    select -cl;
+    for($jointGroup in $skinJointGrps)
+    {
+        int $num = size(`listRelatives -ad $jointGroup`);
+        if ($num<3)
+            delete $jointGroup;
+    }
+}
+
+// 删除选择物体以下所有层级的父子约束节点
+delete `listRelatives -ad -type parentConstraint`

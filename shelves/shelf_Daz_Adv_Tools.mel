@@ -9,8 +9,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -25,6 +25,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "Guide" 
         -overlayLabelColor 1 1 1 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -43,8 +44,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -59,6 +60,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "OrigM" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -77,8 +79,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -93,6 +95,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "ReExpJ" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -111,8 +114,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -127,6 +130,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "Connect" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -143,10 +147,10 @@ global proc shelf_Daz_Adv_Tools () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 37
+        -flexibleWidthValue 38
         -enable 1
-        -width 40
-        -height 32
+        -width 41
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -161,6 +165,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "Disconnect" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -179,8 +184,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -195,6 +200,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "FacePre" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -213,8 +219,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -229,6 +235,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "FaceFit" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -247,8 +254,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -263,6 +270,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "LWOH" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -281,8 +289,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -297,6 +305,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "ImFaAn" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -315,8 +324,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -331,6 +340,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "ReFaAn" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -349,8 +359,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -365,6 +375,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "VtxInf" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -383,8 +394,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -399,6 +410,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "InfVtx" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -417,8 +429,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -433,6 +445,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "CHW" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -451,8 +464,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -467,6 +480,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "HHW" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -485,8 +499,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -501,6 +515,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "MHW" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -519,8 +534,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -535,6 +550,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "HNW" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -553,8 +569,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -569,6 +585,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "BaSW" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -587,8 +604,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -603,6 +620,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "BlSW" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -621,8 +639,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -637,6 +655,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "RT" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -655,8 +674,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -671,6 +690,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "<<--" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -689,8 +709,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -705,6 +725,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "-->>" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -723,8 +744,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -739,6 +760,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "Cmd" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -757,8 +779,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -773,6 +795,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "T-Pose" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -791,8 +814,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -807,6 +830,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "foot" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -825,8 +849,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -841,6 +865,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "MaToe" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -859,8 +884,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -875,6 +900,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "betwist" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -893,8 +919,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -909,6 +935,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "D->A" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -927,8 +954,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -943,6 +970,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "D x A" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -961,8 +989,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -977,6 +1005,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "D->A" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -995,8 +1024,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1011,6 +1040,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "A->D" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1029,8 +1059,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1045,6 +1075,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "A x D" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1063,8 +1094,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1079,6 +1110,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "Bind" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1097,8 +1129,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1113,6 +1145,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "SBuild" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1131,8 +1164,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1147,6 +1180,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "RBuild" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1165,8 +1199,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1181,6 +1215,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "MVtxs" 
         -overlayLabelColor 1 1 1 
         -overlayLabelBackColor 1 0.25 0 0.5 
@@ -1199,8 +1234,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1215,6 +1250,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "MCL" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1233,8 +1269,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1249,6 +1285,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "RevCon" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1267,8 +1304,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1283,6 +1320,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "FixREye" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
@@ -1301,8 +1339,8 @@ global proc shelf_Daz_Adv_Tools () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 33
-        -height 32
+        -width 35
+        -height 34
         -manage 1
         -visible 1
         -preventOverride 0
@@ -1317,6 +1355,7 @@ global proc shelf_Daz_Adv_Tools () {
         -flipX 0
         -flipY 0
         -useAlpha 1
+        -font "plainLabelFont" 
         -imageOverlayLabel "FixLEye" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
